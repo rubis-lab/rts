@@ -88,7 +88,7 @@ setup(
     # need to place data files outside of your packages. See:
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/rts_data'
-    #data_files=[('rts_data', ['data/data_file'])],
+    # data_files=[('rts_data', ['data/data_file'])],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
@@ -99,4 +99,7 @@ setup(
         ],
     },
     zip_safe=False,
+
+    # style checker
+    setup_requires=['setuptools-pep8'],
 )

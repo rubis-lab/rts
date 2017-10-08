@@ -1,3 +1,2 @@
 def rts_print():
-    return (u'RTS Installed')
-            
+    return (u'RTS')
