@@ -29,7 +29,7 @@ class TaskSet(object):
         return
 
     def __iter__(self):
-        return self.task_list.itervalues()
+        return iter(self.task_list)
 
     def append(self, t):
         self.task_list.append(t)
