@@ -4,9 +4,9 @@ class Task(object):
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', type(self).cnt)
-        self.exec_time = kwargs.get('exec_time', 0)
-        self.deadline = kwargs.get('deadline', 0)
-        self.period = kwargs.get('period', 0)
+        self.exec_time = float(kwargs.get('exec_time', 0))
+        self.deadline = float(kwargs.get('deadline', 0))
+        self.period = float(kwargs.get('period', 0))
 
         type(self).cnt += 1
 

@@ -3,6 +3,7 @@ from rts.core.task import Task
 from rts.core.taskset import TaskSet
 from rts.gen.gen import Gen
 
+
 class GenTestCase(unittest.TestCase):
     """ Tests for `gen.py`."""
 
@@ -26,6 +27,6 @@ class GenTestCase(unittest.TestCase):
 
         self.assertTrue(ts[0].exec_time <= 10)
         self.assertTrue(ts[0].exec_time >= 0)
-        
+
 if __name__ == '__main__':
     unittest.main()
