@@ -3,14 +3,10 @@ class Task(object):
     cnt = 0
 
     def __init__(self, **kwargs):
-
         self.id = kwargs.get('id', type(self).cnt)
         self.exec_time = kwargs.get('exec_time', 0)
         self.deadline = kwargs.get('deadline', 0)
         self.period = kwargs.get('period', 0)
-
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
         type(self).cnt += 1
 
