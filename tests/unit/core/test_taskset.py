@@ -4,30 +4,44 @@ from rts.core.taskset import TaskSet
 
 
 class TaskSetTestCase(unittest.TestCase):
-    """ Tests for `task.py`."""
+    """ Tests for `taskset.py`."""
 
     def test_id_does_not_overlap(self):
-        param = {}
-        ts1 = TaskSet(**param)
-        ts2 = TaskSet(**param)
+        ts1 = TaskSet()
+        ts2 = TaskSet()
         self.assertNotEqual(ts1.id, ts2.id)
 
     def test_task_is_counted(self):
-        param = {}
-        ts = TaskSet(**param)
-        t1 = Task(**param)
-        t2 = Task(**param)
+        ts = TaskSet()
+        t1 = Task()
+        t2 = Task()
         ts.append(t1)
         ts.append(t2)
         self.assertEqual(len(ts), 2)
 
     def test_taskset_is_cleared(self):
-        param = {}
-        ts = TaskSet(**param)
-        t1 = Task(**param)
+        ts = TaskSet()
+        t1 = Task()
         ts.append(t1)
         ts.clear()
         self.assertEqual(len(ts), 0)
+
+    def test_task_getter(self):
+        ts = TaskSet()
+        param = {'id': 2}
+        t = Task(**param)
+        ts.append(t)
+        self.assertEqual(ts[0].id, 2)
+
+    def test_task_setter(self):
+        ts = TaskSet()
+        param1 = {'id': 2}
+        t1 = Task(**param1)
+        ts.append(t1)
+        param2 = {'id': 3}
+        t2 = Task(**param2)
+        ts[0] = t2
+        self.assertEqual(ts[0].id, 3)
 
 if __name__ == '__main__':
     unittest.main()

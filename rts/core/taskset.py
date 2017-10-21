@@ -21,6 +21,16 @@ class TaskSet(object):
     def __len__(self):
         return len(self.task_list)
 
+    def __getitem__(self, idx):
+        return self.task_list[idx]
+
+    def __setitem__(self, idx, val):
+        self.task_list[idx] = val
+        return
+
+    def __iter__(self):
+        return self.task_list.itervalues()
+
     def append(self, t):
         self.task_list.append(t)
         return
