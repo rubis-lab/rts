@@ -74,7 +74,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': ['check-manifest'],
-        'test': ['coverage'],
+        'test': ['coverage', 'nose'],
     },
 
     # If there are data files included in your packages that need to be
@@ -102,4 +102,7 @@ setup(
 
     # style checker
     setup_requires=['setuptools-pep8'],
+
+    # tests
+    test_suite='nose.collector',
 )

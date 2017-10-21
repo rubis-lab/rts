@@ -10,5 +10,6 @@ python setup.py sdist
 # Universal Wheels
 python setup.py bdist_wheel
 
-# PEP8 - W291
+# PEP8 -
+# Handling W291 error
 vim:%s/\s\+$//e
