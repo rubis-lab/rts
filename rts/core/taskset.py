@@ -1,6 +1,3 @@
-from .task import Task
-
-
 class TaskSet(object):
     'Basic taskset class'
     cnt = 0

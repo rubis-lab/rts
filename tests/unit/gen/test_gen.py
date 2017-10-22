@@ -1,6 +1,4 @@
 import unittest
-from rts.core.task import Task
-from rts.core.taskset import TaskSet
 from rts.gen.gen import Gen
 
 

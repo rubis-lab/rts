@@ -1,7 +1,3 @@
-from rts.core.task import Task
-from rts.core.taskset import TaskSet
-
-
 def calc_utilization(t):
     return t.exec_time / t.period
 
