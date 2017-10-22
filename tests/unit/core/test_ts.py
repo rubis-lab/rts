@@ -43,5 +43,6 @@ class TaskSetTestCase(unittest.TestCase):
         ts[0] = t2
         self.assertEqual(ts[0].id, 3)
 
+
 if __name__ == '__main__':
     unittest.main()

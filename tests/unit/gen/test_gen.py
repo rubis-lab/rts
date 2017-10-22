@@ -26,5 +26,6 @@ class GenTestCase(unittest.TestCase):
         self.assertTrue(ts[0].exec_time <= 10)
         self.assertTrue(ts[0].exec_time >= 0)
 
+
 if __name__ == '__main__':
     unittest.main()

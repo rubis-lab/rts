@@ -10,5 +10,6 @@ class TaskTestCase(unittest.TestCase):
         self.assertNotEqual(t1.id, t2.id)
         self.assertNotEqual(t1.tid, t2.tid)
 
+
 if __name__ == '__main__':
     unittest.main()

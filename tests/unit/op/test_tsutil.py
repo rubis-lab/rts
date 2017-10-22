@@ -1,12 +1,12 @@
-import unittest
-from nose.tools import assert_almost_equals
-
 from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.op import tsutil
 
+import unittest
+from nose.tools import assert_almost_equals
 
-class TsutilTestCase(unittest.TestCase):
+
+class TutilTestCase(unittest.TestCase):
     """ Tests for `tsutil.py`."""
 
     def test_max_density(self):
@@ -52,6 +52,7 @@ class TsutilTestCase(unittest.TestCase):
         ts.append(t)
         diff = tsutil.sum_utilization(ts) - tsutil.sum_density(ts)
         assert_almost_equals(diff, -0.15)
+
 
 if __name__ == '__main__':
     unittest.main()
