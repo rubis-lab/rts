@@ -24,7 +24,8 @@ class Task(object):
             self.id,
             self.exec_time,
             self.deadline,
-            self.period)
+            self.period
+        )
 """
 param = {'exec_time': 1, 'deadline': 2, 'period': 3}
 

@@ -2,7 +2,7 @@ import unittest
 from nose.tools import assert_almost_equals
 
 from rts.core.task import Task
-from rts.core.taskset import TaskSet
+from rts.core.ts import TaskSet
 from rts.op import tsutil
 
 

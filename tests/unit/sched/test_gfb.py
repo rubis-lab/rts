@@ -1,7 +1,7 @@
 import unittest
 
 from rts.core.task import Task
-from rts.core.taskset import TaskSet
+from rts.core.ts import TaskSet
 from rts.sched import gfb
 
 
