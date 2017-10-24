@@ -1,6 +1,7 @@
-import unittest
 from rts.core.task import Task
 from rts.core.ts import TaskSet
+
+import unittest
 
 
 class TaskSetTestCase(unittest.TestCase):

@@ -1,6 +1,3 @@
-from rts.core.task import Task
-from rts.core.ts import TaskSet
-
 import math
 
 # Each task's slack is tracked
@@ -62,24 +59,3 @@ def is_schedulable(ts, **kwargs):
             return True
 
     return False
-
-"""
-task_param1 = {
-    'exec_time': 4,
-    'deadline': 10,
-    'period': 10,
-}
-t1 = Task(**task_param1)
-task_param2 = {
-    'exec_time': 6,
-    'deadline': 10,
-    'period': 10,
-}
-t2 = Task(**task_param2)
-ts = TaskSet()
-ts.append(t1)
-ts.append(t2)
-slack = [0.0, 0.0]
-
-print(calc_interference(t1, t2))
-"""

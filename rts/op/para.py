@@ -22,11 +22,11 @@ def parallelize_task(t, **kwargs):
 
     """
     normalize variance
-    variance = 0 --> max 0 difference 
+    variance = 0 --> max 0 difference
     a = Ck' .. b = Ck'
     variance = 1 --> max Ck difference
     a = 0 	.. b = Ck
-    
+
     a = Ck'(1 - variance)
     b = Ck'(1 + (Ck - Ck') * variance)
     """

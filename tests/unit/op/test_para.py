@@ -16,7 +16,7 @@ class ParaTestCase(unittest.TestCase):
         }
         t = Task(**task_param)
 
-        para_param  = {
+        para_param = {
             'pcs': 2,
             'overhead': 0.0,
             'variance': 0.0,

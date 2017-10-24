@@ -29,5 +29,6 @@ class BCLTestCase(unittest.TestCase):
         }
         self.assertTrue(bcl.is_schedulable(ts, **bcl_param))
 
+
 if __name__ == '__main__':
     unittest.main()
