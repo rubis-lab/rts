@@ -23,14 +23,22 @@ class ParaTaskSet(object):
         return self.thr_list[t_idx][thr_idx]
 
     def __setitem__(self, idx, val):
-        self.thr_list[idx] = val
+        t_idx, thr_idx = idx
+        self.thr_list[t_idx][thr_idx] = val
         return
 
     def __iter__(self):
         return iter(self.thr_list)
 
-    def append(self, t):
-        self.thr_list.append(t)
+    def append(self, t, t_idx=-1):
+        # adding thread list
+        if t_idx < 0:
+            self.thr_list.append(t)
+        # adding single thread at a time
+        else:
+            while len(self.thr_list) <= t_idx:
+                self.thr_list.append([])
+            self.thr_list[t_idx].append(t)
         return
 
     def clear(self):
