@@ -5,6 +5,7 @@ class ParaTaskSet(object):
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', type(self).cnt)
         self.thr_list = []
+        self.thr_list_seq = self.thr_list
 
         type(self).cnt += 1
 
@@ -28,7 +29,11 @@ class ParaTaskSet(object):
         return
 
     def __iter__(self):
-        return iter(self.thr_list)
+        return iter(self.thr_list_seq)
+
+    def __next__(self):
+
+        return
 
     def append(self, t, t_idx=-1):
         # adding thread list

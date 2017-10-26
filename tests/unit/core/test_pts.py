@@ -83,6 +83,30 @@ class PTSTestCase(unittest.TestCase):
         self.assertEqual(pts[0, 0].id, 0)
         self.assertEqual(pts[1, 0].id, 2)
 
+    def test_pts_seq_list_iterator(self):
+        thr_param11 = {
+            'id': 0,
+        }
+        thr11 = Thread(**thr_param11)
+        thr_param12 = {
+            'id': 1,
+        }
+        thr12 = Thread(**thr_param12)
+        thr_param21 = {
+            'id': 2,
+        }
+        thr21 = Thread(**thr_param21)
+        pts = ParaTaskSet()
+        pts.append(thr11, 0)
+        pts.append(thr12, 0)
+        pts.append(thr21, 1)
+
+        idx = 0
+        for thr in pts:
+            if idx == 2:
+                self.assertEqual(thr.id, 2)
+            idx += 1
+
 
 if __name__ == '__main__':
     unittest.main()
