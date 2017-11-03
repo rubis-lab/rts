@@ -1,14 +1,11 @@
 import math
 
-# Each task's slack is tracked
-slack = []
-
 
 def calc_interference(base_task, inter_task):
     n_inter_task = math.floor(base_task.deadline / inter_task.period)
 
-    carry_in = math.fmod(base_task.deadline, inter_task.period) \
-        - slack[inter_task.id]
+    carry_in = math.fmod(base_task.deadline, inter_task.period)\
+        - inter_task.slack
 
     if carry_in < 0.0:
         carry_in = 0.0
@@ -24,9 +21,9 @@ def calc_interference(base_task, inter_task):
 def is_schedulable(ts, **kwargs):
     num_core = float(kwargs.get('num_core', 1.0))
 
-    del slack[:]
-    for i in range(len(ts)):
-        slack.append(0.0)
+    # init slack of each task
+    for t in ts:
+        t.slack = 0.0
 
     # Terminate condition
     updated = True
@@ -40,7 +37,7 @@ def is_schedulable(ts, **kwargs):
             # Add up all demands from interfering tasks
             sum_j = 0.0
             for inter_task in ts:
-                if base_task.id != inter_task.id:
+                if base_task != inter_task:
                     sum_j += calc_interference(base_task, inter_task)
             sum_j = math.floor(sum_j / num_core)
 
@@ -51,8 +48,8 @@ def is_schedulable(ts, **kwargs):
                 sched = False
 
             # continue if slack is updated
-            elif slack_tmp > slack[base_task.id]:
-                slack[base_task.id] = slack_tmp
+            elif slack_tmp > base_task.slack:
+                base_task.slack = slack_tmp
                 updated = True
 
         if sched:

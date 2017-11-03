@@ -22,7 +22,7 @@ class PTSTestCase(unittest.TestCase):
         pts.append(thr_list1)
         pts.append(thr_list2)
 
-        self.assertEqual(len(pts), 2)
+        self.assertEqual(len(pts), 3)
 
     def test_get_thr(self):
         thr11 = Thread()
@@ -32,35 +32,18 @@ class PTSTestCase(unittest.TestCase):
         thr_list1.append(thr11)
         thr_list1.append(thr12)
 
-        thr21 = Thread()
+        thr_param21 = {
+            'id': 2,
+        }
+        thr21 = Thread(**thr_param21)
         thr_list2 = []
         thr_list2.append(thr21)
 
         pts = ParaTaskSet()
         pts.append(thr_list1)
         pts.append(thr_list2)
-        self.assertNotEqual(pts[0, 0].id, pts[1, 0].id)
-
-    def test_set_thr(self):
-        thr_param1 = {
-            'id': 0,
-        }
-        thr1 = Thread(**thr_param1)
-
-        thr_list = []
-        thr_list.append(thr1)
-
-        pts = ParaTaskSet()
-        pts.append(thr_list)
-
-        thr_param2 = {
-            'id': 2,
-        }
-        thr2 = Thread(**thr_param2)
-
-        pts[0, 0] = thr2
-
-        self.assertEqual(pts[0, 0].id, 2)
+        self.assertNotEqual(pts[0][0].id, pts[1][0].id)
+        self.assertEqual(pts[1][0].id, 2)
 
     def test_pts_append(self):
         thr_param11 = {
@@ -80,8 +63,9 @@ class PTSTestCase(unittest.TestCase):
         pts.append(thr12, 0)
         pts.append(thr21, 1)
 
-        self.assertEqual(pts[0, 0].id, 0)
-        self.assertEqual(pts[1, 0].id, 2)
+        self.assertEqual(pts[0][0].id, 0)
+        self.assertEqual(pts[0][1].id, 1)
+        self.assertEqual(pts[1][0].id, 2)
 
     def test_pts_seq_list_iterator(self):
         thr_param11 = {

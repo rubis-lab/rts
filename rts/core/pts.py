@@ -4,8 +4,8 @@ class ParaTaskSet(object):
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', type(self).cnt)
-        self.thr_list = []
-        self.thr_list_seq = self.thr_list
+        self.thr_list_seq = []
+        self.thr_cnt = [0]
 
         type(self).cnt += 1
 
@@ -17,35 +17,46 @@ class ParaTaskSet(object):
             self.id)
 
     def __len__(self):
-        return len(self.thr_list)
+        return len(self.thr_list_seq)
 
     def __getitem__(self, idx):
-        t_idx, thr_idx = idx
-        return self.thr_list[t_idx][thr_idx]
-
-    def __setitem__(self, idx, val):
-        t_idx, thr_idx = idx
-        self.thr_list[t_idx][thr_idx] = val
-        return
+        return self.thr_list_seq[self.thr_cnt[idx]:self.thr_cnt[idx + 1]]
 
     def __iter__(self):
         return iter(self.thr_list_seq)
 
-    def __next__(self):
+    def shift_thr_cnt_right(self, t_idx):
+        for curr_t_idx in range(len(self.thr_cnt)):
+            if curr_t_idx > t_idx:
+                self.thr_cnt[curr_t_idx] += 1
+        return
 
+    def shift_thr_cnt_left(self, t_idx):
+        for curr_t_idx in range(len(self.thr_cnt)):
+            if curr_t_idx > t_idx:
+                self.thr_cnt[curr_t_idx] -= 1
         return
 
     def append(self, t, t_idx=-1):
-        # adding thread list
+        # insert list of items
         if t_idx < 0:
-            self.thr_list.append(t)
-        # adding single thread at a time
+            self.thr_list_seq[len(self.thr_list_seq):] = t
+            self.thr_cnt.append(self.thr_cnt[-1] + len(t))
+
+        # insert single item
         else:
-            while len(self.thr_list) <= t_idx:
-                self.thr_list.append([])
-            self.thr_list[t_idx].append(t)
-        return
+            # if sibling thread already exist in list
+            if t_idx + 1 < len(self.thr_cnt):
+                self.thr_list_seq.insert(self.thr_cnt[t_idx + 1], t)
+                self.shift_thr_cnt_right(t_idx)
+
+            # if sibling thread not in list
+            else:
+                self.thr_list_seq.append(t)
+                while t_idx + 1 > len(self.thr_cnt):
+                    self.thr_cnt.append(self.thr_cnt[-1])
+                self.thr_cnt.append(self.thr_cnt[-1] + 1)
 
     def clear(self):
-        del self.thr_list[:]
+        del self.thr_list_seq[:]
         return
