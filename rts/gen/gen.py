@@ -33,7 +33,7 @@ class Gen(object):
             'max_period = ' + str(self.max_period) + '\n'
         return info
 
-    def next_task(self):
+    def next_task(self, **kwargs):
         task_param = {
             'exec_time': random.randint(
                 self.min_exec_time, self.max_exec_time),
@@ -53,21 +53,21 @@ class Gen(object):
             ts.append(t)
         return ts
 
-"""
-gen_param = {
-    'num_task': 10,
-    'min_exec_time': 0,
-    'max_exec_time': 10,
-    'min_deadline': 0,
-    'max_deadline': 10,
-    'min_period': 0,
-    'max_period': 10,
-}
-g = Gen(**gen_param)
-ts = g.next_task_set()
 
-for t in ts:
-    print(t)
+if __name__ == '__main__':
+    gen_param = {
+        'num_task': 10,
+        'min_exec_time': 0,
+        'max_exec_time': 10,
+        'min_deadline': 0,
+        'max_deadline': 10,
+        'min_period': 0,
+        'max_period': 10,
+    }
+    g = Gen(**gen_param)
+    ts = g.next_task_set()
 
-print(g)
-"""
+    for t in ts:
+        print(t)
+
+    print(g)
