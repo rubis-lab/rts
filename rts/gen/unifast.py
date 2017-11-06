@@ -51,6 +51,7 @@ class Unifast(Gen):
         ts = TaskSet()
         for i in range(self.num_task):
             t = self.next_task(cand_util=divided_util[i])
+            t.id = i
             ts.append(t)
         return ts
 

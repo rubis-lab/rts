@@ -1,3 +1,6 @@
+from rts.op import tsutil
+
+
 class TaskSet(object):
     'Basic taskset class'
     cnt = 0
@@ -12,8 +15,16 @@ class TaskSet(object):
         type(self).cnt -= 1
 
     def __str__(self):
-        return "%d\t" % (
-            self.id)
+        tot_util = tsutil.sum_utilization(self)
+
+        info_str = '%d\t%.2f\n' % (
+            len(self.task_list),
+            tot_util)
+
+        for t in self.task_list:
+            info_str += t.__str__() + '\n'
+
+        return info_str
 
     def __len__(self):
         return len(self.task_list)

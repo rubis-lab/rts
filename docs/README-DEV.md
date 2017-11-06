@@ -2,7 +2,7 @@
 python setup.py pep8
 
 # Dev Mode
-pip install -e
+pip install -e .
 
 # Source Distribution
 python setup.py sdist
