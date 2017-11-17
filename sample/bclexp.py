@@ -15,7 +15,7 @@ if __name__ == '__main__':
     print(u)
     print('--------')
 
-    num_iter = 5
+    num_iter = 10
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
         # test using various tests
         sched_param = {
-            'num_core': 4,
+            'num_core': 3,
         }
         sched_bcl = bcl.is_schedulable(ts, **sched_param)
         sched_gfb = gfb.is_schedulable(ts, **sched_param)

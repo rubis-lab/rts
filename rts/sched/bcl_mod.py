@@ -1,66 +1,83 @@
 import math
 
 
-def calc_whole_inclusion(base_thr, inter_thr, offset):
-    n_inter_thr = math.floor(base_thr.deadline - offset / inter_thr.period)
+def calc_whole_inclusion(base_task, inter_task, offset):
+    if offset >= base_task.deadline:
+        return 0.0
 
-    return n_inter_thr * inter_thr.exec_time
+    n_inter_task = math.floor((base_task.deadline -
+                               offset) / inter_task.period)
+
+    return n_inter_task * inter_task.exec_time
 
 
-def calc_offsets(pts, base_thr, inter_thr):
-    base_interval = base_thr.deadline
-    rem1 = math.fmod(base_interval, inter_thr.period)
+def calc_carry_in_using_slack(base_task, inter_task, offset):
+    if offset >= base_task.deadline:
+        return 0.0
+
+    # carry-ins calculated from slack values
+    carry_in = math.fmod(base_task.deadline - offset,
+                         inter_task.period) - inter_task.slack
+
+    # carry-in has to be positive
+    if carry_in < 0.0:
+        carry_in = 0.0
+
+    # carry-in cannot exceed the actual execution time
+    return min(inter_task.exec_time, carry_in)
+
+
+def calc_offsets(ts, base_task, inter_task):
+    # calculates relative offsets from interfereing task's deadline
+    base_interval = base_task.deadline
+    rem1 = math.fmod(base_interval, inter_task.period)
 
     offsets = []
-    for thr in pts:
-        rem2 = math.fmod(base_interval, thr.period)
+    for t in ts:
+        rem2 = math.fmod(base_interval, t.period)
         if rem1 >= rem2:
             offsets.append(rem1 - rem2)
         else:
-            offsets.append(rem1 - rem2 + thr.period)
+            offsets.append(rem1 - rem2 + t.period)
 
     return offsets
 
 
-def calc_interference_using_slack(base_thr, inter_thr, offset):
+def calc_interference_using_slack(base_task, inter_task, offset):
     # calculate carry-ins with slack values
     # not considering actual release pattern
     i_sum = 0.0
 
-    # threads are not aligned to their deadlines
-    i_sum += calc_whole_inclusion(base_thr, inter_thr, offset)
+    # tasks are not aligned to their deadlines
+    i_sum += calc_whole_inclusion(base_task, inter_task, offset)
 
     # carry-ins calculated from slack values
-    carry_in = math.fmod(base_thr.deadline - offset, inter_thr.period)\
-        - inter_thr.slack
+    i_sum += calc_carry_in_using_slack(base_task, inter_task, offset)
 
-    # carry-in has to be positive
-    # carry-in cannot exceed the actual execution time
-    if carry_in < 0.0:
-        carry_in = 0.0
-    i_sum += min(inter_thr.exec_time, carry_in)
+    # interference is limited to leftover of basetask
+    i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
 
     return i_sum
 
 
-def calc_carry_in(pts, rem_interval, base_thr, offsets, num_core):
-    # calculates carry-in based on relative position of threads
+def calc_carry_in(ts, rem_interval, base_task, offsets, num_core):
+    # calculates carry-in based on relative position of tasks
 
-    # sum up other thread's interference
+    # sum up other task's interference
     sum_j = 0.0
-    inter_thr_idx = 0
-    for inter_thr in pts:
-        if inter_thr != base_thr:
+    inter_task_idx = 0
+    for inter_task in ts:
+        if inter_task != base_task:
             # use naive interference, calculation with slack
             # this is to limit the calculation depth
             sum_j += calc_interference_using_slack(
-                base_thr, inter_thr, offsets[inter_thr_idx])
+                base_task, inter_task, offsets[inter_task_idx])
 
-        inter_thr_idx += 1
+        inter_task_idx += 1
 
     sum_j = math.floor(sum_j / num_core)
 
-    slack = base_thr.deadline - base_thr.exec_time - sum_j
+    slack = base_task.deadline - base_task.exec_time - sum_j
 
     if slack < 0.0:
         slack = 0.0
@@ -69,49 +86,56 @@ def calc_carry_in(pts, rem_interval, base_thr, offsets, num_core):
     if carry_in < 0.0:
         carry_in = 0.0
 
+    # carry-in limited to execution time
+    carry_in = min(carry_in, base_task.exec_time)
+
     return carry_in
 
 
-def calc_interference(pts, base_thr, inter_thr, num_core):
+def calc_interference(ts, base_task, inter_task, num_core):
     i_sum = 0.0
 
-    # here, all threads are aligned at their deadlines
-    i_sum += calc_whole_inclusion(base_thr, inter_thr, 0.0)
+    # here, all tasks are aligned at their deadlines
+    i_sum += calc_whole_inclusion(base_task, inter_task, 0.0)
 
     # to calculate carry-in, current relative execution is needed
-    offsets = calc_offsets(pts, base_thr, inter_thr)
+    offsets = calc_offsets(ts, base_task, inter_task)
 
-    # calculation is done according to the relative execution
-    # note in this case, base interval is actually
+    # calculation of carry-in is done according to the relative execution
+    # note in this case, the base interval is actually
     # the interfering task's interval
-    # also note rem_interval is the leftofver of interfereing thread
-    rem_interval = math.fmod(base_thr.deadline, inter_thr.period)
+    # also note rem_interval is the leftofver of interfereing task
+    # this interval will be used to limit the carry-in
+    rem_interval = math.fmod(base_task.deadline, inter_task.period)
 
-    i_sum += calc_carry_in(pts, rem_interval, inter_thr, offsets, num_core)
+    i_sum += calc_carry_in(ts, rem_interval, inter_task, offsets, num_core)
+
+    # interference is limited to leftover of basetask
+    i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
 
     return i_sum
 
 
-def calc_slack(pts, base_thr, num_core):
+def calc_slack(ts, base_task, num_core):
     # Add up all demands from interfering tasks
     sum_j = 0.0
-    for inter_thr in pts:
-        if base_thr != inter_thr:
-            sum_j += calc_interference(pts, base_thr, inter_thr, num_core)
+    for inter_task in ts:
+        if base_task != inter_task:
+            sum_j += calc_interference(ts, base_task, inter_task, num_core)
 
     sum_j = math.floor(sum_j / num_core)
 
     # slack is leftover cpu time after job completion
-    slack_tmp = base_thr.deadline - base_thr.exec_time - sum_j
+    slack_tmp = base_task.deadline - base_task.exec_time - sum_j
     return slack_tmp
 
 
-def is_schedulable(pts, **kwargs):
+def is_schedulable(ts, **kwargs):
     num_core = float(kwargs.get('num_core', 1.0))
 
     # init slack of each task
-    for thr in pts:
-        thr.slack = 0.0
+    for t in ts:
+        t.slack = 0.0
 
     # Terminate condition
     updated = True
@@ -120,21 +144,21 @@ def is_schedulable(pts, **kwargs):
 
         # Check each task's feasibility
         sched = True
-        for base_thr in pts:
+        for base_task in ts:
 
             # Update slack
-            slack_tmp = calc_slack(pts, base_thr, num_core)
+            slack_tmp = calc_slack(ts, base_task, num_core)
 
             # slack < 0 --> infeasible
             if slack_tmp < 0.0:
                 sched = False
 
             # continue if slack is updated
-            elif slack_tmp > base_thr.slack:
-                base_thr.slack = slack_tmp
+            elif slack_tmp > base_task.slack:
+                base_task.slack = slack_tmp
                 updated = True
 
         if sched:
             return True
 
-    return True
+    return False
