@@ -17,6 +17,7 @@ class Unifast(Gen):
         return info
 
     def unifast_divide(self, pcs, tot):
+        tot = random.uniform(0.0, tot)
         divided_util = []
         util_sum = tot
         for i in range(pcs - 1):

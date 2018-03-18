@@ -47,7 +47,12 @@ class Stat:
     def print_short(self):
         self.normalize()
         for i in range(self.size):
-            print(str(self.min + i * self.inc) + ":" + str(self.norm_data[i]))
+            print(str(self.min + i * self.inc) + ", " + str(self.norm_data[i]))
+
+    def print_minimal(self):
+        self.normalize()
+        for i in range(self.size):
+            print(str(self.norm_data[i]))
 
 
 if __name__ == '__main__':
