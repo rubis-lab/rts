@@ -28,7 +28,7 @@ def calc_carry_in_using_slack(base_task, inter_task, offset):
 
 
 def calc_offsets(ts, base_task, inter_task):
-    # calculates relative offsets from interfereing task's deadline
+    # calculates relative offsets from interfering task's deadline
     base_interval = base_task.deadline
     rem1 = math.fmod(base_interval, inter_task.period)
 
@@ -55,7 +55,8 @@ def calc_interference_using_slack(base_task, inter_task, offset):
     i_sum += calc_carry_in_using_slack(base_task, inter_task, offset)
 
     # interference is limited to leftover of basetask
-    i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
+    # i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
+    i_sum = min(i_sum, base_task.deadline - base_task.exec_time)
 
     return i_sum
 
@@ -75,7 +76,8 @@ def calc_carry_in(ts, rem_interval, base_task, offsets, num_core):
 
         inter_task_idx += 1
 
-    sum_j = math.floor(sum_j / num_core)
+    # sum_j = math.floor(sum_j / num_core)
+    sum_j = sum_j / num_core
 
     slack = base_task.deadline - base_task.exec_time - sum_j
 
@@ -92,6 +94,11 @@ def calc_carry_in(ts, rem_interval, base_task, offsets, num_core):
     return carry_in
 
 
+def calc_rem_interval(base_task, inter_task):
+    rem_interval = math.fmod(base_task.deadline, inter_task.period)
+    return rem_interval
+
+
 def calc_interference(ts, base_task, inter_task, num_core):
     i_sum = 0.0
 
@@ -104,14 +111,15 @@ def calc_interference(ts, base_task, inter_task, num_core):
     # calculation of carry-in is done according to the relative execution
     # note in this case, the base interval is actually
     # the interfering task's interval
-    # also note rem_interval is the leftofver of interfereing task
+    # also note that rem_interval is the leftover of interfering task
     # this interval will be used to limit the carry-in
-    rem_interval = math.fmod(base_task.deadline, inter_task.period)
+    rem_interval = calc_rem_interval(base_task, inter_task)
 
     i_sum += calc_carry_in(ts, rem_interval, inter_task, offsets, num_core)
 
     # interference is limited to leftover of basetask
-    i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
+    # i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
+    i_sum = min(i_sum, base_task.deadline - base_task.exec_time)
 
     return i_sum
 
@@ -123,7 +131,8 @@ def calc_slack(ts, base_task, num_core):
         if base_task != inter_task:
             sum_j += calc_interference(ts, base_task, inter_task, num_core)
 
-    sum_j = math.floor(sum_j / num_core)
+    # sum_j = math.floor(sum_j / num_core)
+    sum_j = sum_j / num_core
 
     # slack is leftover cpu time after job completion
     slack_tmp = base_task.deadline - base_task.exec_time - sum_j
