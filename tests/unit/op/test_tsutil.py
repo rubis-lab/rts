@@ -6,7 +6,7 @@ import unittest
 from nose.tools import assert_almost_equals
 
 
-class TutilTestCase(unittest.TestCase):
+class TSUtilTestCase(unittest.TestCase):
     """ Tests for `tsutil.py`."""
 
     def test_max_density(self):
