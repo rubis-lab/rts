@@ -46,8 +46,10 @@ def workload_in_interval_edf(t, l):
     w_body_job = t.exec_time * num_body_job
 
     # carry-in
-    # ??? check if slack not defined
-    w_carry_in = math.fmod(t.deadline, t.period) - t.slack
+    # slack not defined
+    if not hasattr(t, 'slack'):
+        t.slack = 0.0
+    w_carry_in = math.fmod(l, t.period) - t.slack
     # carry-in has to be positive
     if w_carry_in < 0.0:
         w_carry_in = 0.0
@@ -59,13 +61,26 @@ def workload_in_interval_edf(t, l):
 
 def workload_in_interval_fp(t, l):
     # body job
+    # slack not defined
+    if not hasattr(t, 'slack'):
+        t.slack = 0.0
     num_body_job = math.floor((l + t.deadline - t.exec_time - t.slack) / t.period)
     w_body_job = t.exec_time * num_body_job
+    print('w_body_job')
+    print(w_body_job)
 
     # carry-out
-    w_carry_out = l + t.deadline - t.exec_time - t.period * num_body_job
+    w_carry_out = l + t.deadline - t.exec_time - t.period * num_body_job - t.slack
+    print('w_carry_out_orig')
+    print(w_carry_out)
 
     # carry-out cannot exceed the actual execution time
-    w_carry_out = math.min(t.exec_time, w_carry_out)
-    
+    w_carry_out = min(t.exec_time, w_carry_out)
+
+    # carry-out cannot exceed the length of the interval
+    w_carry_out = min(l, w_carry_out)
+
+    print('w_carry_out')
+    print(w_carry_out)
+
     return w_body_job + w_carry_out
