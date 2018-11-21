@@ -1,0 +1,21 @@
+{
+    "gen": {
+        "num_task": 10,
+        "min_exec_time": 0,
+        "max_exec_time": 0,
+        "min_deadline": 0,
+        "max_deadline": 0,
+        "min_period": 0,
+        "max_period": 0
+    },
+
+    "sgen": {
+        "num_task": 10,
+        "min_exec_time": 0,
+        "max_exec_time": 0,
+        "min_deadline": 0,
+        "max_deadline": 0,
+        "min_period": 0,
+        "max_period": 0
+    }
+}
