@@ -1,5 +1,6 @@
 #from rts.gen.unifast import Unifast
-from rts.gen.ugen import Ugen
+#from rts.gen.ugen import Ugen
+from rts.gen.egen import Egen
 from rts.sched import bcl_naive
 from rts.op.stat import Stat
 from rts.op import tsutil
@@ -7,14 +8,15 @@ from rts.op import tsutil
 if __name__ == '__main__':
     # create generator
     gen_param = {
-        'num_task': 4,
-        'min_exec_time': 40,
-        'max_exec_time': 60,
-        'min_period': 40,
+        'num_task': 10,
+        'min_exec_time': 1,
+        'max_exec_time': 30,
+        'min_period': 50,
         'max_period': 100,
         'tot_util': 4.0,
     }
-    u = Ugen(**gen_param)
+    #u = Ugen(**gen_param)
+    u = Egen(**gen_param)
     print(u)
     print('--------')
 
@@ -29,11 +31,12 @@ if __name__ == '__main__':
     stat_random = Stat(**stat_param)
     stat_para = Stat(**stat_param)
 
-    num_iter = 1000
+    num_iter = 100000
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
-
+        if ts == -1:
+            print("error")
         # test using various tests
         sched_param = {
             'num_core': 4.0,
