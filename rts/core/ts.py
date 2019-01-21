@@ -46,3 +46,6 @@ class TaskSet(object):
     def clear(self):
         del self.task_list[:]
         return
+
+    def tot_util(self):
+        return tsutil.sum_utilization(self)

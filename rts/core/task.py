@@ -1,3 +1,5 @@
+from rts.op import tsutil
+
 class Task(object):
     'Basic task class'
     cnt = 0
@@ -26,6 +28,9 @@ class Task(object):
             self.deadline,
             self.period
         )
+
+    def utilization(self):
+        return tsutil.calc_utilization(self)
 """
 param = {'exec_time': 1, 'deadline': 2, 'period': 3}
 

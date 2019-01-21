@@ -23,14 +23,13 @@ class Gen(object):
         return
 
     def __str__(self):
-        info = 'Generator - basic\n' + \
-            'num_task = ' + str(self.num_task) + '\n' + \
+        info = 'num_task = ' + str(self.num_task) + '\n' + \
             'min_exec_time = ' + str(self.min_exec_time) + '\n' + \
             'max_exec_time = ' + str(self.max_exec_time) + '\n' + \
             'min_deadline = ' + str(self.min_deadline) + '\n' + \
             'max_deadline = ' + str(self.max_deadline) + '\n' + \
             'min_period = ' + str(self.min_period) + '\n' + \
-            'max_period = ' + str(self.max_period) + '\n'
+            'max_period = ' + str(self.max_period)
         return info
 
     def next_task(self, **kwargs):
