@@ -15,14 +15,29 @@ class ParaTaskTestCase(unittest.TestCase):
         }
         t = Task(**task_param)
         para_task_param = {
+            'base_task': t,
             'max_option': 4,
         }
-        pt = ParaTask(t, **para_task_param)
+        pt = ParaTask(**para_task_param)
 
         self.assertEqual(pt.max_opt, 4)
-        option_one_first_thr = pt.thr_table.get('1')[0]
+        option_one_first_thr = pt[1][0]
         self.assertEqual(option_one_first_thr, t)
         self.assertEqual(option_one_first_thr.exec_time, 4)
+
+    def test_getitem_raise_error(self):
+        task_param = {
+            'exec_time': 4,
+            'deadline': 10,
+            'period': 10,
+        }
+        t = Task(**task_param)
+        para_task_param = {
+            'base_task': t,
+            'max_option': 4,
+        }
+        pt = ParaTask(**para_task_param)
+        pass
 
     def test_append_and_getter(self):
         thr_param11 = {
@@ -47,6 +62,7 @@ class ParaTaskTestCase(unittest.TestCase):
         para_task_param = {
             'max_option': 2,
         }
+        pass
 
 
 if __name__ == '__main__':
