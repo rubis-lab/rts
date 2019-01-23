@@ -1,4 +1,3 @@
-#from rts.gen.unifast import Unifast
 #from rts.gen.ugen import Ugen
 from rts.gen.egen import Egen
 from rts.sched import bcl_naive
@@ -15,7 +14,6 @@ if __name__ == '__main__':
         'max_period': 100,
         'tot_util': 4.0,
     }
-    #u = Ugen(**gen_param)
     u = Egen(**gen_param)
     print(u)
     print('--------')
@@ -27,42 +25,24 @@ if __name__ == '__main__':
         'max': 4.0,
         'inc': 0.1,
     }
-    stat_single = Stat(**stat_param)
-    stat_random = Stat(**stat_param)
-    stat_para = Stat(**stat_param)
+    stat_naive = Stat(**stat_param)
 
-    num_iter = 100000
+    num_iter = 10000
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
         if ts == -1:
             print("error")
+
         # test using various tests
         sched_param = {
             'num_core': 4.0,
         }
-        sched_single = bcl_naive.is_schedulable(ts, **sched_param)
+        sched_naive = bcl_naive.is_schedulable(ts, **sched_param)
 
         ts_util = tsutil.sum_utilization(ts)
-        stat_single.add(ts_util, sched_single)
-        #stat_bcl.add(ts_util, sched_bcl)
-        #stat_bcl_mod.add(ts_util, sched_bcl_mod)
+        stat_naive.add(ts_util, sched_naive)
 
-        #print('single- ' + str(sched_single))
-        # print('bcl- ' + str(sched_bcl))
-        # print('bcl_mod- ' + str(sched_bcl_mod))
-        # print('--------')
-
-    print("single")
-    stat_single.print_minimal()
+    print("naive")
+    stat_naive.print_minimal()
     print("------------")
-
-"""
-    print("bcl")
-    stat_bcl.print_minimal()
-    print("------------")
-
-    print("bcl_mod")
-    stat_bcl_mod.print_minimal()
-    print("------------")
-"""

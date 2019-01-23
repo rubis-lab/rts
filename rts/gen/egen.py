@@ -41,7 +41,7 @@ class Egen(Gen):
             self.ts.append(t)
             return self.ts
         else:
-            return -1
+            raise Exception('Cannot create new task set, tried utilization: ' + t.utilization())
 
     def next_task_set(self):
         # try append task to existing task set
