@@ -4,7 +4,7 @@ from rts.op import para
 
 
 class ParaTask(object):
-    'Parallelizable Task Set'
+    'Parallelizable Task'
     cnt = 0
 
     def __init__(self, **kwargs):
@@ -12,15 +12,15 @@ class ParaTask(object):
         self.id = kwargs.get('id', type(self).cnt)
         self.max_opt = kwargs.get('max_option', 1)
 
+        # parallelizer info
+        self.overhead = kwargs.get('overhead', 0.0)
+        self.variance = kwargs.get('variance', 0.0)
+
         # base task info
         self.base_task = kwargs.get('base_task', Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
         ts = TaskSet()
         ts.append(self.base_task)
         self.ts_table = {'1': ts}
-
-        # parallelizer info
-        self.overhead = kwargs.get('overhead', 0.0)
-        self.variance = kwargs.get('variance', 0.0)
 
         self.populate_ts_table()
 

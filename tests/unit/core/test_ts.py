@@ -44,6 +44,23 @@ class TaskSetTestCase(unittest.TestCase):
         ts[0] = t2
         self.assertEqual(ts[0].id, 3)
 
+    def test_ts_merge(self):
+        param1 = {'id': 2}
+        t1 = Task(**param1)
+        param2 = {'id': 3}
+        t2 = Task(**param2)
+
+        ts1 = TaskSet()
+        ts2 = TaskSet()
+        ts1.append(t1)
+        ts2.append(t1)
+        ts2.append(t2)
+
+        ts1.merge_ts(ts2)
+        self.assertEqual(len(ts1), 3)
+
+        self.assertEqual(ts1[2], t2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -49,3 +49,7 @@ class TaskSet(object):
 
     def tot_util(self):
         return tsutil.sum_utilization(self)
+
+    def merge_ts(self, ts):
+        self.task_list += ts.task_list
+        return self

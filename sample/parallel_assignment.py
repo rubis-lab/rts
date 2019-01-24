@@ -1,4 +1,4 @@
-#from rts.gen.ugen import Ugen
+from rts.core.pt import ParaTask
 from rts.gen.egen import Egen
 from rts.sched import bcl_naive
 from rts.op.stat import Stat
@@ -18,14 +18,15 @@ if __name__ == '__main__':
     print(u)
     print('--------')
 
-    # log stat
+    # logger
     stat_param = {
         'id': 0,
         'min': 0.0,
         'max': 4.0,
         'inc': 0.1,
     }
-    stat_naive = Stat(**stat_param)
+    stat_single = Stat(**stat_param)
+    stat_random = Stat(**stat_param)
 
     num_iter = 10000
     for i in range(num_iter):
@@ -34,15 +35,18 @@ if __name__ == '__main__':
         if ts == -1:
             print("error")
 
-        # test using various tests
+        # single thread
         sched_param = {
             'num_core': 4.0,
         }
-        sched_naive = bcl_naive.is_schedulable(ts, **sched_param)
+        sched_single = bcl_naive.is_schedulable(ts, **sched_param)
+
+        # multiple thread
+        # todo
 
         ts_util = tsutil.sum_utilization(ts)
-        stat_naive.add(ts_util, sched_naive)
+        stat_single.add(ts_util, sched_single)
 
-    print("naive")
-    stat_naive.print_minimal()
+    print("single")
+    stat_single.print_minimal()
     print("------------")

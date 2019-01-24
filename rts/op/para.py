@@ -1,3 +1,4 @@
+from rts.core.ts import TaskSet
 from rts.core.thr import Thread
 
 import random
@@ -57,3 +58,26 @@ def parallelize_task(t, **kwargs):
         idx += 1
 
     return thr_list
+
+
+def parallelize_pts_single(pt_list):
+    ts = TaskSet()
+    for pt in pt_list:
+        ts.merge_ts(pt[1])
+    return ts
+
+
+def parallelize_pts_max(pt_list, **kwargs):
+    max_opt = kwargs.get('max_option', 1)
+    ts = TaskSet()
+    for pt in pt_list:
+        ts.merge_ts(pt[max_opt])
+    return ts
+
+
+def parallelize_pts_random(pt_list, **kwargs):
+    max_opt = kwargs.get('max_option', 1)
+    ts = TaskSet()
+    for pt in pt_list:
+        ts.merge_ts(pt[random.randint(1, max_opt)])
+    return ts
