@@ -2,6 +2,8 @@ from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.core.pt import ParaTask
 from rts.op import para
+from rts.op import tsutil
+
 
 class ParaTaskSet(object):
     'Parallelizable Task Set'
@@ -86,6 +88,9 @@ class ParaTaskSet(object):
                 para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt}))
         else:
             raise Exception('Parallelization strategy not defined')
+
+    def tot_util(self):
+        return tsutil.sum_utilization(self.pts_serialized)
 
 
 if __name__ == '__main__':

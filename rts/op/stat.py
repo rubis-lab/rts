@@ -26,7 +26,8 @@ class Stat:
 
     def add(self, idx, data):
         new_idx = self.conv_idx(idx)
-        self.raw_data[new_idx].append(data)
+        if new_idx < len(self.raw_data):
+            self.raw_data[new_idx].append(data)
         return
 
     def normalize(self):
