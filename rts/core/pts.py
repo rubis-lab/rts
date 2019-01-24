@@ -77,24 +77,13 @@ class ParaTaskSet(object):
 
         if popt == 'single':
             self.pts_serialized.merge_ts(
-                para.parallelize_pts_single(
-                    self.pt_list
-                )
-            )
+                para.parallelize_pts_single(self.pt_list))
         elif popt == 'max':
             self.pts_serialized.merge_ts(
-                para.parallelize_pts_max(
-                    self.pt_list,
-                    **{'max_option': self.max_opt}
-                )
-            )
+                para.parallelize_pts_max(self.pt_list, **{'max_option': self.max_opt}))
         elif popt == 'random':
             self.pts_serialized.merge_ts(
-                para.parallelize_pts_random(
-                    self.pt_list,
-                    **{'max_option': self.max_opt}
-                )
-            )
+                para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt}))
         else:
             raise Exception('Parallelization strategy not defined')
 
