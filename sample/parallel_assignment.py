@@ -2,7 +2,6 @@ from rts.core.pts import ParaTaskSet
 from rts.gen.egen import Egen
 from rts.sched import bcl_naive
 from rts.op.stat import Stat
-from rts.op import tsutil
 
 if __name__ == '__main__':
     # create generator
@@ -10,8 +9,8 @@ if __name__ == '__main__':
         'num_task': 10,
         'min_exec_time': 1,
         'max_exec_time': 30,
-        'min_period': 50,
-        'max_period': 100,
+        'min_period': 30,
+        'max_period': 60,
         'tot_util': 4.0,
     }
     u = Egen(**gen_param)
@@ -27,9 +26,11 @@ if __name__ == '__main__':
     }
     stat_single = Stat(**stat_param)
     stat_max = Stat(**stat_param)
+    stat_max_vs_single = Stat(**stat_param)
     stat_random = Stat(**stat_param)
+    stat_random_vs_single = Stat(**stat_param)
 
-    num_iter = 10000
+    num_iter = 100000
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
@@ -68,6 +69,7 @@ if __name__ == '__main__':
         # max thread schedulability
         sched_max = bcl_naive.is_schedulable(pts_max, **sched_param)
         stat_max.add(pts_max.tot_util(), sched_max)
+        stat_max_vs_single.add(pts_single.tot_util(), sched_max)
 
         # random thread
         pts_param_random = {
@@ -82,6 +84,7 @@ if __name__ == '__main__':
         # random thread schedulability
         sched_random = bcl_naive.is_schedulable(pts_random, **sched_param)
         stat_random.add(pts_random.tot_util(), sched_random)
+        stat_random_vs_single.add(pts_single.tot_util(), sched_random)
 
     print("single")
     stat_single.print_minimal()
@@ -93,4 +96,12 @@ if __name__ == '__main__':
 
     print("random")
     stat_random.print_minimal()
+    print("------------")
+
+    print("max_vs_single")
+    stat_max_vs_single.print_minimal()
+    print("------------")
+
+    print("random_vs_single")
+    stat_random_vs_single.print_minimal()
     print("------------")
