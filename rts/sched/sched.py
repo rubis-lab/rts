@@ -1,5 +1,5 @@
-class Exhustive(object):
-    'Exhustive search'
+class Sched(object):
+    'Basic schedulability test class'
 
     def __init__(self, **kwargs):
         return
@@ -11,8 +11,5 @@ class Exhustive(object):
         info = ''
         return info
 
-    def search(self):
-        pass
-
-    def get_popt(self):
-        pass
+    def is_schedulable(self, ts):
+        return False

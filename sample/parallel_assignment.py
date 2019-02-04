@@ -1,6 +1,6 @@
 from rts.core.pts import ParaTaskSet
 from rts.gen.egen import Egen
-from rts.sched import bcl_naive
+from rts.sched.bcl_naive import BCL_Naive
 from rts.op.stat import Stat
 
 if __name__ == '__main__':
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     stat_random = Stat(**stat_param)
     stat_random_vs_single = Stat(**stat_param)
 
-    num_iter = 100000
+    num_iter = 1000
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
@@ -53,7 +53,8 @@ if __name__ == '__main__':
         pts_single = ParaTaskSet(**pts_param_single)
 
         # single thread schedulability
-        sched_single = bcl_naive.is_schedulable(pts_single, **sched_param)
+        bcl_naive = BCL_Naive(**sched_param)
+        sched_single = bcl_naive.is_schedulable(pts_single)
         stat_single.add(pts_single.tot_util(), sched_single)
 
         # max thread
@@ -67,7 +68,7 @@ if __name__ == '__main__':
         pts_max = ParaTaskSet(**pts_param_max)
 
         # max thread schedulability
-        sched_max = bcl_naive.is_schedulable(pts_max, **sched_param)
+        sched_max = bcl_naive.is_schedulable(pts_max)
         stat_max.add(pts_max.tot_util(), sched_max)
         stat_max_vs_single.add(pts_single.tot_util(), sched_max)
 
@@ -82,7 +83,7 @@ if __name__ == '__main__':
         pts_random = ParaTaskSet(**pts_param_random)
 
         # random thread schedulability
-        sched_random = bcl_naive.is_schedulable(pts_random, **sched_param)
+        sched_random = bcl_naive.is_schedulable(pts_random)
         stat_random.add(pts_random.tot_util(), sched_random)
         stat_random_vs_single.add(pts_single.tot_util(), sched_random)
 
