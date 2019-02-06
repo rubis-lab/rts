@@ -126,4 +126,7 @@ if __name__ == '__main__':
     pts.serialize_pts()
     print(pts)
 
+    a = int('12345', 6)
+    print a
+
 
