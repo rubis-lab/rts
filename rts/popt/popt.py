@@ -1,5 +1,5 @@
-class Exhustive(object):
-    'Exhustive search'
+class Popt(object):
+    'Basic parallel option class'
 
     def __init__(self, **kwargs):
         return
@@ -11,8 +11,8 @@ class Exhustive(object):
         info = ''
         return info
 
-    def is_schedulable(self):
-        pass
+    def is_schedulable(self, pts):
+        return False
 
-    def get_opt_popt(self):
+    def get_opt_popt(self, pts):
         pass

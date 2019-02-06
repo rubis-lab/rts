@@ -48,7 +48,7 @@ if __name__ == '__main__':
             'max_option': 4,
             'overhead': 0.0,
             'variance': 0.3,
-            'popt': 'single',
+            'popt_strategy': 'single',
         }
         pts_single = ParaTaskSet(**pts_param_single)
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             'max_option': 4,
             'overhead': 0.0,
             'variance': 0.3,
-            'popt': 'max',
+            'popt_strategy': 'max',
         }
         pts_max = ParaTaskSet(**pts_param_max)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
             'max_option': 4,
             'overhead': 0.0,
             'variance': 0.3,
-            'popt': 'random',
+            'popt_strategy': 'random',
         }
         pts_random = ParaTaskSet(**pts_param_random)
 

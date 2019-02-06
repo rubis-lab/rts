@@ -28,9 +28,10 @@ class ParaTaskSet(object):
 
         # pts serialized according to selected option.
         # defaults to single thread for each pt in pts.
-        self.popt = kwargs.get('popt', 'single')
+        self.popt_strategy = kwargs.get('popt_strategy', 'single')
+        self.popt_list = kwargs.get('popt_list', [1 for i in range(len(self.pt_list))])
         self.pts_serialized = TaskSet()
-        self.serialize_pts(**{'popt': self.popt})
+        self.serialize_pts()
         return
 
     def __del__(self):
@@ -74,18 +75,15 @@ class ParaTaskSet(object):
             self.pt_list.append(pt)
         return
 
-    def serialize_pts(self, **kwargs):
-        popt = kwargs.get('popt', 'single')
-
-        if popt == 'single':
-            self.pts_serialized.merge_ts(
-                para.parallelize_pts_single(self.pt_list))
-        elif popt == 'max':
-            self.pts_serialized.merge_ts(
-                para.parallelize_pts_max(self.pt_list, **{'max_option': self.max_opt}))
-        elif popt == 'random':
-            self.pts_serialized.merge_ts(
-                para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt}))
+    def serialize_pts(self):
+        if self.popt_strategy == 'single':
+            self.pts_serialized = para.parallelize_pts_single(self.pt_list)
+        elif self.popt_strategy == 'max':
+            self.pts_serialized = para.parallelize_pts_max(self.pt_list, **{'max_option': self.max_opt})
+        elif self.popt_strategy == 'random':
+            self.pts_serialized = para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt})
+        elif self.popt_strategy == 'custom':
+            self.pts_serialized = para.parallelize_pts_custom(self.pt_list, self.popt_list)
         else:
             raise Exception('Parallelization strategy not defined')
 
@@ -117,9 +115,15 @@ if __name__ == '__main__':
         'max_option': 4,
         'overhead': 0.0,
         'variance': 0.3,
-        'popt': 'max',
+        'popt_strategy': 'custom',
+        'popt_list': [1, 2],
     }
 
     pts = ParaTaskSet(**pts_param)
     print(pts)
+
+    pts.popt_list = [2, 1]
+    pts.serialize_pts()
+    print(pts)
+
 

@@ -81,3 +81,14 @@ def parallelize_pts_random(pt_list, **kwargs):
     for pt in pt_list:
         ts.merge_ts(pt[random.randint(1, max_opt)])
     return ts
+
+
+def parallelize_pts_custom(pt_list, popt_list):
+    if len(pt_list) != len(popt_list):
+        raise Exception('pt_list or popt_list malformed. Length does not match.')
+
+    ts = TaskSet()
+    for i in range(len(pt_list)):
+        ts.merge_ts(pt_list[i][popt_list[i]])
+
+    return ts
