@@ -63,27 +63,31 @@ class ParaTask(object):
                             'requested option: ' + str(opt))
 
     def populate_ts_table(self):
+        """
         if self.max_opt >= 2:
             for i in range(2, self.max_opt + 1):
                 self.ts_table[str(i)] = TaskSet()
                 tlist = para.parallelize_task(self.base_task, **{'pcs': i, 'overhead': self.overhead, 'variance': self.variance})
                 for thr in tlist:
                     self[i].append(thr)
+        """
+        if self.max_opt >= 2:
+            para.parallelize_pt_non_dec(self)
         return
 
 
 if __name__ == '__main__':
     task_param = {
-        'exec_time': 4,
-        'deadline': 10,
-        'period': 10,
+        'exec_time': 20,
+        'deadline': 60,
+        'period': 60,
     }
     t = Task(**task_param)
     para_task_param = {
         'base_task': t,
         'max_option': 4,
-        'overhead': 0.0,
-        'variance': 0.3,
+        'overhead': 0.1,
+        'variance': 0.9,
     }
     pt = ParaTask(**para_task_param)
     print(pt)

@@ -1,6 +1,5 @@
 from rts.core.ts import TaskSet
 from rts.core.thr import Thread
-
 import random
 import operator
 import math
@@ -60,12 +59,37 @@ def parallelize_task(t, **kwargs):
     return thr_list
 
 
-def parallelize_pt_nondec(pt):
+def unifast_divide(pcs, tot, limit):
+    max_iter = 25
+    for ll in range(max_iter):
+        divided = []
+        tot_sum = tot
+        for i in range(pcs - 1):
+            tmp = tot_sum * math.pow(
+                random.uniform(0.0, 1.0), (1.0 / (pcs - i)))
+            # round to integer
+            tmp = round(tmp)
+            divided.append(tot_sum - tmp)
+            tot_sum = tmp
+        divided.append(tot_sum)
+
+        # Return only when largest value is under limit
+        if max(divided) <= limit:
+            divided.sort(reverse=True)
+            return divided
+
+    raise Exception('Having trouble generating unifast.. Try again with higher limit')
+
+
+def parallelize_pt_non_dec(pt):
     # Paralleliuze task while non decreasing total execution time
     # Also largest execution time always non increases
 
     # total execution time
+    # required to have total execution time larger than 3 * max_option
     e_tot = pt.base_task.exec_time
+    if e_tot <= pt.max_opt * 3:
+        raise Exception('Execution time too small')
 
     # largest execution time
     e_max = pt.base_task.exec_time
@@ -74,20 +98,52 @@ def parallelize_pt_nondec(pt):
         pt.ts_table[str(opt)] = TaskSet()
 
         # total execution time is increased by overhead
-        e_tot = math.ceil(e_tot * pt.overhead)
+        e_tot = math.ceil(e_tot * (1.0 + pt.overhead))
 
         # ideal seperation execution time
         e_ideal = e_tot / opt
 
-        # control
-        pt[opt].append(thr)
+        """
+        normalize variance
+        variance = 0 --> e_max = e_ideal
+        variance = 1 --> e_max = e_max (prev)
+        
+        e_max_limit = e_ideal + (e_max(prev) - e_ideal) * variance
+        
+        unifast split into pcs, 
+        while only accepting when largest generated e < e_max_limit 
+        """
 
+        # execution times
+        e_max_limit = e_ideal + (e_max - e_ideal) * pt.variance
+        e_list = unifast_divide(opt, e_tot, e_max_limit)
+        e_max = e_list[0]
 
+        # create threads and append to task set
+        ts = TaskSet()
 
+        for i in range(len(e_list)):
 
+            # set minimum e to 1.0
+            if e_list[i] < 0.1:
+                e_list[i] = 1.0
 
+            thr_param = {
+                'id': pt.base_task.id,
+                'exec_time': e_list[i],
+                'deadline': pt.base_task.deadline,
+                'period': pt.base_task.period,
+            }
+            thr = Thread(**thr_param)
 
-    pass
+            ts.append(thr)
+
+        # append to pt
+        pt.ts_table[str(opt)] = ts
+
+        # calculate e_tot again (since e min set to 1.0)
+        e_tot = sum(e_list)
+    return
 
 
 def parallelize_pts_single(pt_list):
@@ -122,3 +178,8 @@ def parallelize_pts_custom(pt_list, popt_list):
         ts.merge_ts(pt_list[i][popt_list[i]])
 
     return ts
+
+if __name__ == '__main__':
+    a = unifast_divide(5, 10, 3)
+    print(a)
+    print(sum(a))
