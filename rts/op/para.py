@@ -3,10 +3,10 @@ from rts.core.thr import Thread
 
 import random
 import operator
+import math
 
 
 def parallelize_task(t, **kwargs):
-
     pcs = kwargs.get('pcs', 1)
     overhead = float(kwargs.get('overhead', random.random()))
     variance = float(kwargs.get('variance', random.random()))
@@ -58,6 +58,36 @@ def parallelize_task(t, **kwargs):
         idx += 1
 
     return thr_list
+
+
+def parallelize_pt_nondec(pt):
+    # Paralleliuze task while non decreasing total execution time
+    # Also largest execution time always non increases
+
+    # total execution time
+    e_tot = pt.base_task.exec_time
+
+    # largest execution time
+    e_max = pt.base_task.exec_time
+
+    for opt in range(2, pt.max_opt + 1):
+        pt.ts_table[str(opt)] = TaskSet()
+
+        # total execution time is increased by overhead
+        e_tot = math.ceil(e_tot * pt.overhead)
+
+        # ideal seperation execution time
+        e_ideal = e_tot / opt
+
+        # control
+        pt[opt].append(thr)
+
+
+
+
+
+
+    pass
 
 
 def parallelize_pts_single(pt_list):
