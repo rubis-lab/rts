@@ -78,7 +78,9 @@ class Cho(Popt):
                 i_sum = -base_thr.exec_time
                 for j in range(len(pts)):
                     inter_thr = pts[j]
-                    i_sum += tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
+                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
+                    # interference is limited to laxity of base thread
+                    i_sum += min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0)
                 i_sum = math.floor(i_sum / self.num_core)
                 # print('i_sum')
                 # print(i_sum)

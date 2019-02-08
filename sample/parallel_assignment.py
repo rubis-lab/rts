@@ -31,7 +31,6 @@ if __name__ == '__main__':
     stat_cho = Stat(**stat_param)
 
     num_iter = 1000
-    wrong_cnt = 0
     for i in range(num_iter):
         # generate tasks
         ts = u.next_task_set()
@@ -90,8 +89,14 @@ if __name__ == '__main__':
 
         if not sched_cho:
             if sched_single or sched_max or sched_random:
-                wrong_cnt += 1
-                print('something wrong')
+                print('!!something wrong')
+            if sched_single:
+                print('sched_single')
+            if sched_max:
+                print('sched_max')
+            if sched_random:
+                print('sched_random')
+
 
     print("single")
     stat_single.print_minimal()
@@ -108,6 +113,3 @@ if __name__ == '__main__':
     print("cho")
     stat_cho.print_minimal()
     print("------------")
-
-    print('wrong_cnt')
-    print(wrong_cnt)
