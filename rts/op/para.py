@@ -61,6 +61,7 @@ def parallelize_task(t, **kwargs):
 
 def unifast_divide(pcs, tot, limit):
     max_iter = 25
+    divided_best_effort = [10000000]
     for ll in range(max_iter):
         divided = []
         tot_sum = tot
@@ -78,7 +79,12 @@ def unifast_divide(pcs, tot, limit):
             divided.sort(reverse=True)
             return divided
 
-    raise Exception('Having trouble generating unifast.. Try again with higher limit')
+        # Save the pseudo sufficient value
+        if max(divided) < max(divided_best_effort):
+            divided_best_effort = divided[:]
+
+    divided_best_effort.sort(reverse=True)
+    return divided_best_effort
 
 
 def parallelize_pt_non_dec(pt):

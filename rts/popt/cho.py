@@ -54,8 +54,8 @@ class Cho(Popt):
     def is_schedulable(self, pts):
         # Create interference vs parallel option table for every task
         self.create_inter_vs_popt_table(pts)
-        print('ip_table')
-        print(self.ip_table)
+        # print('ip_table')
+        # print(self.ip_table)
 
         # Initial - all tasks at lowest parallelization
         pts.popt_strategy = 'single'
@@ -80,8 +80,8 @@ class Cho(Popt):
                     inter_thr = pts[j]
                     i_sum += tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
                 i_sum = math.floor(i_sum / self.num_core)
-                print('i_sum')
-                print(i_sum)
+                # print('i_sum')
+                # print(i_sum)
                 i_sum_list.append(i_sum)
 
             """
@@ -99,8 +99,8 @@ class Cho(Popt):
                         selected_opt[i] += 1
                     else:
                         break
-            print('selected_opt')
-            print(selected_opt)
+            # print('selected_opt')
+            # print(selected_opt)
 
             # if no change needed, check convergence
             if selected_opt == selected_opt_cpy:
@@ -118,7 +118,7 @@ class Cho(Popt):
                 # All tasks interference under tolerence
                 return True
 
-            print('----------------')
+            # print('----------------')
 
     def get_opt_popt(self, pts):
         pass
