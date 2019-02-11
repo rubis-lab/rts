@@ -11,6 +11,7 @@ class Cho(Popt):
     def __init__(self, **kwargs):
         self.max_opt = kwargs.get('max_option', 1)
         self.num_core = float(kwargs.get('num_core', 1.0))
+        self.ip_table = []
         return
 
     def __del__(self):
@@ -21,7 +22,7 @@ class Cho(Popt):
         return info
 
     def create_inter_vs_popt_table(self, pts):
-        self.ip_table = []
+        self.ip_table.clear()
         n_task = len(pts.base_ts)
         for i in range(n_task):
             # option 0 will not be used
@@ -75,9 +76,11 @@ class Cho(Popt):
             i_sum_list = []
             for i in range(n_task):
                 base_thr = pts.pt_list[i][selected_opt[i]][0]
-                i_sum = -base_thr.exec_time
+                i_sum = 0.0
                 for j in range(len(pts)):
                     inter_thr = pts[j]
+                    if inter_thr == base_thr:
+                        continue
                     i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
                     # interference is limited to laxity of base thread
                     i_sum += min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0)
@@ -94,10 +97,9 @@ class Cho(Popt):
             """
             selected_opt_cpy = selected_opt[:]
             for i in range(n_task):
-                base_pt = pts.pt_list[i]
                 while selected_opt[i] < self.max_opt:
                     # floating value comparison... difference less than 0.1
-                    if self.ip_table[i][selected_opt[i]] - i_sum_list[i] < 0.1:
+                    if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
                         selected_opt[i] += 1
                     else:
                         break
@@ -108,16 +110,16 @@ class Cho(Popt):
             if selected_opt == selected_opt_cpy:
                 """
                 if any parallel option maxed out, but still its interference
-                exceeds tolerence --> unschedulable
+                exceeds tolerance --> unschedulable
                 else --> schedulable
                 """
                 for i in range(n_task):
                     # popt maxed out
-                    if abs(selected_opt[i] - self.max_opt) < 0.1:
-                        # interference over tolerence
-                        if self.ip_table[i][selected_opt[i]] - i_sum_list[i] < 0.1:
+                    if selected_opt[i] >= self.max_opt:
+                        # interference exceeds tolerance
+                        if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
                             return False
-                # All tasks interference under tolerence
+                # All tasks interference under tolerance
                 return True
 
             # print('----------------')
