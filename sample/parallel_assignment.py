@@ -31,8 +31,11 @@ if __name__ == '__main__':
     stat_random = Stat(**stat_param)
     stat_cho = Stat(**stat_param)
 
-    num_iter = 1000
+    num_iter = 100000
+    notify_every = 10000
     for i in range(num_iter):
+        if i % notify_every == 0:
+            print("{} % : {} / {}".format(i * 100 / num_iter, i, num_iter))
         # generate tasks
         ts = u.next_task_set()
         if ts == -1:
@@ -100,9 +103,17 @@ if __name__ == '__main__':
                 print('sched_max')
             if sched_random:
                 print('sched_random')
+                print('rnd dbg:')
                 print(rnd_selected_option)
                 rnd_dbg = cho.is_schedulable_dbg(pts, rnd_selected_option)
                 print(rnd_dbg)
+                print('cho verbose result:')
+                _, cho_selected_option = cho.is_schedulable_verbose(pts)
+                print('cho dbg:')
+                print(cho_selected_option)
+                cho_dbg = cho.is_schedulable_dbg(pts, cho_selected_option)
+                print(rnd_dbg)
+
 
     print("single")
     stat_single.print_minimal()

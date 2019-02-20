@@ -84,7 +84,7 @@ class Cho(Popt):
                         continue
                     i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
                     # interference is limited to laxity of base thread
-                    i_sum += min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0)
+                    i_sum += max(0.0, min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0))
                 i_sum = math.floor(i_sum / self.num_core)
                 # print('i_sum')
                 # print(i_sum)
@@ -125,9 +125,91 @@ class Cho(Popt):
 
             # print('----------------')
 
+    def is_schedulable_verbose(self, pts):
+        # Create interference vs parallel option table for every task
+        self.create_inter_vs_popt_table(pts)
+        print('ip_table')
+        print(self.ip_table)
+        # print('ip_table')
+        # print(self.ip_table)
+
+        # Initial - all tasks at lowest parallelization
+        pts.popt_strategy = 'single'
+        pts.serialize_pts()
+        n_task = len(pts.pt_list)
+        selected_opt = [1 for i in range(n_task)]
+
+        # Iteration
+        while True:
+            """
+            Calculate interference of other tasks.
+            Only need to calculate once for each bask task,
+            because worst case is when laxity is the least.
+            Least laxity thread is the first thread,
+            which has the largest execution time.
+            """
+            i_sum_list = []
+            for i in range(n_task):
+                base_thr = pts.pt_list[i][selected_opt[i]][0]
+                i_sum = 0.0
+                for j in range(len(pts)):
+                    inter_thr = pts[j]
+                    if inter_thr == base_thr:
+                        continue
+                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
+                    # interference is limited to laxity of base thread
+                    i_sum += max(0.0, min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0))
+                i_sum = math.floor(i_sum / self.num_core)
+                i_sum_list.append(i_sum)
+
+            print('i_sum_list')
+            print(i_sum_list)
+
+            """
+            Find minimum possible option for each tasks.
+            Compare with interference vs parallel option table created earlier.
+            The option is always non decreasing.
+            Increment option until it can tolerate calculated interference.
+            """
+            selected_opt_cpy = selected_opt[:]
+            for i in range(n_task):
+                while selected_opt[i] < self.max_opt:
+                    # floating value comparison... difference less than 0.1
+                    if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
+                        selected_opt[i] += 1
+                    else:
+                        break
+            print('selected_opt')
+            print(selected_opt)
+
+            # if no change needed, check convergence
+            if selected_opt == selected_opt_cpy:
+                """
+                if any parallel option maxed out, but still its interference
+                exceeds tolerance --> unschedulable
+                else --> schedulable
+                """
+                for i in range(n_task):
+                    # popt maxed out
+                    if selected_opt[i] >= self.max_opt:
+                        # interference exceeds tolerance
+                        if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
+                            print('*unschedulable, with option')
+                            print(selected_opt)
+                            return False, selected_opt
+                # All tasks interference under tolerance
+                print('schedulable, with option')
+                print(selected_opt)
+                return True
+
+            # print('----------------')
+
     def is_schedulable_dbg(self, pts, popt_list):
         # Test schedulability of a task set with given option using CHO.
         self.create_inter_vs_popt_table(pts)
+
+        print('ip_table_dbg')
+        print(self.ip_table)
 
         pts.popt_strategy = 'custom'
         pts.popt_list = popt_list
@@ -147,12 +229,14 @@ class Cho(Popt):
                     continue
                 i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
                 # interference is limited to laxity of base thread
-                i_sum += min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0)
+                i_sum += max(0.0, min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0))
             i_sum = math.floor(i_sum / self.num_core)
             # print('i_sum')
             # print(i_sum)
             i_sum_list.append(i_sum)
 
+        print('i_sum_list_dbg')
+        print(i_sum_list)
         # Test schedulability
         for i in range(n_task):
             if i_sum_list[i] > self.ip_table[i][popt_list[i]] + 0.1:

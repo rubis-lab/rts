@@ -11,7 +11,7 @@ class BCLNaive(Sched):
         i_sum = tsutil.workload_in_interval_edf(inter_task, base_task.deadline)
 
         # interference is limited to leftover of basetask
-        i_sum = min(i_sum, base_task.deadline - base_task.exec_time + 1.0)
+        i_sum = max(0.0, min(i_sum, base_task.deadline - base_task.exec_time + 1.0))
 
         return i_sum
 
