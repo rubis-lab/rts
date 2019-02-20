@@ -14,6 +14,7 @@ if __name__ == '__main__':
         'min_period': 60,
         'max_period': 200,
         'tot_util': 4.0,
+        'util_over': False,
     }
     u = Egen(**gen_param)
     print(u)

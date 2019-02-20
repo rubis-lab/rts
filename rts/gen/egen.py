@@ -12,10 +12,18 @@ class Egen(Gen):
         self.tot_util = kwargs.get('tot_util', 1.0)
         self.ts = TaskSet()
         self.last_id = -1
+        self.utilization_overflow = kwargs.get('util_over', True)
 
     def next_task(self, **kwargs):
         period = random.randint(self.min_period, self.max_period)
         exec_time = random.randint(self.min_exec_time, self.max_exec_time)
+
+        # prevents tasks with utilization > 1.0
+        if not self.utilization_overflow:
+            while exec_time > period + 0.1:
+                period = random.randint(self.min_period, self.max_period)
+                exec_time = random.randint(self.min_exec_time, self.max_exec_time)
+
         deadline = period  # implicit deadline
         task_param = {
             'period': period,
@@ -29,7 +37,8 @@ class Egen(Gen):
     def __str__(self):
         info = 'Generator - egen\n' + \
             super(type(self), self).__str__() + '\n' + \
-            'tot_util = ' + str(self.tot_util)
+            'tot_util = ' + str(self.tot_util) + '\n' + \
+            'util_over = ' + str(self.utilization_overflow)
         return info
 
     def create_new_task_set(self, t):
