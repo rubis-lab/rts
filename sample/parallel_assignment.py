@@ -1,6 +1,6 @@
 from rts.core.pts import ParaTaskSet
 from rts.gen.egen import Egen
-from rts.sched.bcl_naive import BCL_Naive
+from rts.sched.bcl_naive import BCLNaive
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         pts_util = pts.tot_util()
 
         # single thread schedulability
-        bcl_naive = BCL_Naive(**sched_param)
+        bcl_naive = BCLNaive(**sched_param)
         sched_single = bcl_naive.is_schedulable(pts)
         stat_single.add(pts_util, sched_single)
 
@@ -70,13 +70,11 @@ if __name__ == '__main__':
         # random thread
         pts.popt_strategy = 'random'
         pts.serialize_pts()
+        rnd_selected_option = pts.popt_list
 
         # random thread schedulability
         sched_random = bcl_naive.is_schedulable(pts)
         stat_random.add(pts_util, sched_random)
-
-        pts.popt_strategy = 'single'
-        pts.serialize_pts()
 
         # cho
         pts.popt_strategy = 'custom'
@@ -95,13 +93,16 @@ if __name__ == '__main__':
         if not sched_cho:
             if sched_single or sched_max or sched_random:
                 print('!!something wrong')
-                print(pts)
+                # print(pts)
             if sched_single:
                 print('sched_single')
             if sched_max:
                 print('sched_max')
             if sched_random:
                 print('sched_random')
+                print(rnd_selected_option)
+                rnd_dbg = cho.is_schedulable_dbg(pts, rnd_selected_option)
+                print(rnd_dbg)
 
     print("single")
     stat_single.print_minimal()

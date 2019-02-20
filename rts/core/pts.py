@@ -3,6 +3,7 @@ from rts.core.ts import TaskSet
 from rts.core.pt import ParaTask
 from rts.op import para
 from rts.op import tsutil
+import random
 
 
 class ParaTaskSet(object):
@@ -81,7 +82,11 @@ class ParaTaskSet(object):
         elif self.popt_strategy == 'max':
             self.pts_serialized = para.parallelize_pts_max(self.pt_list, **{'max_option': self.max_opt})
         elif self.popt_strategy == 'random':
-            self.pts_serialized = para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt})
+            del self.popt_list[:]
+            for i in range(len(self.base_ts)):
+                self.popt_list.append(random.randint(1, self.max_opt))
+            # self.pts_serialized = para.parallelize_pts_random(self.pt_list, **{'max_option': self.max_opt})
+            self.pts_serialized = para.parallelize_pts_custom(self.pt_list, self.popt_list)
         elif self.popt_strategy == 'custom':
             self.pts_serialized = para.parallelize_pts_custom(self.pt_list, self.popt_list)
         else:
@@ -125,8 +130,5 @@ if __name__ == '__main__':
     pts.popt_list = [2, 1]
     pts.serialize_pts()
     print(pts)
-
-    a = int('12345', 6)
-    print a
 
 

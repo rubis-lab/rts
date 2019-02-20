@@ -5,6 +5,7 @@ from rts.core.pts import ParaTaskSet
 from rts.op import tsutil
 import math
 
+
 class Cho(Popt):
     'Cho 2019'
 
@@ -22,7 +23,7 @@ class Cho(Popt):
         return info
 
     def create_inter_vs_popt_table(self, pts):
-        self.ip_table.clear()
+        del self.ip_table[:]
         n_task = len(pts.base_ts)
         for i in range(n_task):
             # option 0 will not be used
@@ -123,6 +124,40 @@ class Cho(Popt):
                 return True
 
             # print('----------------')
+
+    def is_schedulable_dbg(self, pts, popt_list):
+        # Test schedulability of a task set with given option using CHO.
+        self.create_inter_vs_popt_table(pts)
+
+        pts.popt_strategy = 'custom'
+        pts.popt_list = popt_list
+        pts.serialize_pts()
+
+        n_task = len(pts.pt_list)
+
+        # Calculate interference of other threads.
+        i_sum_list = []
+        for i in range(n_task):
+            # check only the first thread of each task.
+            base_thr = pts.pt_list[i][popt_list[i]][0]
+            i_sum = 0.0
+            for j in range(len(pts)):
+                inter_thr = pts[j]
+                if inter_thr == base_thr:
+                    continue
+                i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
+                # interference is limited to laxity of base thread
+                i_sum += min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0)
+            i_sum = math.floor(i_sum / self.num_core)
+            # print('i_sum')
+            # print(i_sum)
+            i_sum_list.append(i_sum)
+
+        # Test schedulability
+        for i in range(n_task):
+            if i_sum_list[i] > self.ip_table[i][popt_list[i]] + 0.1:
+                return False
+        return True
 
     def get_opt_popt(self, pts):
         pass

@@ -3,7 +3,7 @@ from rts.sched.sched import Sched
 from rts.op import tsutil
 
 
-class BCL_Naive(Sched):
+class BCLNaive(Sched):
     def __init__(self, **kwargs):
         self.num_core = float(kwargs.get('num_core', 1.0))
 
@@ -30,7 +30,7 @@ class BCL_Naive(Sched):
 
             # sum of interference from other tasks
             interference = self.sum_interference(ts, base_task, self.num_core)
-            if interference > (base_task.deadline - base_task.exec_time):
+            if interference > (base_task.deadline - base_task.exec_time) + 0.1:  # floating point comparison
                 return False
 
         return True

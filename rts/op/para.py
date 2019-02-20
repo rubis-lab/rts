@@ -146,9 +146,6 @@ def parallelize_pt_non_dec(pt):
 
         # append to pt
         pt.ts_table[str(opt)] = ts
-
-        # calculate e_tot again (since e min set to 1.0)
-        e_tot = sum(e_list)
     return
 
 
