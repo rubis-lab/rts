@@ -13,3 +13,6 @@
 
 # operating system files
 *.DS_Store
+
+# sphinx documentation file
+/docs/_build/

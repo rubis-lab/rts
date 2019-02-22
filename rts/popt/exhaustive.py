@@ -3,7 +3,7 @@ from rts.sched.sched import Sched
 from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.core.pts import ParaTaskSet
-from rts.sched.bcl_naive import BCL_Naive
+from rts.sched.bcl_naive import BCLNaive
 
 
 class Exhaustive(Popt):
