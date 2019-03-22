@@ -1,6 +1,6 @@
-Parallelizable Task Set
+Parallelizable Taskset
 =======================
 
 .. automodule:: core.pts
    :members:
-   :undoc-members:
+   :special-members: __init__, __del__, __str__, __len__, __getitem__, __setitem__

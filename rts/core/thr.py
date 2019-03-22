@@ -2,19 +2,50 @@ from rts.core.task import Task
 
 
 class Thread(Task):
-    'Thread class inherited from Task'
+    """
+    Class ParaTask : Generate Thread \n
+
+    **Import info :** \n
+    +----------------+--------------+
+    | Package Name   | Module Name  |
+    +================+==============+
+    | core           | task         |
+    +----------------+--------------+
+
+    """
+
     cnt = 0
 
     def __init__(self, **kwargs):
+        """
+        **Role**: Initailize Thread \n
+
+        .. important:: **thread** inherits from **Task**\n
+        (When tasks shares same attributes, thread will be generated)
+
+        """
+
         super(type(self), self).__init__(**kwargs)
         self.tid = kwargs.get('tid', type(self).cnt)
 
         type(self).cnt += 1
 
     def __del__(self):
+        """
+        **Role**: Delete Class\n
+        .. note:: **cnt** : decreases by 1
+
+        """
         type(self).cnt -= 1
 
     def __str__(self):
+        """
+        **Role**: Format for printing taskset \n
+
+        .. note:: **Thread** => **id** **tid** **exec_time** **deadline** **period**
+
+        """
+
         return "%d\t%d\t%.2f\t%.2f\t%.2f" % (
             self.id,
             self.tid,

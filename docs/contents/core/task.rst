@@ -3,4 +3,4 @@ Basic Task Class
 
 .. automodule:: core.task
    :members:
-   :undoc-members:
+   :special-members: __init__, __del__, __str__

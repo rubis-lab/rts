@@ -7,10 +7,45 @@ import random
 
 
 class ParaTaskSet(object):
+
+    """
     'Parallelizable Task Set'
+    Class ParaTask : Generate Parallelizable Taskset\n
+
+    **Import info :** \n
+    +----------------+--------------+
+    | Package Name   | Module Name  |
+    +================+==============+
+    | core           | task         |
+    +----------------+--------------+
+    | core           | ts           |
+    +----------------+--------------+
+    | core           | pt           |
+    +----------------+--------------+
+    | op             | para         |
+    +----------------+--------------+
+    | op             | tsutil       |
+    +----------------+--------------+
+
+    """
     cnt = 0
 
     def __init__(self, **kwargs):
+        """
+         **Role**: Initialize Parallelizable Taskset\n
+         .. note::
+          * **max_option** : The maximum parallelize option that \n
+          * **overhead** : The increasing rate of **execution_time** on every **parallelization** \n
+          * **variance** : The **execution_time** difference between **paralleizable task** and **thread** on paralleization\n
+          * **base_ts** : **parallelize task** needs **base_task** ( Default: exec_time=1, deadline=2, period=3 )\n
+          * **pt_list** : Save **paralleizable tasks** in a list to make a **paralleizable taskset*\n
+          * **populate_pt_list** : See the **"populate_pt_list"**\n
+          * **popt_strategy** : parallel option (default **single** )\n
+          * **popt_list** : parallel option list for each **pt_list**\n
+          * **pts_serialized** :  Generate **taskset** includes **parallelizable tasks** with **parallel option**
+          * **serialize_pts** : See the **serialize pts**
+         """
+
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
         self.max_opt = kwargs.get('max_option', 1)
@@ -36,9 +71,22 @@ class ParaTaskSet(object):
         return
 
     def __del__(self):
+        """
+        **Role**: Delete Parallelizable Taskset
+        .. note:: **cnt** : decreases by 1
+
+        """
+
         type(self).cnt -= 1
 
     def __str__(self):
+        """
+        **Role**: Format for printing Parallelizable Taskset \n
+
+        .. note::
+         * **info** = 'id' + 'max_option' + 'base_ts' + 'generated (pts_serialized)'\n
+
+        """
         info = 'id: ' + str(self.id) + '\n' + \
                'max_option: ' + str(self.max_opt) + '\n\n' + \
                'base_ts: ' + '\n' + str(self.base_ts) + '\n' + \
@@ -47,24 +95,43 @@ class ParaTaskSet(object):
         return info
 
     def __len__(self):
+        """
+        **Role**: Returns length of **pts_serialized** \n
+
+        """
         return len(self.pts_serialized)
 
     def __getitem__(self, idx):
+        """
+        **Role**: Get **Prallelizable Task** based on index
+        """
         return self.pts_serialized[idx]
 
     def __setitem__(self, idx, thr):
+        """
+        **Role**: Set **Prallelizable Task**'s parallel option with given value
+        """
         self.pts_serialized[idx] = thr
         return
 
     def __iter__(self):
+        """
+        **Role**: Set **Prallelizable Task**'s parallel option with given value
+        """
         return iter(self.pts_serialized)
 
     def clear(self):
+        """
+        **Role**: Delete **Prallelizable Taskset**
+        """
         del self.pts_serialized[:]
         del self.pt_list[:]
         return
 
     def populate_pt_list(self):
+        """
+        **Role**: Generate **Parallelizabe Task** for given **base_task** with **max_option**, **overhead**, **variance**
+        """
         for t in self.base_ts:
             para_task_param = {
                 'base_task': t,
@@ -77,6 +144,23 @@ class ParaTaskSet(object):
         return
 
     def serialize_pts(self):
+        """
+        **Role**: Generate **taskset** includes **parallelizable tasks** with **parallel option**\n
+
+        .. note::
+         * :py:const:`if popt_strategy == single` \n
+            Generate **Single** parallel option base Parallelizable Taskset\n
+
+         * :py:const:`if popt_strategy == max` \n
+            Generate **max** parallel option base Parallelizable Taskset\n
+
+         * :py:const:`if popt_strategy == random` \n
+            Generate **random (1 ~ max_option)** parallel option base Parallelizable Taskset\n
+
+         * :py:const:`if popt_strategy == custom` \n
+            Generate **value (popt_list argument)** parallel option base Parallelizable Taskset\n
+
+        """
         if self.popt_strategy == 'single':
             self.pts_serialized = para.parallelize_pts_single(self.pt_list)
         elif self.popt_strategy == 'max':
@@ -93,6 +177,9 @@ class ParaTaskSet(object):
             raise Exception('Parallelization strategy not defined')
 
     def tot_util(self):
+        """
+        **Role**: Calculate total utilization (from **"op.tsutil.sum_utilization"**)
+        """
         return tsutil.sum_utilization(self.pts_serialized)
 
 

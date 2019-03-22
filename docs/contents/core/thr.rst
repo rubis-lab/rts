@@ -3,4 +3,4 @@ Thread Class
 
 .. automodule:: core.thr
    :members:
-   :undoc-members:
+   :special-members: __init__, __del__, __str__
