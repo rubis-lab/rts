@@ -281,6 +281,5 @@ class MainLoop(QObject):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     plot = Window()
-    plot.show()
     main = MainLoop(app)
     sys.exit(app.exec())

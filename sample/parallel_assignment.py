@@ -4,7 +4,6 @@ from rts.sched.bcl_naive import BCLNaive
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
 
-
 if __name__ == '__main__':
     # create generator
     gen_param = {
@@ -114,7 +113,6 @@ if __name__ == '__main__':
                 print(cho_selected_option)
                 cho_dbg = cho.is_schedulable_dbg(pts, cho_selected_option)
                 print(rnd_dbg)
-
 
     print("single")
     stat_single.print_minimal()
