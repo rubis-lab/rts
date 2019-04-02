@@ -210,7 +210,6 @@ class Window(QWidget):
         right_layout = QVBoxLayout()
         right_layout.addWidget(self.tableWidget)
         right_layout.addWidget(self.button_start)
-        right_layout.addWidget(self.label_status)
 
         # Compiling Layout
         whole_layout = QHBoxLayout()
