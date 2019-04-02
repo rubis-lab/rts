@@ -8,3 +8,4 @@ Op
    para
    stat
    tsutil
+   plotting
