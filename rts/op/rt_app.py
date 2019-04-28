@@ -8,6 +8,7 @@ class RTApp(object):
         self.exp_duration = kwargs.get('duration', 10)
         self.name = kwargs.get('name', 'exp')
         self.scale = kwargs.get('scale', 1000)
+        self.comp = kwargs.get('comp', 1.1)
         self.create_global()
         self.thr_cnt = 0
 
@@ -25,13 +26,13 @@ class RTApp(object):
         thr_name = 'thread' + str(self.thr_cnt)
         tasks = self.json_data['tasks']
         tasks[thr_name] = {
-            'run': int(self.scale * t.exec_time),
-            'dl-runtime': int(self.scale * t.exec_time),
+            'runtime': int(self.scale * t.exec_time),
+            'dl-runtime': int(self.scale * t.exec_time * self.comp),
             'dl-deadline': int(self.scale * t.deadline),
-            'dl-period': int(self.scale * t.period),
+            'dl-period': int(self.scale * t.period * self.comp),
             'timer': {
                 'ref': 'unique' + str(self.thr_cnt),
-                'period': int(self.scale * t.period)
+                'period': int(self.scale * t.period * self.comp)
             }
         }
         self.thr_cnt += 1
