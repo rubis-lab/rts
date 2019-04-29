@@ -67,7 +67,7 @@ if __name__ == '__main__':
         pts = ParaTaskSet(**pts_param_single)
         pts_util = pts.tot_util()
         # additional info for rt app
-        with open('additional.info') as f:
+        with open('additional.info', 'w+') as f:
             f.write(pts_util)
         f.close()
 
