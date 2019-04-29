@@ -29,7 +29,7 @@ class RTApp(object):
             'runtime': int(self.scale * t.exec_time),
             'dl-runtime': int(self.scale * t.exec_time * self.comp),
             'dl-deadline': int(self.scale * t.deadline),
-            'dl-period': int(self.scale * t.period * self.comp),
+            'dl-period': int(self.scale * t.period),
             'timer': {
                 'ref': 'unique' + str(self.thr_cnt),
                 'period': int(self.scale * t.period * self.comp)

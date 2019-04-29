@@ -39,7 +39,7 @@ if __name__ == '__main__':
     }
     rtapp = RTApp(**rt_app_param)
 
-    num_iter = 3
+    num_iter = 1
     notify_every = 10000
     for i in range(num_iter):
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         pts_util = pts.tot_util()
         # additional info for rt app
         with open('additional.info', 'w+') as f:
-            f.write(pts_util)
+            f.write(str(pts_util))
         f.close()
 
             # single thread schedulability
