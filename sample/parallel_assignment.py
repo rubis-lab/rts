@@ -42,6 +42,8 @@ if __name__ == '__main__':
     num_iter = 3
     notify_every = 10000
     for i in range(num_iter):
+
+
         if i % notify_every == 0:
             print("{} % : {} / {}".format(i * 100 / num_iter, i, num_iter))
         # generate tasks
@@ -64,8 +66,12 @@ if __name__ == '__main__':
         }
         pts = ParaTaskSet(**pts_param_single)
         pts_util = pts.tot_util()
+        # additional info for rt app
+        with open('additional.info') as f:
+            f.write(pts_util)
+        f.close()
 
-        # single thread schedulability
+            # single thread schedulability
         bcl_naive = BCLNaive(**sched_param)
         sched_single = bcl_naive.is_schedulable(pts)
         stat_single.add(pts_util, sched_single)
