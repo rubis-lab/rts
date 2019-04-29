@@ -1,0 +1,61 @@
+{
+    "global": {
+        "default_policy": "SCHED_DEADLINE", 
+        "duration": 20, 
+        "ftrace": true, 
+        "gnuplot": true, 
+        "log_basename": "random"
+    }, 
+    "tasks": {
+        "thread0": {
+            "dl-deadline": 17900, 
+            "dl-period": 19690, 
+            "dl-runtime": 9130, 
+            "runtime": 8300, 
+            "timer": {
+                "period": 19690, 
+                "ref": "unique0"
+            }
+        }, 
+        "thread1": {
+            "dl-deadline": 14600, 
+            "dl-period": 16060, 
+            "dl-runtime": 5280, 
+            "runtime": 4800, 
+            "timer": {
+                "period": 16060, 
+                "ref": "unique1"
+            }
+        }, 
+        "thread2": {
+            "dl-deadline": 14600, 
+            "dl-period": 16060, 
+            "dl-runtime": 3190, 
+            "runtime": 2900, 
+            "timer": {
+                "period": 16060, 
+                "ref": "unique2"
+            }
+        }, 
+        "thread3": {
+            "dl-deadline": 14600, 
+            "dl-period": 16060, 
+            "dl-runtime": 1760, 
+            "runtime": 1600, 
+            "timer": {
+                "period": 16060, 
+                "ref": "unique3"
+            }
+        }, 
+        "thread4": {
+            "dl-deadline": 9400, 
+            "dl-period": 10340, 
+            "dl-runtime": 8910, 
+            "runtime": 8100, 
+            "timer": {
+                "period": 10340, 
+                "ref": "unique4"
+            }
+        }
+    }
+}

@@ -4,6 +4,8 @@ from rts.sched.bcl_naive import BCLNaive
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
 from rts.op.rt_app import RTApp
+import random
+import time
 
 if __name__ == '__main__':
     # create generator
@@ -38,8 +40,9 @@ if __name__ == '__main__':
         'duration': 5
     }
     rtapp = RTApp(**rt_app_param)
-
-    num_iter = 1
+    
+    random.seed(time.time())
+    num_iter = random.randint(3, 9)
     notify_every = 10000
     for i in range(num_iter):
 

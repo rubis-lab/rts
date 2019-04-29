@@ -32,7 +32,8 @@ class RTApp(object):
             'dl-period': int(self.scale * t.period),
             'timer': {
                 'ref': 'unique' + str(self.thr_cnt),
-                'period': int(self.scale * t.period * self.comp)
+                'period': int(self.scale * t.period * self.comp),
+		'mode': 'absolute'
             }
         }
         self.thr_cnt += 1
