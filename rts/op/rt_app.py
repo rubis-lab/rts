@@ -37,6 +37,10 @@ class RTApp(object):
         }
         self.thr_cnt += 1
 
+    def clear_json(self):
+        self.thr_cnt = 0
+        self.json_data = {}
+
     def to_file(self):
         with open(self.name + '.json', 'w') as outfile:
             json.dump(self.json_data, outfile, indent=4, sort_keys=True)

@@ -3,6 +3,7 @@ from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.core.pts import ParaTaskSet
 from rts.op import tsutil
+from rts.op.rt_app import RTApp
 import math
 
 
@@ -65,6 +66,7 @@ class Cho(Popt):
         n_task = len(pts.pt_list)
         selected_opt = [1 for i in range(n_task)]
 
+        print(pts)
         # Iteration
         while True:
             """
@@ -119,9 +121,18 @@ class Cho(Popt):
                     if selected_opt[i] >= self.max_opt:
                         # interference exceeds tolerance
                         if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
-                            return False
+                            return pts # false
                 # All tasks interference under tolerance
-                return True
+                print(selected_opt)
+                print('selected_opt')
+                pts.popt_strategy = 'custom'
+                pts.popt_list = selected_opt
+                pts.serialize_pts()
+                print('serialized----------')
+                print(pts.pts_serialized)
+
+
+                return pts # true
 
             # print('----------------')
 

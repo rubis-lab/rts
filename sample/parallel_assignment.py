@@ -3,6 +3,7 @@ from rts.gen.egen import Egen
 from rts.sched.bcl_naive import BCLNaive
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
+from rts.op.rt_app import RTApp
 
 if __name__ == '__main__':
     # create generator
@@ -31,7 +32,14 @@ if __name__ == '__main__':
     stat_random = Stat(**stat_param)
     stat_cho = Stat(**stat_param)
 
-    num_iter = 100000
+    #for RTApp Json Output
+    rt_app_param = {
+        'scale': 100,
+        'duration': 20
+    }
+    rtapp = RTApp(**rt_app_param)
+
+    num_iter = 3
     notify_every = 10000
     for i in range(num_iter):
         if i % notify_every == 0:
@@ -61,6 +69,17 @@ if __name__ == '__main__':
         bcl_naive = BCLNaive(**sched_param)
         sched_single = bcl_naive.is_schedulable(pts)
         stat_single.add(pts_util, sched_single)
+        print(pts)
+        rtapp.name="single"
+        rtapp.create_global()
+        print('rtapp name change')
+        for t in pts:
+            rtapp.add_thr(t)
+        print('rtapp name add ts')
+        rtapp.to_file()
+        print('rtapp file created')
+        rtapp.clear_json()
+
 
         # max thread
         pts.popt_strategy = 'max'
@@ -69,6 +88,15 @@ if __name__ == '__main__':
         # max thread schedulability
         sched_max = bcl_naive.is_schedulable(pts)
         stat_max.add(pts_util, sched_max)
+        rtapp.name="max"
+        rtapp.create_global()
+        print('rtapp name change')
+        for t in pts:
+            rtapp.add_thr(t)
+        print('rtapp name add ts')
+        rtapp.to_file()
+        print('rtapp file created')
+        rtapp.clear_json()
 
         # random thread
         pts.popt_strategy = 'random'
@@ -78,6 +106,15 @@ if __name__ == '__main__':
         # random thread schedulability
         sched_random = bcl_naive.is_schedulable(pts)
         stat_random.add(pts_util, sched_random)
+        rtapp.name="random"
+        rtapp.create_global()
+        print('rtapp name change')
+        for t in pts:
+            rtapp.add_thr(t)
+        print('rtapp name add ts')
+        rtapp.to_file()
+        print('rtapp file created')
+        rtapp.clear_json()
 
         # cho
         pts.popt_strategy = 'custom'
@@ -90,8 +127,19 @@ if __name__ == '__main__':
         }
 
         cho = Cho(**popt_param)
-        sched_cho = cho.is_schedulable(pts)
+        pts_cho = cho.is_schedulable(pts)
+        sched_cho = True # temporary
         stat_cho.add(pts_util, sched_cho)
+
+        rtapp.name="cho"
+        rtapp.create_global()
+        print('rtapp name change')
+        for t in pts_cho:
+            rtapp.add_thr(t)
+        print('rtapp name add ts')
+        rtapp.to_file()
+        print('rtapp file created')
+        rtapp.clear_json()
 
         if not sched_cho:
             if sched_single or sched_max or sched_random:
