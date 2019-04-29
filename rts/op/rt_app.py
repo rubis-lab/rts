@@ -26,6 +26,7 @@ class RTApp(object):
         thr_name = 'thread' + str(self.thr_cnt)
         tasks = self.json_data['tasks']
         tasks[thr_name] = {
+            "loop": -1,
             'runtime': int(self.scale * t.exec_time),
             'dl-runtime': int(self.scale * t.exec_time * self.comp),
             'dl-deadline': int(self.scale * t.deadline),
@@ -33,7 +34,7 @@ class RTApp(object):
             'timer': {
                 'ref': 'unique' + str(self.thr_cnt),
                 'period': int(self.scale * t.period * self.comp),
-		'mode': 'absolute'
+                'mode': 'absolute'
             }
         }
         self.thr_cnt += 1
