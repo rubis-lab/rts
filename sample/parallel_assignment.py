@@ -37,7 +37,8 @@ if __name__ == '__main__':
     #for RTApp Json Output
     rt_app_param = {
         'scale': 100,
-        'duration': 5
+        'duration': 5,
+        'loop': 1000,
     }
     rtapp = RTApp(**rt_app_param)
     
