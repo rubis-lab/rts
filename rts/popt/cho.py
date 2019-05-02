@@ -121,7 +121,7 @@ class Cho(Popt):
                     if selected_opt[i] >= self.max_opt:
                         # interference exceeds tolerance
                         if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
-                            return pts # false
+                            return False, pts # false
                 # All tasks interference under tolerance
                 print(selected_opt)
                 print('selected_opt')
@@ -132,7 +132,7 @@ class Cho(Popt):
                 print(pts.pts_serialized)
 
 
-                return pts # true
+                return True, pts # true
 
             # print('----------------')
 

@@ -212,7 +212,7 @@ if __name__ == '__main__':
     }
 
     pts = ParaTaskSet(**pts_param)
-    print(pts)
+    #(pts)
 
     pts.popt_list = [2, 1]
     pts.serialize_pts()
