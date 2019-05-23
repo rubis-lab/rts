@@ -1,60 +1,202 @@
 {
     "global": {
-        "default_policy": "SCHED_DEADLINE", 
-        "duration": 20, 
-        "ftrace": true, 
-        "gnuplot": true, 
+        "default_policy": "SCHED_DEADLINE",
+        "duration": 5,
+        "ftrace": true,
+        "gnuplot": true,
         "log_basename": "random"
-    }, 
+    },
     "tasks": {
         "thread0": {
-            "dl-deadline": 17900, 
-            "dl-period": 19690, 
-            "dl-runtime": 9130, 
-            "runtime": 8300, 
+            "dl-deadline": 16900,
+            "dl-period": 16900,
+            "dl-runtime": 2640,
+            "loop": 1000,
+            "runtime": 2400,
             "timer": {
-                "period": 19690, 
+                "mode": "absolute",
+                "period": 18590,
                 "ref": "unique0"
             }
-        }, 
+        },
         "thread1": {
-            "dl-deadline": 14600, 
-            "dl-period": 16060, 
-            "dl-runtime": 5280, 
-            "runtime": 4800, 
+            "dl-deadline": 16900,
+            "dl-period": 16900,
+            "dl-runtime": 2530,
+            "loop": 1000,
+            "runtime": 2300,
             "timer": {
-                "period": 16060, 
+                "mode": "absolute",
+                "period": 18590,
                 "ref": "unique1"
             }
-        }, 
-        "thread2": {
-            "dl-deadline": 14600, 
-            "dl-period": 16060, 
-            "dl-runtime": 3190, 
-            "runtime": 2900, 
+        },
+        "thread10": {
+            "dl-deadline": 9500,
+            "dl-period": 9500,
+            "dl-runtime": 1100,
+            "loop": 1000,
+            "runtime": 1000,
             "timer": {
-                "period": 16060, 
+                "mode": "absolute",
+                "period": 10450,
+                "ref": "unique10"
+            }
+        },
+        "thread11": {
+            "dl-deadline": 7500,
+            "dl-period": 7500,
+            "dl-runtime": 3740,
+            "loop": 1000,
+            "runtime": 3400,
+            "timer": {
+                "mode": "absolute",
+                "period": 8250,
+                "ref": "unique11"
+            }
+        },
+        "thread12": {
+            "dl-deadline": 7500,
+            "dl-period": 7500,
+            "dl-runtime": 3190,
+            "loop": 1000,
+            "runtime": 2900,
+            "timer": {
+                "mode": "absolute",
+                "period": 8250,
+                "ref": "unique12"
+            }
+        },
+        "thread13": {
+            "dl-deadline": 7500,
+            "dl-period": 7500,
+            "dl-runtime": 2420,
+            "loop": 1000,
+            "runtime": 2200,
+            "timer": {
+                "mode": "absolute",
+                "period": 8250,
+                "ref": "unique13"
+            }
+        },
+        "thread14": {
+            "dl-deadline": 7500,
+            "dl-period": 7500,
+            "dl-runtime": 660,
+            "loop": 1000,
+            "runtime": 600,
+            "timer": {
+                "mode": "absolute",
+                "period": 8250,
+                "ref": "unique14"
+            }
+        },
+        "thread15": {
+            "dl-deadline": 16200,
+            "dl-period": 16200,
+            "dl-runtime": 5060,
+            "loop": 1000,
+            "runtime": 4600,
+            "timer": {
+                "mode": "absolute",
+                "period": 17820,
+                "ref": "unique15"
+            }
+        },
+        "thread2": {
+            "dl-deadline": 16900,
+            "dl-period": 16900,
+            "dl-runtime": 1320,
+            "loop": 1000,
+            "runtime": 1200,
+            "timer": {
+                "mode": "absolute",
+                "period": 18590,
                 "ref": "unique2"
             }
-        }, 
+        },
         "thread3": {
-            "dl-deadline": 14600, 
-            "dl-period": 16060, 
-            "dl-runtime": 1760, 
-            "runtime": 1600, 
+            "dl-deadline": 9500,
+            "dl-period": 9500,
+            "dl-runtime": 9350,
+            "loop": 1000,
+            "runtime": 8500,
             "timer": {
-                "period": 16060, 
+                "mode": "absolute",
+                "period": 10450,
                 "ref": "unique3"
             }
-        }, 
+        },
         "thread4": {
-            "dl-deadline": 9400, 
-            "dl-period": 10340, 
-            "dl-runtime": 8910, 
-            "runtime": 8100, 
+            "dl-deadline": 13500,
+            "dl-period": 13500,
+            "dl-runtime": 3740,
+            "loop": 1000,
+            "runtime": 3400,
             "timer": {
-                "period": 10340, 
+                "mode": "absolute",
+                "period": 14850,
                 "ref": "unique4"
+            }
+        },
+        "thread5": {
+            "dl-deadline": 13500,
+            "dl-period": 13500,
+            "dl-runtime": 2860,
+            "loop": 1000,
+            "runtime": 2600,
+            "timer": {
+                "mode": "absolute",
+                "period": 14850,
+                "ref": "unique5"
+            }
+        },
+        "thread6": {
+            "dl-deadline": 13500,
+            "dl-period": 13500,
+            "dl-runtime": 2420,
+            "loop": 1000,
+            "runtime": 2200,
+            "timer": {
+                "mode": "absolute",
+                "period": 14850,
+                "ref": "unique6"
+            }
+        },
+        "thread7": {
+            "dl-deadline": 9500,
+            "dl-period": 9500,
+            "dl-runtime": 1760,
+            "loop": 1000,
+            "runtime": 1600,
+            "timer": {
+                "mode": "absolute",
+                "period": 10450,
+                "ref": "unique7"
+            }
+        },
+        "thread8": {
+            "dl-deadline": 9500,
+            "dl-period": 9500,
+            "dl-runtime": 1540,
+            "loop": 1000,
+            "runtime": 1400,
+            "timer": {
+                "mode": "absolute",
+                "period": 10450,
+                "ref": "unique8"
+            }
+        },
+        "thread9": {
+            "dl-deadline": 9500,
+            "dl-period": 9500,
+            "dl-runtime": 1210,
+            "loop": 1000,
+            "runtime": 1100,
+            "timer": {
+                "mode": "absolute",
+                "period": 10450,
+                "ref": "unique9"
             }
         }
     }

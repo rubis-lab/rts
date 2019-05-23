@@ -60,7 +60,10 @@ class ParaTaskSet(object):
         self.base_ts = kwargs.get('base_ts', tmp_ts)
         self.pt_list = []
 
-        self.populate_pt_list()
+        if kwargs.get('custom', 'False') == 'True':
+            self.pt_list = kwargs.get('pt_list', [[]])
+        else:
+            self.populate_pt_list()
 
         # pts serialized according to selected option.
         # defaults to single thread for each pt in pts.
@@ -68,6 +71,7 @@ class ParaTaskSet(object):
         self.popt_list = kwargs.get('popt_list', [1 for i in range(len(self.pt_list))])
         self.pts_serialized = TaskSet()
         self.serialize_pts()
+
         return
 
     def __del__(self):

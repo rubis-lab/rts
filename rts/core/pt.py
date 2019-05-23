@@ -1,6 +1,7 @@
 from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.op import para
+from rts.core.thr import Thread
 
 
 class ParaTask(object):
@@ -49,7 +50,31 @@ class ParaTask(object):
         ts.append(self.base_task)
         self.ts_table = {'1': ts}
 
-        self.populate_ts_table()
+        if kwargs.get('custom', 'False') == 'True':
+            self.exec_times = kwargs.get('exec_times', [[]])
+            self.custom_init()
+        else:
+            self.populate_ts_table()
+
+    def custom_init(self):
+        if self.max_opt >= 2:
+            para.parallelize_pt_non_dec(self)
+            for opt in range(1, self.max_opt + 1):
+
+                ts = TaskSet()
+                for i in range(0, opt):
+
+                    thr_param = {
+                        'id': self.base_task.id,
+                        'exec_time': self.exec_times[opt - 1][i],
+                        'deadline': self.base_task.deadline,
+                        'period': self.base_task.period,
+                    }
+                    thr = Thread(**thr_param)
+
+                    ts.append(thr)
+                self.ts_table[str(opt)] = ts
+        return
 
     def __del__(self):
         """
