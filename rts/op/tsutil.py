@@ -59,6 +59,30 @@ def workload_in_interval_edf(t, l):
     return w_body_job + w_carry_in
 
 
+def workload_in_interval_edf_whole(t, l):
+    # body job
+    # tasks aligned to deadlines
+    num_body_job = math.floor(l / t.period)
+    w_body_job = t.exec_time * num_body_job
+
+    return w_body_job
+
+
+def workload_in_interval_dbf(t, l):
+    num_body_job = math.floor((l - t.deadline) / t.period)
+
+    w_body_job = t.exec_time * (num_body_job + 1.0)
+
+    return w_body_job
+
+
+def get_k_max_exec_time_task(ts, k=1):
+    tasks = ts.task_list
+    tasks.sort(key=lambda x: x.exec_time)
+
+    return tasks[:k]
+
+
 def workload_in_interval_fp(t, l):
     # body job
     # slack not defined

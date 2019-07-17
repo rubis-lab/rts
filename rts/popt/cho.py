@@ -66,7 +66,7 @@ class Cho(Popt):
         n_task = len(pts.pt_list)
         selected_opt = [1 for i in range(n_task)]
 
-        print(pts)
+        # print(pts)
         # Iteration
         while True:
             """
@@ -123,13 +123,13 @@ class Cho(Popt):
                         if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
                             return False, pts # false
                 # All tasks interference under tolerance
-                print(selected_opt)
-                print('selected_opt')
+                # print(selected_opt)
+                # print('selected_opt')
                 pts.popt_strategy = 'custom'
                 pts.popt_list = selected_opt
                 pts.serialize_pts()
-                print('serialized----------')
-                print(pts.pts_serialized)
+                # print('serialized----------')
+                # print(pts.pts_serialized)
 
 
                 return True, pts # true
