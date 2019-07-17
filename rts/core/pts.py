@@ -71,6 +71,7 @@ class ParaTaskSet(object):
         self.popt_list = kwargs.get('popt_list', [1 for i in range(len(self.pt_list))])
         self.pts_serialized = TaskSet()
         self.serialize_pts()
+        self.task_list = self.pts_serialized.task_list
 
         return
 
