@@ -31,18 +31,31 @@ if __name__ == '__main__':
 	stat_max = Stat(**stat_param)
 	stat_random = Stat(**stat_param)
 	stat_cho = Stat(**stat_param)
+	n_sched_single = 0
+	n_sched_max = 0
+	n_sched_random = 0
+	n_sched_cho = 0
 
 	stat_single_bcl = Stat(**stat_param)
 	stat_single_bar = Stat(**stat_param)
 	stat_single_rta = Stat(**stat_param)
+	n_sched_single_bcl = 0
+	n_sched_single_bar = 0
+	n_sched_single_rta = 0
 
 	stat_max_bcl = Stat(**stat_param)
 	stat_max_bar = Stat(**stat_param)
 	stat_max_rta = Stat(**stat_param)
+	n_sched_max_bcl = 0
+	n_sched_max_bar = 0
+	n_sched_max_rta = 0
 
 	stat_random_bcl = Stat(**stat_param)
 	stat_random_bar = Stat(**stat_param)
 	stat_random_rta = Stat(**stat_param)
+	n_sched_random_bcl = 0
+	n_sched_random_bar = 0
+	n_sched_random_rta = 0
 
 	notify_every = 1000
 	num_iter = 10000
@@ -76,19 +89,48 @@ if __name__ == '__main__':
 
 		# single thread schedulability
 		bcl_naive = BCLNaive(**sched_param)
-		stat_single_bcl.add(pts_util, bcl_naive.is_schedulable(ts))
+
+		# stat_single_bcl.add(pts_util, bcl_naive.is_schedulable(ts))
+		sched_single_bcl = bcl_naive.is_schedulable(ts)
+		stat_single_bcl.add(pts_util, sched_single_bcl)
+		if sched_single_bcl:
+			n_sched_single_bcl += 1
+
 		bar = BAR(**sched_param)
-		stat_single_bar.add(pts_util, bar.is_schedulable(ts))
-		stat_single_rta.add(pts_util, bcl.is_schedulable(ts, **sched_param))
+		# stat_single_bar.add(pts_util, bar.is_schedulable(ts))
+		sched_single_bar = bar.is_schedulable(ts)
+		stat_single_bar.add(pts_util, sched_single_bar)
+		if sched_single_bar:
+			n_sched_single_bar += 1
+
+		# stat_single_rta.add(pts_util, bcl.is_schedulable(ts, **sched_param))
+		sched_single_rta = bcl.is_schedulable(ts, **sched_param)
+		stat_single_rta.add(pts_util, sched_single_rta)
+		if sched_single_rta:
+			n_sched_single_rta += 1
 
 		# max thread
 		pts.popt_strategy = 'max'
 		pts.serialize_pts()
 
 		# max thread schedulability
-		stat_max_bcl.add(pts_util, bcl_naive.is_schedulable(pts))
-		stat_max_bar.add(pts_util, bar.is_schedulable(pts))
-		stat_max_rta.add(pts_util, bcl.is_schedulable(pts, **sched_param))
+		# stat_max_bcl.add(pts_util, bcl_naive.is_schedulable(pts))
+		sched_max_bcl = bcl_naive.is_schedulable(pts)
+		stat_max_bcl.add(pts_util, sched_max_bcl)
+		if sched_max_bcl:
+			n_sched_max_bcl += 1
+
+		# stat_max_bar.add(pts_util, bar.is_schedulable(pts))
+		sched_max_bar = bar.is_schedulable(pts)
+		stat_max_bar.add(pts_util, sched_max_bar)
+		if sched_max_bar:
+			n_sched_max_bar += 1
+
+		# stat_max_rta.add(pts_util, bcl.is_schedulable(pts, **sched_param))
+		sched_max_rta = bcl.is_schedulable(pts, **sched_param)
+		stat_max_rta.add(pts_util, sched_max_rta)
+		if sched_max_rta:
+			n_sched_max_rta += 1
 
 		# random thread
 		pts.popt_strategy = 'random'
@@ -96,9 +138,23 @@ if __name__ == '__main__':
 		rnd_selected_option = pts.popt_list
 
 		# random thread schedulability
-		stat_random_bcl.add(pts_util, bcl_naive.is_schedulable(pts))
-		stat_random_bar.add(pts_util, bar.is_schedulable(pts))
-		stat_random_rta.add(pts_util, bcl.is_schedulable(pts, **sched_param))
+		# stat_random_bcl.add(pts_util, bcl_naive.is_schedulable(pts))
+		sched_random_bcl = bcl_naive.is_schedulable(pts)
+		stat_random_bcl.add(pts_util, sched_random_bcl)
+		if sched_random_bcl:
+			n_sched_random_bcl += 1
+
+		# stat_random_bar.add(pts_util, bar.is_schedulable(pts))
+		sched_random_bar = bar.is_schedulable(pts)
+		stat_random_bar.add(pts_util, sched_random_bar)
+		if sched_random_bar:
+			n_sched_random_bar += 1
+
+		# stat_random_rta.add(pts_util, bcl.is_schedulable(pts, **sched_param))
+		sched_random_rta = bcl.is_schedulable(pts, **sched_param)
+		stat_random_rta.add(pts_util, sched_random_rta)
+		if sched_random_rta:
+			n_sched_random_rta += 1
 
 		# cho
 		pts.popt_strategy = 'custom'
@@ -113,6 +169,8 @@ if __name__ == '__main__':
 		cho = Cho(**popt_param)
 		sched_cho, pts_cho = cho.is_schedulable(pts)
 		stat_cho.add(pts_util, sched_cho)
+		if sched_cho:
+			n_sched_cho += 1
 
 	# print("single")
 	# stat_single.print_minimal()
@@ -161,3 +219,33 @@ if __name__ == '__main__':
 	print("------------")
 	print("stat_cho")
 	stat_cho.print_minimal()
+
+	print("------------")
+	print('total')
+	print(num_iter)
+	print('n_sched_single')
+	print(n_sched_single)
+	print('n_sched_max')
+	print(n_sched_max)
+	print('n_sched_random')
+	print(n_sched_random)
+	print('n_sched_cho')
+	print(n_sched_cho)
+	print('n_sched_single_bcl')
+	print(n_sched_single_bcl)
+	print('n_sched_single_bar')
+	print(n_sched_single_bar)
+	print('n_sched_single_rta')
+	print(n_sched_single_rta)
+	print('n_sched_max_bcl')
+	print(n_sched_max_bcl)
+	print('n_sched_max_bar')
+	print(n_sched_max_bar)
+	print('n_sched_max_rta')
+	print(n_sched_max_rta)
+	print('n_sched_random_bcl')
+	print(n_sched_random_bcl)
+	print('n_sched_random_bar')
+	print(n_sched_random_bar)
+	print('n_sched_random_rta')
+	print(n_sched_random_rta)
