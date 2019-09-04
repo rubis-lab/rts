@@ -25,8 +25,7 @@ class Gen(object):
         return
 
     def __str__(self):
-        info = 'num_task = ' + str(self.num_task) + '\n' + \
-            'min_exec_time = ' + str(self.min_exec_time) + '\n' + \
+        info = 'min_exec_time = ' + str(self.min_exec_time) + '\n' + \
             'max_exec_time = ' + str(self.max_exec_time) + '\n' + \
             'min_deadline = ' + str(self.min_deadline) + '\n' + \
             'max_deadline = ' + str(self.max_deadline) + '\n' + \
