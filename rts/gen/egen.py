@@ -24,7 +24,11 @@ class Egen(Gen):
                 period = random.randint(self.min_period, self.max_period)
                 exec_time = random.randint(self.min_exec_time, self.max_exec_time)
 
-        deadline = period  # implicit deadline
+        if self.implicit_deadline:
+            deadline = period
+        else:
+                deadline = random.randint(self.min_deadline, self.max_deadline)
+
         task_param = {
             'period': period,
             'exec_time': exec_time,
