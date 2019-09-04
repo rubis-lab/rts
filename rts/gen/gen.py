@@ -18,6 +18,7 @@ class Gen(object):
         self.min_period = kwargs.get('min_period', 0)
         self.max_period = kwargs.get('max_period', 0)
         self.implicit_deadline = kwargs.get('implicit_deadline', True)
+        self.constrained_deadline = kwargs.get('constrained_deadline', True)
         return
 
     def __del__(self):
@@ -32,6 +33,7 @@ class Gen(object):
             'min_period = ' + str(self.min_period) + '\n' + \
             'max_period = ' + str(self.max_period) + '\n' + \
             'implicit_deadline = ' + str(self.implicit_deadline) + '\n' + \
+            'constrained_deadline = ' + str(self.constrained_deadline)
         return info
 
     def next_task(self, **kwargs):

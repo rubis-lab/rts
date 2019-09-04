@@ -27,6 +27,9 @@ class Egen(Gen):
         if self.implicit_deadline:
             deadline = period
         else:
+            if self.constrained_deadline:
+                deadline = random.randint(self.min_deadline, period)
+            else:
                 deadline = random.randint(self.min_deadline, self.max_deadline)
 
         task_param = {
