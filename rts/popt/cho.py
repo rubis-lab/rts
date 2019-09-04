@@ -3,7 +3,6 @@ from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.core.pts import ParaTaskSet
 from rts.op import tsutil
-from rts.op.rt_app import RTApp
 import math
 
 
