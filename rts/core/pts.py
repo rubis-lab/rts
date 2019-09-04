@@ -52,6 +52,8 @@ class ParaTaskSet(object):
 
         # parallelizer info
         self.overhead = kwargs.get('overhead', 0.0)
+        if self.overhead > 0.5:
+                self.overhead = 3.0
         self.variance = kwargs.get('variance', 0.0)
 
         # base task set info
