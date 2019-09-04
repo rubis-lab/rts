@@ -42,7 +42,7 @@ class ParaTask(object):
 
         # parallelizer info
         self.overhead = kwargs.get('overhead', 0.0)
-        self.variance = kwargs.get('variance', 0.0)
+        self.variance = kwargs.get('variance', 1.0)
 
         # base task info
         self.base_task = kwargs.get('base_task', Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
