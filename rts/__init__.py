@@ -1,2 +1,2 @@
-def rts_print():
-    return (u'RTS')
+def rts_info():
+	return (u'rtss-rts')
