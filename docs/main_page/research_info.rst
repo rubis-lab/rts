@@ -1,4 +1,2 @@
-Topic
-------
-
-This research is about ...
+Optimal Task Parallelization for Global EDF on Multi-core Systems
+-----------------------------------------------------------------

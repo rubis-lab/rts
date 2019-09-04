@@ -1,4 +1,4 @@
-E-Generator
+Egen
 ===========
 
 .. automodule:: gen.egen

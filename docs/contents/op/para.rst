@@ -1,4 +1,4 @@
-Prallelize Task
+parallelize
 ================
 
 .. automodule:: op.para

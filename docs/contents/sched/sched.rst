@@ -1,4 +1,4 @@
-schedulability test class
+Sched
 =========================
 
 .. automodule:: sched.sched

@@ -17,10 +17,8 @@ Real-time TaskSimulator Documentation
    :caption: Contents
 
    contents/core/index.rst
-   contents/exp/index.rst
    contents/gen/index.rst
    contents/op/index.rst
-   contents/param/index.rst
    contents/popt/index.rst
    contents/sched/index.rst
 

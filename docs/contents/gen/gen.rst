@@ -1,4 +1,4 @@
-Generator
+Gen
 ===========
 
 .. automodule:: gen.gen

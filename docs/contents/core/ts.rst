@@ -1,4 +1,4 @@
-Basic Taskset Class
+TaskSet
 ===================
 
 .. automodule:: core.ts

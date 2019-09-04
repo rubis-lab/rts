@@ -1,4 +1,4 @@
-Parallelizable Taskset
+ParaTaskSet
 =======================
 
 .. automodule:: core.pts
