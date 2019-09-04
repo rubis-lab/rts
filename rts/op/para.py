@@ -262,6 +262,97 @@ def normalize_list(l):
 
     return [(ll - l_mean) / l_sum for ll in l]
 
+def parallelize_pt_non_dec_alpha(pt):
+    # Paralleliuze task while non decreasing total execution time
+    # largest execution time always non increases
+
+    # total execution time
+    # required to have total execution time larger than 3 * max_option
+    e_tot = pt.base_task.exec_time
+    if e_tot <= pt.max_opt * 3:
+        raise Exception('Execution time too small')
+
+    # largest execution time
+    e_max = pt.base_task.exec_time
+
+    e_tot_prev = e_tot
+    e_max_prev = e_max
+
+    for opt in range(2, pt.max_opt + 1):
+        # print('----------------')
+        # print('opt: ' + str(opt))
+        e_mean = e_tot_prev / opt
+        # print('e_mean: ' + str(e_mean))
+
+        # random draw (opt) from [0, 1]
+        # fixed s_tot, which is scaled later
+        # necessary step, to keep the ratio same
+        # discard if max thread is larger than before.
+        max_effort = 10
+        effort = 0
+        while True:
+            if effort >= max_effort:
+                break
+
+            s_tot = 1000
+            s_list = unifast_divide(opt, s_tot, (s_tot / opt) * (1.0 + pt.variance))
+            s_list_norm = normalize_list(s_list)
+            # print(s_list_norm)
+
+            e_list = [round(e_mean * (1.0 + s)) for s in s_list_norm]
+            # print('e_list: ' + str(e_list))
+
+            e_max = max(e_list)
+            # print('e_max: ' + str(e_max))
+
+            if e_max >= e_max_prev: 
+                effort += 1
+                continue
+            break
+
+
+        # scale e_tot accordingly
+        e_tot = pt.overhead * (e_max_prev - e_max) + e_tot_prev
+        # print('e_tot: ' + str(e_tot))
+
+        # make all tasks again, this time max pinned to e_max.
+        e_list = [e_max] + unifast_divide(opt - 1, e_tot - e_max, e_max)
+        e_list.sort(reverse=True)
+        # print('e_list_new: ' + str(e_list))
+
+        pt.ts_table[str(opt)] = TaskSet()
+
+        # alpha
+        # alpha = (e_tot - e_tot_prev) / (e_max_prev - e_max)
+        # print('alpha: ' + str(alpha))
+        # print('----------------')
+
+        # update e_tot, e_max
+        e_max_prev = e_max
+        e_tot_prev = e_tot
+
+        # create threads and append to task set
+        ts = TaskSet()
+
+        for i in range(len(e_list)):
+
+            # set minimum e to 1.0
+            if e_list[i] < 0.1:
+                e_list[i] = 1.0
+
+            thr_param = {
+                'id': pt.base_task.id,
+                'exec_time': e_list[i],
+                'deadline': pt.base_task.deadline,
+                'period': pt.base_task.period,
+            }
+            thr = Thread(**thr_param)
+
+            ts.append(thr)
+
+        # append to pt
+        pt.ts_table[str(opt)] = ts
+    return
 
 def parallelize_pts_single(pt_list):
     ts = TaskSet()

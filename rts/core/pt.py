@@ -168,7 +168,8 @@ class ParaTask(object):
         ###            self[i].append(thr)
 
         if self.max_opt >= 2:
-            para.parallelize_pt_non_dec(self)
+            # para.parallelize_pt_non_dec(self)
+            para.parallelize_pt_non_dec_alpha(self)
         return
 
 
