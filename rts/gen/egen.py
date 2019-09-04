@@ -13,6 +13,7 @@ class Egen(Gen):
         self.ts = TaskSet()
         self.last_id = -1
         self.utilization_overflow = kwargs.get('util_over', True)
+        self.deadline_scale = kwargs.get('deadline_scale', 1.0)
 
     def next_task(self, **kwargs):
         period = random.randint(self.min_period, self.max_period)
@@ -35,7 +36,7 @@ class Egen(Gen):
         task_param = {
             'period': period,
             'exec_time': exec_time,
-            'deadline': deadline,
+            'deadline': deadline * self.deadline_scale,
         }
 
         t = Task(**task_param)
