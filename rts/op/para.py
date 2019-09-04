@@ -256,6 +256,11 @@ def unifast_divide_alpha(pcs, tot, limit):
     divided_best_effort.sort(reverse=True)
     return divided_best_effort
 
+def normalize_list(l):
+    l_sum = sum(l)
+    l_mean = l_sum / len(l)
+
+    return [(ll - l_mean) / l_sum for ll in l]
 
 
 def parallelize_pts_single(pt_list):
