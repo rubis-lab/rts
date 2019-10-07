@@ -1,4 +1,4 @@
-Cho's
+Cho
 =============
 
 .. automodule:: popt.cho

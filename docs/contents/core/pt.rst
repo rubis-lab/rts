@@ -1,4 +1,4 @@
-Parallelizable Task
+ParaTask
 ===================
 
 .. automodule:: core.pt

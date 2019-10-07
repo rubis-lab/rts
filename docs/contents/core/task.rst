@@ -1,4 +1,4 @@
-Basic Task Class
+Task
 ===================
 
 .. automodule:: core.task

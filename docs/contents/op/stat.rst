@@ -1,4 +1,4 @@
-Stat Class
+Stat
 ================
 
 .. automodule:: op.stat

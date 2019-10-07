@@ -1,4 +1,4 @@
-U-Generator
+Ugen
 ===========
 
 .. automodule:: gen.ugen

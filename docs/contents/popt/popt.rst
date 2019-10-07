@@ -1,4 +1,4 @@
-Parallel Option
+Popt
 ================
 
 .. automodule:: popt.popt

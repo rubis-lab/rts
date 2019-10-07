@@ -9,9 +9,9 @@ class ParaTaskTestCase(unittest.TestCase):
     """ Tests for `pt.py`."""
     def test_init_with_task(self):
         task_param = {
-            'exec_time': 4,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 40,
+            'deadline': 100,
+            'period': 100,
         }
         t = Task(**task_param)
         para_task_param = {
@@ -23,13 +23,13 @@ class ParaTaskTestCase(unittest.TestCase):
         self.assertEqual(pt.max_opt, 4)
         option_one_first_thr = pt[1][0]
         self.assertEqual(option_one_first_thr, t)
-        self.assertEqual(option_one_first_thr.exec_time, 4)
+        self.assertEqual(option_one_first_thr.exec_time, 40)
 
     def test_getitem_raise_error(self):
         task_param = {
-            'exec_time': 4,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 40,
+            'deadline': 100,
+            'period': 100,
         }
         t = Task(**task_param)
         para_task_param = {
@@ -41,21 +41,21 @@ class ParaTaskTestCase(unittest.TestCase):
 
     def test_append_and_getter(self):
         thr_param11 = {
-            'exec_time': 4,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 40,
+            'deadline': 100,
+            'period': 100,
         }
         thr11 = Thread(**thr_param11)
         thr_param21 = {
-            'exec_time': 2,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 20,
+            'deadline': 100,
+            'period': 100,
         }
         thr21 = Thread(**thr_param21)
         thr_param22 = {
-            'exec_time': 3,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 30,
+            'deadline': 100,
+            'period': 100,
         }
         thr22 = Thread(**thr_param22)
 

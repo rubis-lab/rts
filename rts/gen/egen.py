@@ -13,6 +13,7 @@ class Egen(Gen):
         self.ts = TaskSet()
         self.last_id = -1
         self.utilization_overflow = kwargs.get('util_over', True)
+        self.deadline_scale = kwargs.get('deadline_scale', 1.0)
 
     def next_task(self, **kwargs):
         period = random.randint(self.min_period, self.max_period)
@@ -24,11 +25,18 @@ class Egen(Gen):
                 period = random.randint(self.min_period, self.max_period)
                 exec_time = random.randint(self.min_exec_time, self.max_exec_time)
 
-        deadline = period  # implicit deadline
+        if self.implicit_deadline:
+            deadline = period
+        else:
+            if self.constrained_deadline:
+                deadline = random.randint(self.min_deadline, period)
+            else:
+                deadline = random.randint(self.min_deadline, self.max_deadline)
+
         task_param = {
             'period': period,
             'exec_time': exec_time,
-            'deadline': deadline,
+            'deadline': deadline * self.deadline_scale,
         }
 
         t = Task(**task_param)

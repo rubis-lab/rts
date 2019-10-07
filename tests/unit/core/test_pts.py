@@ -10,16 +10,16 @@ class PTSTestCase(unittest.TestCase):
 
     def test_single_and_max_popt(self):
         task_param = {
-            'exec_time': 4,
-            'deadline': 10,
-            'period': 10,
+            'exec_time': 40,
+            'deadline': 100,
+            'period': 100,
         }
         t1 = Task(**task_param)
 
         task_param = {
-            'exec_time': 10,
-            'deadline': 20,
-            'period': 20,
+            'exec_time': 100,
+            'deadline': 200,
+            'period': 200,
         }
         t2 = Task(**task_param)
 
@@ -45,7 +45,7 @@ class PTSTestCase(unittest.TestCase):
             'popt': 'max',
         }
         pts2 = ParaTaskSet(**pts_param2)
-        self.assertEqual(len(pts2), 8)
+        self.assertEqual(len(pts2), 2)
 
 
 if __name__ == '__main__':

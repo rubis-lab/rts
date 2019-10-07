@@ -1,4 +1,4 @@
-BCL
+bcl
 =============
 
 .. automodule:: sched.bcl

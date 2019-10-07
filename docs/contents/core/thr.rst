@@ -1,4 +1,4 @@
-Thread Class
+Thread
 ===================
 
 .. automodule:: core.thr

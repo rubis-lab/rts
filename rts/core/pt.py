@@ -42,7 +42,7 @@ class ParaTask(object):
 
         # parallelizer info
         self.overhead = kwargs.get('overhead', 0.0)
-        self.variance = kwargs.get('variance', 0.0)
+        self.variance = kwargs.get('variance', 1.0)
 
         # base task info
         self.base_task = kwargs.get('base_task', Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
@@ -168,7 +168,8 @@ class ParaTask(object):
         ###            self[i].append(thr)
 
         if self.max_opt >= 2:
-            para.parallelize_pt_non_dec(self)
+            # para.parallelize_pt_non_dec(self)
+            para.parallelize_pt_non_dec_alpha(self)
         return
 
 

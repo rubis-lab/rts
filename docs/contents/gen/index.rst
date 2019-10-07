@@ -1,4 +1,4 @@
-Gen
+gen
 ===================================================
 
 .. toctree::
@@ -7,6 +7,5 @@ Gen
 
    egen
    gen
-   sgen
    ugen
    unifast
