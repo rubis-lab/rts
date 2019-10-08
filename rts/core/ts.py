@@ -3,7 +3,7 @@ from rts.op import tsutil
 
 class TaskSet(object):
     """
-    Class ParaTask : Generate Taskset\n
+    Class ParaTask : Generate TaskSet\n
 
     **Import info :** \n
     +----------------+--------------+
@@ -18,7 +18,7 @@ class TaskSet(object):
 
     def __init__(self, **kwargs):
         """
-        **Role**: Initializae **id (= cnt) & task_list** based on keyword argument\n
+        **Role**: Initialize **id (= cnt) & task_list** based on keyword argument\n
 
         .. note:: **cnt** : increases by 1
 
@@ -32,7 +32,6 @@ class TaskSet(object):
         """
         **Role**: Delete Class\n
         .. note:: **cnt** : decreases by 1
-
         """
         type(self).cnt -= 1
 
@@ -40,10 +39,9 @@ class TaskSet(object):
         """
         **Role**: Format for printing taskset \n
 
-        >>> length of task_list, tot_util
+        length of task_list, tot_util
 
         .. note:: **tot_util** : sum of each task's utilization (from **"op.tsutil.sum_utilization"**)
-
         """
 
         tot_util = tsutil.sum_utilization(self)

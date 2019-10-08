@@ -11,21 +11,19 @@ class Thread(Task):
     +================+==============+
     | core           | task         |
     +----------------+--------------+
-
     """
 
     cnt = 0
 
     def __init__(self, **kwargs):
         """
-        **Role**: Initailize Thread \n
+        **Role**: Initialize Thread \n
 
         .. important:: **thread** inherits from **Task**\n
-        (When tasks shares same attributes, thread will be generated)
-
+        Thread = Task + tid. You may treat a thread the same as you would a task.
         """
 
-        super(type(self), self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.tid = kwargs.get('tid', type(self).cnt)
 
         type(self).cnt += 1
@@ -41,11 +39,8 @@ class Thread(Task):
     def __str__(self):
         """
         **Role**: Format for printing taskset \n
-
         .. note:: **Thread** => **id** **tid** **exec_time** **deadline** **period**
-
         """
-
         return "%d\t%d\t%.2f\t%.2f\t%.2f" % (
             self.id,
             self.tid,
