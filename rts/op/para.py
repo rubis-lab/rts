@@ -229,6 +229,7 @@ def parallelize_pt_non_dec(pt):
         pt.ts_table[str(opt)] = ts
     return
 
+
 def unifast_divide_alpha(pcs, tot, limit):
     max_iter = 25
     divided_best_effort = [10000000]
@@ -256,14 +257,16 @@ def unifast_divide_alpha(pcs, tot, limit):
     divided_best_effort.sort(reverse=True)
     return divided_best_effort
 
+
 def normalize_list(l):
     l_sum = sum(l)
     l_mean = l_sum / len(l)
 
     return [(ll - l_mean) / l_sum for ll in l]
 
+
 def parallelize_pt_non_dec_alpha(pt):
-    # Paralleliuze task while non decreasing total execution time
+    # Parallelize task while non decreasing total execution time
     # largest execution time always non increases
 
     # total execution time
@@ -310,7 +313,6 @@ def parallelize_pt_non_dec_alpha(pt):
                 continue
             break
 
-
         # scale e_tot accordingly
         e_tot = pt.overhead * (e_max_prev - e_max) + e_tot_prev
         # print('e_tot: ' + str(e_tot))
@@ -353,6 +355,7 @@ def parallelize_pt_non_dec_alpha(pt):
         # append to pt
         pt.ts_table[str(opt)] = ts
     return
+
 
 def parallelize_pts_single(pt_list):
     ts = TaskSet()

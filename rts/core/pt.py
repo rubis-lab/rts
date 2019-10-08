@@ -5,7 +5,6 @@ from rts.core.thr import Thread
 
 
 class ParaTask(object):
-
     """
     Class ParaTask : Generate Parallelizable Task\n
 
@@ -19,7 +18,6 @@ class ParaTask(object):
     +----------------+--------------+
     | op             | para         |
     +----------------+--------------+
-
     """
     cnt = 0
 
@@ -29,11 +27,10 @@ class ParaTask(object):
         .. note::
          * **max_option** : The maximum parallelize option that \n
          * **overhead** : The increasing rate of **execution_time** on every **parallelization** \n
-         * **variance** : The **execution_time** difference between **threads** on paralleization\n
+         * **variance** : The **execution_time** difference between **threads** on parallelization\n
          * **base_task** : **parallelize task** needs **base_task** ( Default: exec_time=1, deadline=2, period=3 )\n
          * **ts_table** : Save taskset from **1** to **max_option**\n
          * **populate_ts_table** : See the **"populate_ts_table"**\n
-
         """
 
         type(self).cnt += 1
@@ -52,13 +49,16 @@ class ParaTask(object):
 
         if kwargs.get('custom', 'False') == 'True':
             self.exec_times = kwargs.get('exec_times', [[]])
-            self.custom_init()
+            self.populate_ts_table_custom()
         else:
             self.populate_ts_table()
 
-    def custom_init(self):
+    def populate_ts_table_custom(self):
+        """
+        **Role**: Populate ts_table using predefined execution times.\n
+        """
         if self.max_opt >= 2:
-            para.parallelize_pt_non_dec(self)
+            # para.parallelize_pt_non_dec_alpha(self)
             for opt in range(1, self.max_opt + 1):
 
                 ts = TaskSet()
@@ -122,11 +122,11 @@ class ParaTask(object):
         """
 
         if opt == 0:
-            raise Exception('Parallization option cannot be 0.')
+            raise Exception('Parallelization option cannot be 0.')
         elif opt <= len(self.ts_table):
             return self.ts_table[str(opt)]
         else:
-            raise Exception('Parllelization option out of bound.\n' +
+            raise Exception('Parallelization option out of bound.\n' +
                             'max_parallel option: ' + str(self.max_opt) + '\n' +
                             'requested option: ' + str(opt))
 
@@ -142,49 +142,22 @@ class ParaTask(object):
             Exception Handler
         """
         if opt == 0:
-            raise Exception('Parallization option cannot be 0.')
+            raise Exception('Parallelization option cannot be 0.')
         elif opt <= len(self.ts_table):
             self.ts_table[str(opt)] = ts
             return
         else:
-            raise Exception('Parllelization option out of bound.\n' +
+            raise Exception('Parallelization option out of bound.\n' +
                             'max_parallel option: ' + str(self.max_opt) + '\n' +
                             'requested option: ' + str(opt))
 
     def populate_ts_table(self):
         """
         **Role**: Generate **populate_ts_table**
-
-        For more details **See "op.para.parallelize_pt_non_dec"**
-
-
+        For more details **See "op.para.parallelize_pt_non_dec_alpha"**
         """
-
-        ###if self.max_opt >= 2:
-        ###    for i in range(2, self.max_opt + 1):
-        ###        self.ts_table[str(i)] = TaskSet()
-        ###        tlist = para.parallelize_task(self.base_task, **{'pcs': i, 'overhead': self.overhead, 'variance': self.variance})
-        ###        for thr in tlist:
-        ###            self[i].append(thr)
 
         if self.max_opt >= 2:
             # para.parallelize_pt_non_dec(self)
             para.parallelize_pt_non_dec_alpha(self)
         return
-
-
-if __name__ == '__main__':
-    task_param = {
-        'exec_time': 20,
-        'deadline': 60,
-        'period': 60,
-    }
-    t = Task(**task_param)
-    para_task_param = {
-        'base_task': t,
-        'max_option': 4,
-        'overhead': 0.1,
-        'variance': 0.9,
-    }
-    pt = ParaTask(**para_task_param)
-    print(pt)

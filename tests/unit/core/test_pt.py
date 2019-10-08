@@ -25,7 +25,7 @@ class ParaTaskTestCase(unittest.TestCase):
         self.assertEqual(option_one_first_thr, t)
         self.assertEqual(option_one_first_thr.exec_time, 40)
 
-    def test_getitem_raise_error(self):
+    def test_get_set_item_raise_error(self):
         task_param = {
             'exec_time': 40,
             'deadline': 100,
@@ -37,32 +37,32 @@ class ParaTaskTestCase(unittest.TestCase):
             'max_option': 4,
         }
         pt = ParaTask(**para_task_param)
-        pass
+        with self.assertRaises(Exception):
+            temp_val = pt[5]
+        with self.assertRaises(Exception):
+            temp_val += pt[0]
+        with self.assertRaises(Exception):
+            pt[5] = temp_val
 
-    def test_append_and_getter(self):
-        thr_param11 = {
-            'exec_time': 40,
-            'deadline': 100,
-            'period': 100,
-        }
-        thr11 = Thread(**thr_param11)
-        thr_param21 = {
+    def test_custom_populate(self):
+        task_param = {
             'exec_time': 20,
-            'deadline': 100,
-            'period': 100,
+            'deadline': 50,
+            'period': 60,
         }
-        thr21 = Thread(**thr_param21)
-        thr_param22 = {
-            'exec_time': 30,
-            'deadline': 100,
-            'period': 100,
-        }
-        thr22 = Thread(**thr_param22)
-
+        t = Task(**task_param)
         para_task_param = {
-            'max_option': 2,
+            'base_task': t,
+            'max_option': 4,
+            'custom': 'True',
+            'exec_times': [[20], [11, 10], [9, 8, 8], [7, 6, 6, 5]],
         }
-        pass
+        pt = ParaTask(**para_task_param)
+        ts4 = pt[4]
+        self.assertEqual(ts4[0].exec_time, 7)
+        self.assertEqual(ts4[1].deadline, 50)
+        self.assertEqual(ts4[2].period, 60)
+        self.assertEqual(ts4[3].exec_time, 5)
 
 
 if __name__ == '__main__':
