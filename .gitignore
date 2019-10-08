@@ -6,7 +6,8 @@
 /build/
 
 # data files
-.json
+*.json
+*.info
 
 # idea project files
 /.idea/

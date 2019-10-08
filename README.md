@@ -1,13 +1,15 @@
 # rtss-rts: RTSS 2019 Real-time Task Simulator
 
 Scripts to conduct experiments using simulated real-time tasks.
-Used in RTSS 2019 Fig ?.
+Used in RTSS 2019 Fig 10.
+
+## Requirements
 
 ## To install
 ```
-git clone https://github.com/upoque/rtss-rts.git
-cd rtss-rts
-pip install -e .
+git clone https://github.com/upoque/Real-timeTaskSimulator.git rts
+cd rts
+pip3 install -e .
 ```
 
 ## Run tests
