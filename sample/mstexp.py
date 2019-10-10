@@ -1,8 +1,5 @@
-from rts.core.pts import ParaTaskSet
-from rts.gen.egen import Egen
-from rts.sched.bcl_naive import BCLNaive
 from rts.op.stat import Stat
-from rts.popt.cho import Cho
+from rts.popt.cho_mst import ChoMultiSegmentTask
 from rts.sched.bcl_mst import BCLMultiSegmentTask
 from rts.gen.mstgen import MSgen
 
@@ -33,10 +30,11 @@ if __name__ == '__main__':
         'max': 4.0,
         'inc': 0.1,
     }
-    stat_base = Stat(**stat_param)
+    stat_single = Stat(**stat_param)
+    stat_cho = Stat(**stat_param)
 
-    notify_every = 100
-    num_iter = 1000
+    notify_every = 1
+    num_iter = 1
 
     # schedulability check param
     sched_param = {
@@ -47,27 +45,30 @@ if __name__ == '__main__':
 
         if i % notify_every == 0:
             print("{} % : {} / {}".format(i * 100 / num_iter, i, num_iter))
-
+        print('--------')
         # generate tasks
         msts = msg.next_mst_set()
-
-        # configure ms (not used now).
-        # ms_param_single = {
-        #     'base_ts': ts,
-        #     'max_option': 4,
-        #     'overhead': 0.3,
-        #     'variance': 0.7,
-        #     'popt_strategy': 'single',
-        # }
-
         msts_util = msts.tot_util()
-
+        print(msts)
+        print('--------')
         # check schedulability
         bcl_mst = BCLMultiSegmentTask(**sched_param)
-        sched_base = bcl_mst.is_schedulable(msts)
-        stat_base.add(msts_util, sched_base)
+        sched_single = bcl_mst.is_schedulable(msts)
+        stat_single.add(msts_util, sched_single)
 
-    print("base")
-    stat_base.print_minimal()
-    print("------------")
+        # cho schedulability
+        msts_param = {
+            'num_core': 4.0,
+            'max_option': 4,
+        }
+        cho = ChoMultiSegmentTask(**msts_param)
+        sched_cho, _ = cho.is_schedulable(msts)
+        stat_cho.add(msts_util, sched_cho)
 
+    # print("single")
+    # stat_single.print_minimal()
+    # print("------------")
+    #
+    # print("cho")
+    # stat_cho.print_minimal()
+    # print("------------")

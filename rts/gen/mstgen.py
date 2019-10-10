@@ -49,7 +49,7 @@ class MSgen(Gen):
         ms = MultiSegmentTask(**{
             'base_ts': ts,
             'max_option': self.max_option,
-            'popt_strategy': 'random'
+            'popt_strategy': 'single'
         })
         return ms
 
