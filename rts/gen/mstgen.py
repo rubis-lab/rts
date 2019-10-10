@@ -92,33 +92,25 @@ class MSgen(Gen):
             'max_option = ' + str(self.max_option)
         return info
 
-    def create_new_task_set(self, t):
+    def create_new_mst_set(self, mst):
         self.ts.clear()
 
-        if t.utilization() <= self.tot_util:
-            self.last_id = 0
-            t.id = self.last_id
-            self.ts.append(t)
-            return self.ts
+        if mst.tot_util() <= self.tot_util:
+            self.msts.append(mst)
+            return self.msts
         else:
-            raise Exception('Cannot create new task set, tried utilization: ' + t.utilization())
-
-    def next_task_set(self):
-        # try append task to existing task set
-        t = self.next_task()
-        if self.ts.tot_util() + t.utilization() >= self.tot_util:
-            return self.create_new_task_set(t)
-
-        # append task to existing task set
-        self.last_id += 1
-        t.id = self.last_id
-        self.ts.append(t)
-
-        return self.ts
+            raise Exception('Cannot create new task set, tried utilization: ' + mst.tot_util())
 
     def next_mst_set(self):
         # try to append a task to the existing mst set
-        return
+        mst = self.next_mst()
+        if self.msts.tot_util() + mst.tot_util() >= self.tot_util:
+            return self.create_new_mst_set(mst)
+
+        # append task to existing task set
+        self.msts.append(mst)
+
+        return self.msts
 
 
 if __name__ == '__main__':
@@ -139,6 +131,7 @@ if __name__ == '__main__':
         'max_option': 4
     }
     msg = MSgen(**gen_param)
-    msg.next_mst()
+    msts = msg.next_mst_set()
+    print(msts)
 
     print(msg)
