@@ -93,7 +93,7 @@ class MSgen(Gen):
         return info
 
     def create_new_mst_set(self, mst):
-        self.ts.clear()
+        self.msts.clear()
 
         if mst.tot_util() <= self.tot_util:
             self.msts.append(mst)
