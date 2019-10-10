@@ -34,7 +34,8 @@ class MultiSegmentTask(object):
             self.populate_pt_list()
 
         # task like property
-        self.exec_time = -1 # will be updated to sum of longest exec_times of all segments
+        self.exec_time = -1 # sum of all exec_times
+        self.crit_exec_time = -1 # sum of largest exec_times
         self.deadline = self.base_ts[0].deadline
         self.period = self.base_ts[0].period
 
@@ -111,12 +112,40 @@ class MultiSegmentTask(object):
         self.update_exec_time()
 
     def update_exec_time(self):
+        self.crit_exec_time = 0.0
         self.exec_time = 0.0
-        for e in self.ts_list:
-            self.exec_time += e[0].exec_time # sum of largest exec_time (longest path)
+        for ts in self.ts_list:
+            self.crit_exec_time += ts[0].exec_time  # sum of largest exec_time (longest path)
+            for t in ts:
+                self.exec_time += t.exec_time  # sum of all exec_time
 
     def tot_util(self):
         sum_util = 0.0
         for ts in self.ts_list:
             sum_util += tsutil.sum_utilization(ts)
         return sum_util
+
+if __name__ == '__main__':
+    t1 = Task(**{
+        'exec_time': 20,
+        'deadline': 30,
+        'period': 40
+    })
+    t2 = Task(**{
+        'exec_time': 40,
+        'deadline': 60,
+        'period': 80
+    })
+    ts = TaskSet()
+    ts.append(t1)
+    ts.append(t2)
+
+    ms = MultiSegmentTask(**{
+        'base_ts': ts,
+        'max_option': 4,
+        'popt_strategy': 'max'
+    })
+
+    print(ms)
+    print(ms.crit_exec_time)
+    print(ms.exec_time)

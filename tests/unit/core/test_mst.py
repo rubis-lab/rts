@@ -86,6 +86,6 @@ class MultiSegmentTaskTestCase(unittest.TestCase):
 			'popt_strategy': 'single'
 		})
 
-		self.assertEqual(ms.exec_time, 60)
+		self.assertEqual(ms.crit_exec_time, 60)
 		self.assertEqual(ms.deadline, 30)
 		self.assertEqual(ms.period, 40)
