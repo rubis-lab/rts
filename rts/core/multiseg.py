@@ -43,6 +43,39 @@ class MultiSegment(object):
         self.update_ts_list()
         return
 
+    def __del__(self):
+        type(self).cnt -= 1
+
+    def __str__(self):
+        info = 'id: ' + str(self.id) + '\n' + \
+            'max_option: ' + str(self.max_opt) + '\n' + \
+            'popt_strategy: ' + self.popt_strategy + '\n' + \
+            'num_segments: ' + str(len(self)) + '\n' + \
+            'tot_util: ' + str(self.tot_util()) + '\n\n' + \
+            'generated: \n'
+        for i, ts in enumerate(self.ts_list):
+            info += 'segment ' + str(i + 1) + '\n' + \
+                str(ts) + '\n'
+        return info
+
+    def __len__(self):
+        return len(self.ts_list)
+
+    def __getitem__(self, idx):
+        return self.ts_list[idx]
+
+    def __setitem__(self, idx, thr):
+        self.ts_list[idx] = thr
+        return
+
+    def __iter__(self):
+        return iter(self.ts_list)
+
+    def clear(self):
+        del self.ts_list[:]
+        del self.pt_list[:]
+        return
+
     def populate_pt_list(self):
         for t in self.base_ts:
             para_task_param = {
@@ -70,6 +103,14 @@ class MultiSegment(object):
         else:
             raise Exception('Parallelization strategy not defined')
 
+    def tot_util(self):
+        sum_util = 0.0
+        for ts in self.ts_list:
+            sum_util += tsutil.sum_utilization(ts)
+        return sum_util
+
 
 if __name__ == '__main__':
     print('multiseg')
+    ms = MultiSegment()
+    print(ms)
