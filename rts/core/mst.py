@@ -33,6 +33,11 @@ class MultiSegmentTask(object):
         else:
             self.populate_pt_list()
 
+        # task like property
+        self.exec_time = -1 # will be updated to sum of longest exec_times of all segments
+        self.deadline = self.base_ts[0].deadline
+        self.period = self.base_ts[0].period
+
         # create a list of task sets according to selected option.
         # defaults to single thread for each pt
         self.popt_strategy = kwargs.get('popt_strategy', 'single')
@@ -101,6 +106,14 @@ class MultiSegmentTask(object):
             self.ts_list = para.parallelize_multiseg_custom(self.pt_list, self.popt_list)
         else:
             raise Exception('Parallelization strategy not defined')
+
+        # update longest exec_time
+        self.update_exec_time()
+
+    def update_exec_time(self):
+        self.exec_time = 0.0
+        for e in self.ts_list:
+            self.exec_time += e[0].exec_time # sum of largest exec_time (longest path)
 
     def tot_util(self):
         sum_util = 0.0

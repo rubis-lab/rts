@@ -58,8 +58,34 @@ class MultiSegmentTaskTestCase(unittest.TestCase):
 			'max_option': 4,
 			'popt_strategy': 'single'
 		})
+
 		ms.popt_strategy = 'max'
 		ms.update_ts_list()
 		self.assertEqual(len(ms), 2)
 		self.assertEqual(len(ms[0]), 4)
 		self.assertEqual(len(ms[1]), 4)
+
+	def test_task_like_property(self):
+		t1 = Task(**{
+			'exec_time': 20,
+			'deadline': 30,
+			'period': 40
+		})
+		t2 = Task(**{
+			'exec_time': 40,
+			'deadline': 60,
+			'period': 80
+		})
+		ts = TaskSet()
+		ts.append(t1)
+		ts.append(t2)
+
+		ms = MultiSegmentTask(**{
+			'base_ts': ts,
+			'max_option': 4,
+			'popt_strategy': 'single'
+		})
+
+		self.assertEqual(ms.exec_time, 60)
+		self.assertEqual(ms.deadline, 30)
+		self.assertEqual(ms.period, 40)
