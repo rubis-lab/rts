@@ -120,10 +120,8 @@ class MultiSegmentTask(object):
                 self.exec_time += t.exec_time  # sum of all exec_time
 
     def tot_util(self):
-        sum_util = 0.0
-        for ts in self.ts_list:
-            sum_util += tsutil.sum_utilization(ts)
-        return sum_util
+        return self.exec_time / self.period
+
 
 if __name__ == '__main__':
     t1 = Task(**{
@@ -149,3 +147,4 @@ if __name__ == '__main__':
     print(ms)
     print(ms.crit_exec_time)
     print(ms.exec_time)
+    print(ms.tot_util())
