@@ -26,7 +26,6 @@ class ParaTaskSet(object):
     +----------------+--------------+
     | op             | tsutil       |
     +----------------+--------------+
-
     """
     cnt = 0
 
@@ -36,9 +35,9 @@ class ParaTaskSet(object):
          .. note::
           * **max_option** : The maximum parallelize option that \n
           * **overhead** : The increasing rate of **execution_time** on every **parallelization** \n
-          * **variance** : The **execution_time** difference between **paralleizable task** and **thread** on paralleization\n
+          * **variance** : How **execution_time**s vary between **thread**s \n
           * **base_ts** : **parallelize task** needs **base_task** ( Default: exec_time=1, deadline=2, period=3 )\n
-          * **pt_list** : Save **paralleizable tasks** in a list to make a **paralleizable taskset*\n
+          * **pt_list** : Save **parallelizable tasks** in a list to make a **parallelizable taskset*\n
           * **populate_pt_list** : See the **"populate_pt_list"**\n
           * **popt_strategy** : parallel option (default **single** )\n
           * **popt_list** : parallel option list for each **pt_list**\n
@@ -52,11 +51,13 @@ class ParaTaskSet(object):
 
         # parallelizer info
         self.overhead = kwargs.get('overhead', 0.0)
-        if self.overhead > 0.5:
-                self.overhead = 3.0
+        # overhead cap
+        # if self.overhead > 0.5:
+        #     self.overhead = 3.0
         self.variance = kwargs.get('variance', 0.0)
 
         # base task set info
+        # tmp_ts: fallback task set with a single dummy task.
         tmp_ts = TaskSet()
         tmp_ts.append(Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
         self.base_ts = kwargs.get('base_ts', tmp_ts)
@@ -70,7 +71,7 @@ class ParaTaskSet(object):
         # pts serialized according to selected option.
         # defaults to single thread for each pt in pts.
         self.popt_strategy = kwargs.get('popt_strategy', 'single')
-        self.popt_list = kwargs.get('popt_list', [1 for i in range(len(self.pt_list))])
+        self.popt_list = kwargs.get('popt_list', [1 for _ in range(len(self.pt_list))])
         self.pts_serialized = TaskSet()
         self.serialize_pts()
         self.task_list = self.pts_serialized.task_list
@@ -81,7 +82,6 @@ class ParaTaskSet(object):
         """
         **Role**: Delete Parallelizable Taskset
         .. note:: **cnt** : decreases by 1
-
         """
 
         type(self).cnt -= 1
@@ -92,7 +92,6 @@ class ParaTaskSet(object):
 
         .. note::
          * **info** = 'id' + 'max_option' + 'base_ts' + 'generated (pts_serialized)'\n
-
         """
         info = 'id: ' + str(self.id) + '\n' + \
                'max_option: ' + str(self.max_opt) + '\n\n' + \
@@ -104,7 +103,6 @@ class ParaTaskSet(object):
     def __len__(self):
         """
         **Role**: Returns length of **pts_serialized** \n
-
         """
         return len(self.pts_serialized)
 
@@ -219,7 +217,6 @@ if __name__ == '__main__':
     }
 
     pts = ParaTaskSet(**pts_param)
-    #(pts)
 
     pts.popt_list = [2, 1]
     pts.serialize_pts()
