@@ -1,13 +1,12 @@
 from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.core.pt import ParaTask
-from rts.core.pts import ParaTaskSet
 from rts.op import para
 from rts.op import tsutil
 import random
 
 
-class MultiSegment(object):
+class MultiSegmentTask(object):
     """
     'Multi Segment Task'
     """
@@ -108,9 +107,3 @@ class MultiSegment(object):
         for ts in self.ts_list:
             sum_util += tsutil.sum_utilization(ts)
         return sum_util
-
-
-if __name__ == '__main__':
-    print('multiseg')
-    ms = MultiSegment()
-    print(ms)

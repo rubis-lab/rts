@@ -1,15 +1,15 @@
 from rts.core.task import Task
 from rts.core.ts import TaskSet
-from rts.core.multiseg import MultiSegment
+from rts.core.mst import MultiSegmentTask
 
 import unittest
 
 
-class MultiSegmentTestCase(unittest.TestCase):
-	""" Tests for `multiseg.py`."""
+class MultiSegmentTaskTestCase(unittest.TestCase):
+	""" Tests for `mst.py`."""
 
 	def test_default_multiseg_created(self):
-		ms = MultiSegment()
+		ms = MultiSegmentTask()
 		self.assertEqual(ms[0][0].exec_time, 1.0)
 		self.assertEqual(ms[0][0].deadline, 2.0)
 
@@ -28,7 +28,7 @@ class MultiSegmentTestCase(unittest.TestCase):
 		ts.append(t1)
 		ts.append(t2)
 
-		ms = MultiSegment(**{
+		ms = MultiSegmentTask(**{
 			'base_ts': ts,
 			'max_option': 4,
 			'popt_strategy': 'single'
@@ -53,7 +53,7 @@ class MultiSegmentTestCase(unittest.TestCase):
 		ts.append(t1)
 		ts.append(t2)
 
-		ms = MultiSegment(**{
+		ms = MultiSegmentTask(**{
 			'base_ts': ts,
 			'max_option': 4,
 			'popt_strategy': 'single'
