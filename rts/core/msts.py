@@ -6,6 +6,7 @@ class MultiSegmentTaskSet(object):
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', type(self).cnt)
+        self.popt_strategy = kwargs.get('popt_strategy', 'single')
         self.mst_list = []
         type(self).cnt += 1
 
@@ -46,4 +47,7 @@ class MultiSegmentTaskSet(object):
     def tot_util(self):
         return tsutil.sum_utilization(self)
 
-
+    def update_msts(self):
+        for mst in self.mst_list:
+            mst.popt_strategy = self.popt_strategy
+            mst.update_ts_list()

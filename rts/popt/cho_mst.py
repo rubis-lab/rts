@@ -10,6 +10,7 @@ class ChoMultiSegmentTask(Popt):
         self.max_opt = kwargs.get('max_option', 1)
         self.num_core = float(kwargs.get('num_core', 1.0))
         self.ip_table = []
+        self.tolerance_table = []
         return
 
     def __del__(self):
@@ -19,42 +20,28 @@ class ChoMultiSegmentTask(Popt):
         info = ''
         return info
 
-    def create_inter_vs_popt_table(self, pts):
-        del self.ip_table[:]
-        n_task = len(pts.base_ts)
+    def create_tolerance_table(self, msts):
+        del self.tolerance_table[:]
+        n_task = len(msts)
         for i in range(n_task):
             # option 0 will not be used
-            self.ip_table.append([-1.0])
+            self.tolerance_table.append([-1.0])
 
+            msts[i].popt_strategy = 'custom'
+            n_seg = len(msts[i])
             for j in range(self.max_opt):
-                # thread set of task i, option j + 1
-                thrs_i_oj = pts.pt_list[i][j + 1]
-
-                # Minimum laxity (D - C) among thread set
-                lax = []
-                for k in range(len(thrs_i_oj)):
-                    lax.append(thrs_i_oj[k].deadline - thrs_i_oj[k].exec_time)
-                """
-                print('thrs_i list')
-                print(i)
-                print(thrs_i_oj)
-                print('lax list')
-                print(lax)
-                print('min lax value')
-                print(min(lax))
-                print('min lax idx')
-                print(lax.index(min(lax)))
-                print('corresponding thr')
-                print(thrs_i_oj[lax.index(min(lax))])
-                """
-                self.ip_table[i].append(min(lax))
+                popt_list = [j + 1 for _ in range(n_seg)]  # naive raising
+                msts[i].popt_list = popt_list
+                msts[i].update_ts_list()
+                lax = msts[i].deadline - msts[i].crit_exec_time
+                self.tolerance_table[i].append(lax)
         return
 
     def is_schedulable(self, msts):
         # Create interference vs parallel option table for every task
-        # self.create_inter_vs_popt_table(msts)
-        # print('ip_table')
-        # print(self.ip_table)
+        self.create_tolerance_table(msts)
+        # print('tolerance_table')
+        # print(self.tolerance_table)
 
         # Initial - all tasks at lowest parallelization
         for mst in msts:
@@ -64,12 +51,9 @@ class ChoMultiSegmentTask(Popt):
         n_task = len(msts)
         n_segs = [len(mst) for mst in msts]
         selected_opt = [1 for _ in range(n_task)]
-        print('n_segs: ' + str(n_segs))
-        print('n_task: ' + str(n_task))
+        # print('n_segs: ' + str(n_segs))
+        # print('n_task: ' + str(n_task))
 
-        return True, msts
-
-        # print(pts)
         # Iteration
         while True:
             """
@@ -81,15 +65,21 @@ class ChoMultiSegmentTask(Popt):
             """
             i_sum_list = []
             for i in range(n_task):
-                base_thr = pts.pt_list[i][selected_opt[i]][0]
+                msts[i].popt_strategy = 'custom'
+                n_seg = len(msts[i])
+                popt_list = [selected_opt[i] for _ in range(n_seg)]  # naive raising
+                msts[i].popt_list = popt_list
+                msts[i].update_ts_list()
+                base_task = msts[i]
+
                 i_sum = 0.0
-                for j in range(len(pts)):
-                    inter_thr = pts[j]
-                    if inter_thr == base_thr:
+                for j in range(n_task):
+                    inter_task = msts[j]
+                    if inter_task == base_task:
                         continue
-                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_thr, base_thr.deadline)
+                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_task, base_task.deadline)
                     # interference is limited to laxity of base thread
-                    i_sum += max(0.0, min(i_sum_tmp, base_thr.deadline - base_thr.exec_time + 1.0))
+                    i_sum += max(0.0, min(i_sum_tmp, base_task.deadline - base_task.crit_exec_time + 1.0))
                 i_sum = math.floor(i_sum / self.num_core)
                 # print('i_sum')
                 # print(i_sum)
@@ -105,7 +95,7 @@ class ChoMultiSegmentTask(Popt):
             for i in range(n_task):
                 while selected_opt[i] < self.max_opt:
                     # floating value comparison... difference less than 0.1
-                    if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
+                    if i_sum_list[i] > self.tolerance_table[i][selected_opt[i]] + 0.1:
                         selected_opt[i] += 1
                     else:
                         break
@@ -123,21 +113,21 @@ class ChoMultiSegmentTask(Popt):
                     # popt maxed out
                     if selected_opt[i] >= self.max_opt:
                         # interference exceeds tolerance
-                        if i_sum_list[i] > self.ip_table[i][selected_opt[i]] + 0.1:
-                            return False, pts # false
+                        if i_sum_list[i] > self.tolerance_table[i][selected_opt[i]] + 0.1:
+                            return False, selected_opt # false
                 # All tasks interference under tolerance
                 # print(selected_opt)
                 # print('selected_opt')
-                pts.popt_strategy = 'custom'
-                pts.popt_list = selected_opt
-                pts.serialize_pts()
+                # Update all options
+                for i in range(n_task):
+                    msts[i].popt_strategy = 'custom'
+                    n_seg = len(msts[i])
+                    msts[i].popt_list = [selected_opt[i] for _ in range(n_seg)]  # naive raising
+                    msts[i].update_ts_list()
+
                 # print('serialized----------')
                 # print(pts.pts_serialized)
-
-
-                return True, pts # true
-
-            # print('----------------')
+                return True, selected_opt # true
 
 
 if __name__ == '__main__':

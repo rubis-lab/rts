@@ -31,10 +31,12 @@ if __name__ == '__main__':
         'inc': 0.1,
     }
     stat_single = Stat(**stat_param)
+    stat_max = Stat(**stat_param)
+    stat_random = Stat(**stat_param)
     stat_cho = Stat(**stat_param)
 
-    notify_every = 1
-    num_iter = 1
+    notify_every = 10000
+    num_iter = 100000
 
     # schedulability check param
     sched_param = {
@@ -42,19 +44,35 @@ if __name__ == '__main__':
     }
 
     for i in range(num_iter):
-
         if i % notify_every == 0:
             print("{} % : {} / {}".format(i * 100 / num_iter, i, num_iter))
-        print('--------')
+
         # generate tasks
         msts = msg.next_mst_set()
         msts_util = msts.tot_util()
-        print(msts)
-        print('--------')
-        # check schedulability
+        # print(msts)
+
+        # single thread schedulability
         bcl_mst = BCLMultiSegmentTask(**sched_param)
         sched_single = bcl_mst.is_schedulable(msts)
         stat_single.add(msts_util, sched_single)
+
+        # max thread
+        msts.popt_strategy = 'max'
+        msts.update_msts()
+
+        # max thread schedulability
+        sched_max = bcl_mst.is_schedulable(msts)
+        stat_max.add(msts_util, sched_max)
+
+        # random thread
+        msts.popt_strategy = 'random'
+        msts.update_msts()
+        # rnd_selected_option = pts.popt_list
+
+        # random thread schedulability
+        sched_random = bcl_mst.is_schedulable(msts)
+        stat_random.add(msts_util, sched_random)
 
         # cho schedulability
         msts_param = {
@@ -65,10 +83,18 @@ if __name__ == '__main__':
         sched_cho, _ = cho.is_schedulable(msts)
         stat_cho.add(msts_util, sched_cho)
 
-    # print("single")
-    # stat_single.print_minimal()
-    # print("------------")
-    #
-    # print("cho")
-    # stat_cho.print_minimal()
-    # print("------------")
+    print("single")
+    stat_single.print_minimal()
+    print("------------")
+
+    print("max")
+    stat_max.print_minimal()
+    print("------------")
+
+    print("random")
+    stat_random.print_minimal()
+    print("------------")
+
+    print("cho")
+    stat_cho.print_minimal()
+    print("------------")
