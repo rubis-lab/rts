@@ -20,6 +20,8 @@ class MSgen(Gen):
         self.min_seg_size = kwargs.get('min_seg_size',  10)
         self.max_seg_size = kwargs.get('max_seg_size', 20)
         self.max_option = kwargs.get('max_option', 1)
+        self.overhead = kwargs.get('overhead', 0.0)
+        self.variance = kwargs.get('variance', 0.0)
 
     def next_mst(self):
         base_t = self.next_task()
@@ -49,6 +51,8 @@ class MSgen(Gen):
         ms = MultiSegmentTask(**{
             'base_ts': ts,
             'max_option': self.max_option,
+            'overhead': self.overhead,
+            'variance': self.variance,
             'popt_strategy': 'single'
         })
         return ms
@@ -89,7 +93,10 @@ class MSgen(Gen):
             'constrained_deadline = ' + str(self.constrained_deadline) + '\n' + \
             'min_seg_size = ' + str(self.min_seg_size) + '\n' + \
             'max_seg_size = ' + str(self.max_seg_size) + '\n' + \
-            'max_option = ' + str(self.max_option)
+            'max_option = ' + str(self.max_option) + '\n' + \
+            'overhead = ' + str(self.overhead) + '\n' + \
+            'variance = ' + str(self.variance)
+
         return info
 
     def create_new_mst_set(self, mst):

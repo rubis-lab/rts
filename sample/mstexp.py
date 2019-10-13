@@ -7,18 +7,20 @@ if __name__ == '__main__':
     # create generator
     gen_param = {
         'min_exec_time': 50,
-        'max_exec_time': 120,
-        'min_period': 80,
-        'max_period': 250,
-        'min_deadline': 80,
-        'max_deadline': 250,
+        'max_exec_time': 150,
+        'min_period': 100,
+        'max_period': 300,
+        'min_deadline': 100,
+        'max_deadline': 300,
         'tot_util': 4.0,
         'util_over': True,
         'implicit_deadline': False,
         'constrained_deadline': True,
-        'min_seg_size': 15,
-        'max_seg_size': 40,
-        'max_option': 4
+        'min_seg_size': 30,
+        'max_seg_size': 80,
+        'max_option': 4,
+        'overhead': 0.3,
+        'variance': 0.7
     }
     msg = MSgen(**gen_param)
     print(msg)

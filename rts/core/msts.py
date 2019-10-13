@@ -7,6 +7,8 @@ class MultiSegmentTaskSet(object):
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', type(self).cnt)
         self.popt_strategy = kwargs.get('popt_strategy', 'single')
+        self.overhead = kwargs.get('overhead', 0.0)
+        self.variance = kwargs.get('variance', 0.0)
         self.mst_list = []
         type(self).cnt += 1
 
