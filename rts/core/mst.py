@@ -93,6 +93,50 @@ class MultiSegmentTask(object):
             self.pt_list.append(pt)
         return
 
+    def increment_naive(self):
+        new_popt_list = []
+        for opt in self.popt_list:
+            if opt < self.max_opt:
+                new_popt_list.append(opt + 1)
+            else:  # won't increment over max_opt
+                new_popt_list.append(opt)
+        self.popt_list = new_popt_list
+        return
+
+    def increment_fdsf(self):
+        # farther from deadline segment first
+        # or... first segment first
+        new_popt_list = []
+        incremented = False
+        for opt in self.popt_list:
+            if not incremented:
+                if opt < self.max_opt:
+                    new_popt_list.append(opt + 1)
+                    incremented = True  # increment only a single option
+                else:  # won't increment over max_opt
+                    new_popt_list.append(opt)
+            else:
+                new_popt_list.append(opt)
+        self.popt_list = new_popt_list
+        return
+
+    def increment_cdsf(self):
+        # closer to deadline segment first
+        # or... last segment first
+        new_popt_list = []
+        incremented = False
+        for opt in self.popt_list[::-1]:
+            if not incremented:
+                if opt < self.max_opt:
+                    new_popt_list.append(opt + 1)
+                    incremented = True  # increment only a single option
+                else:  # won't increment over max_opt
+                    new_popt_list.append(opt)
+            else:
+                new_popt_list.append(opt)
+        self.popt_list = new_popt_list[::-1]  # reverse it back
+        return
+
     def update_ts_list(self):
         if self.popt_strategy == 'single':
             self.ts_list = para.parallelize_multiseg_single(self.pt_list)

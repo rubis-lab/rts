@@ -89,3 +89,86 @@ class MultiSegmentTaskTestCase(unittest.TestCase):
 		self.assertEqual(ms.crit_exec_time, 60)
 		self.assertEqual(ms.deadline, 30)
 		self.assertEqual(ms.period, 40)
+
+	def test_mst_increment_naive(self):
+		t1 = Task(**{
+			'exec_time': 20,
+			'deadline': 30,
+			'period': 40
+		})
+		t2 = Task(**{
+			'exec_time': 40,
+			'deadline': 60,
+			'period': 80
+		})
+		ts = TaskSet()
+		ts.append(t1)
+		ts.append(t2)
+		ms = MultiSegmentTask(**{
+			'base_ts': ts,
+			'max_option': 2,
+			'popt_strategy': 'single'
+		})
+		ms.increment_naive()
+		self.assertEqual(ms.popt_list[0], 2)
+		ms.increment_naive()
+		self.assertEqual(ms.popt_list[1], 2)
+
+	def test_mst_increment_fdsf(self):
+		t1 = Task(**{
+			'exec_time': 20,
+			'deadline': 30,
+			'period': 40
+		})
+		t2 = Task(**{
+			'exec_time': 40,
+			'deadline': 60,
+			'period': 80
+		})
+		ts = TaskSet()
+		ts.append(t1)
+		ts.append(t2)
+		ms = MultiSegmentTask(**{
+			'base_ts': ts,
+			'max_option': 2,
+			'popt_strategy': 'single'
+		})
+		ms.increment_fdsf()
+		self.assertEqual(ms.popt_list[0], 2)
+		self.assertEqual(ms.popt_list[1], 1)
+		ms.increment_fdsf()
+		self.assertEqual(ms.popt_list[0], 2)
+		self.assertEqual(ms.popt_list[1], 2)
+		ms.increment_fdsf()
+		self.assertEqual(ms.popt_list[0], 2)
+		self.assertEqual(ms.popt_list[1], 2)
+
+	def test_mst_increment_cdsf(self):
+		t1 = Task(**{
+			'exec_time': 20,
+			'deadline': 30,
+			'period': 40
+		})
+		t2 = Task(**{
+			'exec_time': 40,
+			'deadline': 60,
+			'period': 80
+		})
+		ts = TaskSet()
+		ts.append(t1)
+		ts.append(t2)
+		ms = MultiSegmentTask(**{
+			'base_ts': ts,
+			'max_option': 2,
+			'popt_strategy': 'single'
+		})
+		ms.increment_cdsf()
+		self.assertEqual(ms.popt_list[0], 1)
+		self.assertEqual(ms.popt_list[1], 2)
+		ms.increment_cdsf()
+		self.assertEqual(ms.popt_list[0], 2)
+		self.assertEqual(ms.popt_list[1], 2)
+		ms.increment_cdsf()
+		self.assertEqual(ms.popt_list[0], 2)
+		self.assertEqual(ms.popt_list[1], 2)
+

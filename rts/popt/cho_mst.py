@@ -20,6 +20,8 @@ class ChoMultiSegmentTask(Popt):
         info = ''
         return info
 
+
+
     def create_tolerance_table(self, msts):
         del self.tolerance_table[:]
         n_task = len(msts)
@@ -128,47 +130,3 @@ class ChoMultiSegmentTask(Popt):
                 # print('serialized----------')
                 # print(pts.pts_serialized)
                 return True, selected_opt # true
-
-
-if __name__ == '__main__':
-    pass
-    # task_param = {
-    #     'exec_time': 35,
-    #     'deadline': 60,
-    #     'period': 60,
-    # }
-    # t1 = Task(**task_param)
-    #
-    # task_param = {
-    #     'exec_time': 72,
-    #     'deadline': 80,
-    #     'period': 80,
-    # }
-    # t2 = Task(**task_param)
-    #
-    # ts = TaskSet()
-    # ts.append(t1)
-    # ts.append(t2)
-    #
-    # pts_param = {
-    #     'base_ts': ts,
-    #     'max_option': 4,
-    #     'overhead': 0.0,
-    #     'variance': 0.8,
-    #     'popt_strategy': 'custom',
-    #     'popt_list': [1, 1],
-    # }
-    #
-    # pts = ParaTaskSet(**pts_param)
-    # print(pts)
-    #
-    # popt_param = {
-    #     'num_core': 2.0,
-    #     'max_option': 4,
-    # }
-    #
-    # exhaustive = Cho(**popt_param)
-    #
-    # ss = exhaustive.is_schedulable(pts)
-    # print('Test result:')
-    # print(ss)

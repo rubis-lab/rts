@@ -49,6 +49,11 @@ class MultiSegmentTaskSet(object):
     def tot_util(self):
         return tsutil.sum_utilization(self)
 
+    def increment_msts_naive(self, msts, max_opt):
+        curr_popt = getattr(msts, 'popt_list', [1 for _ in range(len(msts))])
+        next_popt = []
+        return 0
+
     def update_msts(self):
         for mst in self.mst_list:
             mst.popt_strategy = self.popt_strategy
