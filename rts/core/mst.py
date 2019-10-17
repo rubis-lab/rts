@@ -101,6 +101,8 @@ class MultiSegmentTask(object):
             else:  # won't increment over max_opt
                 new_popt_list.append(opt)
         self.popt_list = new_popt_list
+        self.popt_strategy = 'custom'
+        self.update_ts_list()
         return
 
     def increment_fdsf(self):
@@ -118,6 +120,8 @@ class MultiSegmentTask(object):
             else:
                 new_popt_list.append(opt)
         self.popt_list = new_popt_list
+        self.popt_strategy = 'custom'
+        self.update_ts_list()
         return
 
     def increment_cdsf(self):
@@ -135,6 +139,8 @@ class MultiSegmentTask(object):
             else:
                 new_popt_list.append(opt)
         self.popt_list = new_popt_list[::-1]  # reverse it back
+        self.popt_strategy = 'custom'
+        self.update_ts_list()
         return
 
     def update_ts_list(self):

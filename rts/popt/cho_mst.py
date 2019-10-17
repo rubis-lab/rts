@@ -11,6 +11,7 @@ class ChoMultiSegmentTask(Popt):
         self.num_core = float(kwargs.get('num_core', 1.0))
         self.ip_table = []
         self.tolerance_table = []
+        self.inc_strategy = kwargs.get('inc_strategy', 'naive')
         return
 
     def __del__(self):
@@ -20,23 +21,31 @@ class ChoMultiSegmentTask(Popt):
         info = ''
         return info
 
-
-
     def create_tolerance_table(self, msts):
         del self.tolerance_table[:]
-        n_task = len(msts)
-        for i in range(n_task):
-            # option 0 will not be used
-            self.tolerance_table.append([-1.0])
 
-            msts[i].popt_strategy = 'custom'
-            n_seg = len(msts[i])
-            for j in range(self.max_opt):
-                popt_list = [j + 1 for _ in range(n_seg)]  # naive raising
-                msts[i].popt_list = popt_list
-                msts[i].update_ts_list()
-                lax = msts[i].deadline - msts[i].crit_exec_time
-                self.tolerance_table[i].append(lax)
+        for i, mst in enumerate(msts):
+            self.tolerance_table.append([-1.0])  # option 0 will not be used
+
+            mst.popt_strategy = 'single'  # start from single
+            mst.update_ts_list()
+            self.tolerance_table[i].append(mst.deadline - mst.crit_exec_time)
+
+            mst.n_opts = 1
+            if self.inc_strategy == 'naive':
+                mst.n_opts = mst.max_opt
+            elif self.inc_strategy == 'fdsf':
+                n_seg = len(mst)
+                mst.n_opts = (mst.max_opt - 1) ** n_seg
+            elif self.inc_strategy == 'cdsf':
+                n_seg = len(mst)
+                mst.n_opts = (mst.max_opt - 1) ** n_seg
+            else:
+                print('Increment strategy not defined.')
+
+            for _ in range(1, mst.n_opts):
+                mst.increment_naive()
+                self.tolerance_table[i].append(mst.deadline - mst.crit_exec_time)
         return
 
     def is_schedulable(self, msts):
@@ -51,9 +60,7 @@ class ChoMultiSegmentTask(Popt):
             mst.update_ts_list()
 
         n_task = len(msts)
-        n_segs = [len(mst) for mst in msts]
         selected_opt = [1 for _ in range(n_task)]
-        # print('n_segs: ' + str(n_segs))
         # print('n_task: ' + str(n_task))
 
         # Iteration
@@ -116,7 +123,7 @@ class ChoMultiSegmentTask(Popt):
                     if selected_opt[i] >= self.max_opt:
                         # interference exceeds tolerance
                         if i_sum_list[i] > self.tolerance_table[i][selected_opt[i]] + 0.1:
-                            return False, selected_opt # false
+                            return False, selected_opt  # false
                 # All tasks interference under tolerance
                 # print(selected_opt)
                 # print('selected_opt')
@@ -129,4 +136,4 @@ class ChoMultiSegmentTask(Popt):
 
                 # print('serialized----------')
                 # print(pts.pts_serialized)
-                return True, selected_opt # true
+                return True, selected_opt  # true
