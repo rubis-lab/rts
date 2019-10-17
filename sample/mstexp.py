@@ -35,10 +35,13 @@ if __name__ == '__main__':
     stat_single = Stat(**stat_param)
     stat_max = Stat(**stat_param)
     stat_random = Stat(**stat_param)
-    stat_cho = Stat(**stat_param)
+
+    stat_cho_naive = Stat(**stat_param)
+    stat_cho_fdsf = Stat(**stat_param)
+    stat_cho_cdsf = Stat(**stat_param)
 
     notify_every = 10000
-    num_iter = 100000
+    num_iter = 50000
 
     # schedulability check param
     sched_param = {
@@ -76,14 +79,35 @@ if __name__ == '__main__':
         sched_random = bcl_mst.is_schedulable(msts)
         stat_random.add(msts_util, sched_random)
 
-        # cho schedulability
+        # cho schedulability (naive)
         msts_param = {
             'num_core': 4.0,
             'max_option': 4,
+            'inc_strategy': 'naive'
         }
-        cho = ChoMultiSegmentTask(**msts_param)
-        sched_cho, _ = cho.is_schedulable(msts)
-        stat_cho.add(msts_util, sched_cho)
+        cho_naive = ChoMultiSegmentTask(**msts_param)
+        sched_cho_naive, _ = cho_naive.is_schedulable(msts)
+        stat_cho_naive.add(msts_util, sched_cho_naive)
+
+        # cho schedulability (fdsf)
+        msts_param = {
+            'num_core': 4.0,
+            'max_option': 4,
+            'inc_strategy': 'fdsf'
+        }
+        cho_fdsf = ChoMultiSegmentTask(**msts_param)
+        sched_cho_fdsf, _ = cho_fdsf.is_schedulable(msts)
+        stat_cho_fdsf.add(msts_util, sched_cho_fdsf)
+
+        # cho schedulability (cdsf)
+        msts_param = {
+            'num_core': 4.0,
+            'max_option': 4,
+            'inc_strategy': 'cdsf'
+        }
+        cho_cdsf = ChoMultiSegmentTask(**msts_param)
+        sched_cho_cdsf, _ = cho_cdsf.is_schedulable(msts)
+        stat_cho_cdsf.add(msts_util, sched_cho_cdsf)
 
     print("single")
     stat_single.print_minimal()
@@ -97,6 +121,14 @@ if __name__ == '__main__':
     stat_random.print_minimal()
     print("------------")
 
-    print("cho")
-    stat_cho.print_minimal()
+    print("cho_naive")
+    stat_cho_naive.print_minimal()
+    print("------------")
+
+    print("cho_fdsf")
+    stat_cho_fdsf.print_minimal()
+    print("------------")
+
+    print("cho_cdsf")
+    stat_cho_cdsf.print_minimal()
     print("------------")
