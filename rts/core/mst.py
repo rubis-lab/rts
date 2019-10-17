@@ -34,8 +34,8 @@ class MultiSegmentTask(object):
             self.populate_pt_list()
 
         # task like property
-        self.exec_time = -1 # sum of all exec_times
-        self.crit_exec_time = -1 # sum of largest exec_times
+        self.exec_time = -1  # sum of all exec_times
+        self.crit_exec_time = -1  # sum of largest exec_times
         self.deadline = self.base_ts[0].deadline
         self.period = self.base_ts[0].period
 
@@ -44,7 +44,7 @@ class MultiSegmentTask(object):
         self.popt_strategy = kwargs.get('popt_strategy', 'single')
         self.popt_list = kwargs.get('popt_list', [1 for _ in range(len(self.pt_list))])
 
-        self.ts_list = []
+        self.ts_list = []  # list of ts resulting from pt[option]
         self.update_ts_list()
         return
 
@@ -64,13 +64,13 @@ class MultiSegmentTask(object):
         return info
 
     def __len__(self):
-        return len(self.ts_list)
+        return len(self.ts_list)  # number of segments
 
     def __getitem__(self, idx):
-        return self.ts_list[idx]
+        return self.ts_list[idx]  # get segment
 
-    def __setitem__(self, idx, thr):
-        self.ts_list[idx] = thr
+    def __setitem__(self, idx, ts):
+        self.ts_list[idx] = ts  # set segment
         return
 
     def __iter__(self):
