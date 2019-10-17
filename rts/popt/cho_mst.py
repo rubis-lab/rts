@@ -1,5 +1,6 @@
 from rts.popt.popt import Popt
 from rts.op import tsutil
+from rts.op import mstsutil
 import math
 
 
@@ -86,9 +87,12 @@ class ChoMultiSegmentTask(Popt):
                 for inter_mst in msts:
                     if inter_mst == base_mst:
                         continue
-                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_mst, base_mst.deadline)
-                    # interference is limited to laxity of base thread
-                    i_sum += max(0.0, min(i_sum_tmp, base_mst.deadline - base_mst.crit_exec_time + 1.0))
+                    i_sum_tmp = mstsutil.bounded_workload_in_interval_edf(
+                        inter_mst,
+                        base_mst.deadline,
+                        base_mst.deadline - base_mst.crit_exec_time + 1.0)
+
+                    i_sum += max(0.0, i_sum_tmp)
                 i_sum = math.floor(i_sum / self.num_core)
                 i_sum_list.append(i_sum)
 

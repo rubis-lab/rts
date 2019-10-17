@@ -1,6 +1,6 @@
 import math
 from rts.sched.sched import Sched
-from rts.op import tsutil
+from rts.op import mstsutil
 
 
 class BCLMultiSegmentTask(Sched):
@@ -8,10 +8,15 @@ class BCLMultiSegmentTask(Sched):
         self.num_core = float(kwargs.get('num_core', 1.0))
 
     def calc_interference(self, base_task, inter_task):
-        i_sum = tsutil.workload_in_interval_edf(inter_task, base_task.deadline)
+        i_sum = mstsutil.bounded_workload_in_interval_edf(
+            inter_task,
+            base_task.deadline,
+            base_task.deadline - base_task.crit_exec_time + 1.0)
+        # i_sum = tsutil.workload_in_interval_edf(inter_task, base_task.deadline)
 
         # interference is limited to leftover of basetask
-        i_sum = max(0.0, min(i_sum, base_task.deadline - base_task.crit_exec_time + 1.0))
+        i_sum = max(0.0, i_sum)
+        #  i_sum = max(0.0, min(i_sum, base_task.deadline - base_task.crit_exec_time + 1.0))
 
         return i_sum
 

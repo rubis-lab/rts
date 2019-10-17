@@ -21,7 +21,7 @@ def workload_in_interval_edf(mst, l):
     for seg in mst[::-1]:  # iterate from last segment
         l_seg_carry_in = min(rem_l_carry_in, seg[0].exec_time)  # seg length defined by the first thread
         for i, thr in enumerate(seg):
-            w_carry_in_job += min(thr.exec_time, l_seg_carry_in)
+            w_carry_in_job[i] += min(thr.exec_time, l_seg_carry_in)
 
         rem_l_carry_in -= l_seg_carry_in
         if rem_l_carry_in < 0.1:
@@ -29,3 +29,13 @@ def workload_in_interval_edf(mst, l):
 
     w_total = [a + b for a, b in zip(w_body_job, w_carry_in_job)]
     return w_total
+
+
+def bounded_workload_in_interval_edf(mst, l, bound):
+    w_unbounded = workload_in_interval_edf(mst, l)
+
+    w_bounded = 0.0
+    for w in w_unbounded:
+        w_bounded += min(w, bound)
+
+    return w_bounded
