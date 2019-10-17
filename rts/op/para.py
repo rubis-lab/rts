@@ -417,8 +417,10 @@ def parallelize_multiseg_custom(pt_list, popt_list):
     if len(pt_list) != len(popt_list):
         raise Exception('pt_list or popt_list malformed. Length does not match.')
     ts_list = []
-    for i in range(len(pt_list)):
-        ts_list.append(pt_list[i][popt_list[i]])
+    for i, pt in enumerate(pt_list):
+        ts_list.append(pt[popt_list[i]])
+    # for i in range(len(pt_list)):
+    #     ts_list.append(pt_list[i][popt_list[i]])
     return ts_list
 
 

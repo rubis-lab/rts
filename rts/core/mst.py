@@ -145,10 +145,12 @@ class MultiSegmentTask(object):
 
     def update_ts_list(self):
         if self.popt_strategy == 'single':
+            self.popt_list = [1 for _ in range(len(self))]
             self.ts_list = para.parallelize_multiseg_single(self.pt_list)
         elif self.popt_strategy == 'max':
+            self.popt_list = [self.max_opt for _ in range(len(self))]
             self.ts_list = para.parallelize_multiseg_max(self.pt_list, **{'max_option': self.max_opt})
-        elif self.popt_strategy == 'random':
+        elif self.popt_strategy == 'random':  # deprecated
             del self.popt_list[:]
             for i in range(len(self.base_ts)):
                 self.popt_list.append(random.randint(1, self.max_opt))
@@ -160,41 +162,57 @@ class MultiSegmentTask(object):
 
         # update longest exec_time
         self.update_exec_time()
+        return
 
     def update_exec_time(self):
-        self.crit_exec_time = 0.0
-        self.exec_time = 0.0
+        c_e = 0.0
+        e = 0.0
+        # print('used_option')
+        # print(self.popt_list)
         for ts in self.ts_list:
-            self.crit_exec_time += ts[0].exec_time  # sum of largest exec_time (longest path)
+            c_e += ts[0].exec_time  # sum of largest exec_time (longest path)
+            # print('ts[0].exec_time')
+            # print(ts[0].exec_time)
             for t in ts:
-                self.exec_time += t.exec_time  # sum of all exec_time
+                e += t.exec_time  # sum of all exec_time
+                # print('t.exec_time')
+                # print(t.exec_time)
+
+        self.crit_exec_time = c_e
+        self.exec_time = e
+        # print('exec_time_updated')
+        # print('c_e')
+        # print(c_e)
+        # print('e')
+        # print(e)
+        return
 
     def tot_util(self):
         return self.exec_time / self.period
-
-
-if __name__ == '__main__':
-    t1 = Task(**{
-        'exec_time': 20,
-        'deadline': 30,
-        'period': 40
-    })
-    t2 = Task(**{
-        'exec_time': 40,
-        'deadline': 60,
-        'period': 80
-    })
-    ts = TaskSet()
-    ts.append(t1)
-    ts.append(t2)
-
-    ms = MultiSegmentTask(**{
-        'base_ts': ts,
-        'max_option': 4,
-        'popt_strategy': 'max'
-    })
-
-    print(ms)
-    print(ms.crit_exec_time)
-    print(ms.exec_time)
-    print(ms.tot_util())
+#
+#
+# if __name__ == '__main__':
+#     t1 = Task(**{
+#         'exec_time': 20,
+#         'deadline': 30,
+#         'period': 40
+#     })
+#     t2 = Task(**{
+#         'exec_time': 40,
+#         'deadline': 60,
+#         'period': 80
+#     })
+#     ts = TaskSet()
+#     ts.append(t1)
+#     ts.append(t2)
+#
+#     ms = MultiSegmentTask(**{
+#         'base_ts': ts,
+#         'max_option': 4,
+#         'popt_strategy': 'max'
+#     })
+#
+#     print(ms)
+#     print(ms.crit_exec_time)
+#     print(ms.exec_time)
+#     print(ms.tot_util())
