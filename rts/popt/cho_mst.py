@@ -1,5 +1,5 @@
 from rts.popt.popt import Popt
-from rts.op import tsutil
+from rts.op import mstsutil
 import math
 
 
@@ -34,18 +34,36 @@ class ChoMultiSegmentTask(Popt):
             mst.max_opt_ms = 1
             if self.inc_strategy == 'naive':
                 mst.max_opt_ms = mst.max_opt
+                # n_seg = len(mst)
+                # print('**********naive')
+                # print('n_seg')
+                # print(n_seg)
+                # print('mst.max_opt_ms')
+                # print(mst.max_opt_ms)
             elif self.inc_strategy == 'fdsf':
                 n_seg = len(mst)
-                mst.max_opt_ms = (mst.max_opt - 1) ** n_seg
+                mst.max_opt_ms = (mst.max_opt - 1) * n_seg + 1
+                # print('**********fdsf')
+                # print('n_seg')
+                # print(n_seg)
+                # print('mst.max_opt_ms')
+                # print(mst.max_opt_ms)
             elif self.inc_strategy == 'cdsf':
                 n_seg = len(mst)
-                mst.max_opt_ms = (mst.max_opt - 1) ** n_seg
+                mst.max_opt_ms = (mst.max_opt - 1) * n_seg + 1
+                # print('**********cdsf')
+                # print('n_seg')
+                # print(n_seg)
+                # print('mst.max_opt_ms')
+                # print(mst.max_opt_ms)
             else:
                 print('Increment strategy not defined.')
 
             for _ in range(1, mst.max_opt_ms):
                 if self.inc_strategy == 'naive':
                     mst.increment_naive()
+                    # print('mst.crit_exec_time')
+                    # print(mst.crit_exec_time)
                 elif self.inc_strategy == 'fdsf':
                     mst.increment_fdsf()
                 elif self.inc_strategy == 'cdsf':
@@ -54,6 +72,8 @@ class ChoMultiSegmentTask(Popt):
                     print('Increment strategy not defined.')
 
                 self.tolerance_table[i].append(mst.deadline - mst.crit_exec_time)
+            # print('self.tolerance_table[i]')
+            # print(self.tolerance_table[i])
         return
 
     def is_schedulable(self, msts):
@@ -86,9 +106,12 @@ class ChoMultiSegmentTask(Popt):
                 for inter_mst in msts:
                     if inter_mst == base_mst:
                         continue
-                    i_sum_tmp = tsutil.workload_in_interval_edf(inter_mst, base_mst.deadline)
-                    # interference is limited to laxity of base thread
-                    i_sum += max(0.0, min(i_sum_tmp, base_mst.deadline - base_mst.crit_exec_time + 1.0))
+                    i_sum_tmp = mstsutil.bounded_workload_in_interval_edf(
+                        inter_mst,
+                        base_mst.deadline,
+                        base_mst.deadline - base_mst.crit_exec_time + 1.0)
+
+                    i_sum += max(0.0, i_sum_tmp)
                 i_sum = math.floor(i_sum / self.num_core)
                 i_sum_list.append(i_sum)
 
