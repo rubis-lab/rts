@@ -1,9 +1,6 @@
 from rts.popt.popt import Popt
 from rts.sched.sched import Sched
-from rts.core.task import Task
-from rts.core.ts import TaskSet
-from rts.core.pts import ParaTaskSet
-from rts.sched.bcl_naive import BCLNaive
+from rts.sched.bcl_mst import BCLMultiSegmentTask
 
 
 class ExhaustiveMultiSegmentTask(Popt):
@@ -11,7 +8,10 @@ class ExhaustiveMultiSegmentTask(Popt):
 
     def __init__(self, **kwargs):
         self.max_opt = kwargs.get('max_option', 1)
-        self.sched = kwargs.get('sched', Sched())
+        self.max_n_seg = kwargs.get('max_n_seg', 1)
+        self.notify_n_seg = kwargs.get('notify_n_seg', self.max_n_seg - 2)
+        self.num_core = kwargs.get('num_core', 1.0)
+        self.bcl_mst = BCLMultiSegmentTask(**{'num_core': self.num_core})
         return
 
     def __del__(self):
@@ -36,42 +36,34 @@ class ExhaustiveMultiSegmentTask(Popt):
         tot_n_seg = 0
         for mst in msts:
             tot_n_seg += len(mst)
-
-        if tot_n_seg > 15:
-            print('tot_n_seg')
-            print(tot_n_seg)
+        if tot_n_seg > self.notify_n_seg:
+            print('WARNING: tot_n_seg: ' + str(tot_n_seg))
+            if tot_n_seg > self.max_n_seg:
+                print('ERROR: max_n_seg exceeded. aborting.')
+                return False, msts
 
         for i in range(self.max_opt ** tot_n_seg):
             idx = [0 for _ in range(tot_n_seg)]
             idx_conv = self.conv_num_base(i, self.max_opt, idx)
 
+            # update parallelization option
             for mst in msts:
                 idx_mst = idx_conv[:len(mst)]
+                popt_mst = [p + 1 for p in idx_mst]
                 idx_conv_left = idx_conv[len(mst):]
                 idx_conv = idx_conv_left
 
+                mst.popt_list = popt_mst
+                mst.popt_strategy = 'custom'
+                mst.update_ts_list()
 
-            # set parallel option
+            # check schedulability
+            if self.bcl_mst.is_schedulable(msts):
+                return True, msts
 
-
-
-        # # number of possible cases: max_opt ^ (sum n_seg)
-        # n_seg
-        # n_task = len(pts.base_ts)
-        # for i in range(self.max_opt ** n_task):
-        #     idx = [0 for j in range(n_task)]
-        #     self.conv_num_base(i, self.max_opt, idx)
-        #
-        #     # set parallel option
-        #     for j in range(n_task):
-        #         pts.popt_list[j] = idx[j] + 1
-        #     pts.serialize_pts()
-        #
-        #     # check schedulability
-        #     if self.sched.is_schedulable(pts):
-        #         return True
-        #
-        # return False
+        # out of option
+        print('--> not found.. tried ' + str(self.max_opt ** tot_n_seg) + ' cases.')
+        return False, msts
 
     def get_opt_popt(self, pts):
         pass
