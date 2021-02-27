@@ -1,10 +1,12 @@
+from tqdm import tqdm
 from rts.core.pts import ParaTaskSet
 from rts.gen.egen import Egen
 from rts.sched.bcl_naive import BCLNaive
 from rts.sched.bcl import BCL
+from rts.sched.bar import BAR
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
-from rts.sched import bcl
+
 
 if __name__ == '__main__':
     # create generator
@@ -12,11 +14,9 @@ if __name__ == '__main__':
         'min_exec_time': 30,
         'max_exec_time': 100,
         'min_period': 60,
-        # 'max_period': 200,
-        'max_period': 500,
+        'max_period': 200,
         'min_deadline': 40,
-        # 'max_deadline': 200,
-        'max_deadline': 500,
+        'max_deadline': 200,
         'tot_util': 4.0,
         'util_over': True,
         'implicit_deadline': False,
@@ -34,20 +34,22 @@ if __name__ == '__main__':
     }
     stat_bcl = Stat(**stat_param)
     stat_rta = Stat(**stat_param)
-
-    notify_every = 10000
-    num_iter = 50000
+    stat_bar = Stat(**stat_param)
+    stat_cho = Stat(**stat_param)
 
     # schedulability check param
     sched_param = {
         'num_core': 4.0,
     }
 
-    for i in range(num_iter):
+    bcl_naive = BCLNaive(**sched_param)
+    rta = BCL(**sched_param)
+    bar = BAR(**sched_param)
 
-        if i % notify_every == 0:
-            print('{} % : {} / {}'.format(i * 100 / num_iter, i, num_iter))
+    
 
+    num_iter = 10000
+    for i in tqdm(range(num_iter)):
         # generate tasks
         ts = u.next_task_set()
 
@@ -63,69 +65,45 @@ if __name__ == '__main__':
         pts_util = pts.tot_util()
 
         # bcl naive schedulability
-        bcl_naive = BCLNaive(**sched_param)
         sched_bcl = bcl_naive.is_schedulable(ts)
         stat_bcl.add(pts_util, sched_bcl)
 
         # rta schedulability
-        rta = BCL(**sched_param)
         sched_rta = rta.is_schedulable(ts)
         stat_rta.add(pts_util, sched_rta)
 
-    print('bcl')
-    stat_bcl.print_minimal()
-    print('------------')
+        # bar schedulability
+        sched_bar = bar.is_schedulable(ts)
+        stat_bar.add(pts_util, sched_bar)
 
-    print('rta')
-    stat_rta.print_minimal()
-    print('------------')
+        # cho
+        pts.popt_strategy = 'custom'
+        pts.serialize_pts()
 
-    exit(1)
+        # cho schedulability
+        popt_param = {
+            'num_core': 4.0,
+            'max_option': 4,
+        }
 
-    #     # max thread
-    #     pts.popt_strategy = 'max'
-    #     pts.serialize_pts()
+        cho = Cho(**popt_param)
+        sched_cho, _ = cho.is_schedulable(pts)
+        stat_cho.add(pts_util, sched_cho)
 
-    #     # max thread schedulability
-    #     sched_max = bcl_naive.is_schedulable(pts)
-    #     stat_max.add(pts_util, sched_max)
+    log_file = 'tc_log.txt'
+    with open(log_file, 'w') as f:
+        f.write('bcl\n')
+        f.write(stat_bcl.result_minimal())
+        f.write('------------\n')
 
-    #     # random thread
-    #     pts.popt_strategy = 'random'
-    #     pts.serialize_pts()
-    #     rnd_selected_option = pts.popt_list
+        f.write('rta\n')
+        f.write(stat_rta.result_minimal())
+        f.write('------------\n')
 
-    #     # random thread schedulability
-    #     sched_random = bcl_naive.is_schedulable(pts)
-    #     stat_random.add(pts_util, sched_random)
+        f.write('bar\n')
+        f.write(stat_bar.result_minimal())
+        f.write('------------\n')
 
-    #     # cho
-    #     pts.popt_strategy = 'custom'
-    #     pts.serialize_pts()
-
-    #     # cho schedulability
-    #     popt_param = {
-    #         'num_core': 4.0,
-    #         'max_option': 4,
-    #     }
-
-    #     cho = Cho(**popt_param)
-    #     sched_cho, _ = cho.is_schedulable(pts)
-    #     stat_cho.add(pts_util, sched_cho)
-
-    # print('single')
-    # stat_single.print_minimal()
-    # print('------------')
-    
-    # print('max')
-    # stat_max.print_minimal()
-    # print('------------')
-    
-    # print('random')
-    # stat_random.print_minimal()
-    # print('------------')
-    
-    # print('ours')
-    # stat_cho.print_minimal()
-    # print('------------')
-    
+        f.write('cho\n')
+        f.write(stat_cho.result_minimal())
+        f.write('------------\n')

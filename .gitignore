@@ -8,6 +8,7 @@
 # data files
 *.json
 *.info
+*.txt
 
 # idea project files
 /.idea/

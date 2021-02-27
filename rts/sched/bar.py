@@ -53,8 +53,8 @@ class BAR(Sched):
 
     def is_schedulable(self, ts):
         # trivial condition
-        if tsutil.sum_utilization(ts) <= 1.0:
-            return True
+        # if tsutil.sum_utilization(ts) <= 1.0:
+        #     return True
         if tsutil.sum_utilization(ts) > self.num_core:
             return False
         # Dk > Ck
