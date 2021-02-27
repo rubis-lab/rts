@@ -41,7 +41,7 @@ class Stat:
                     num_true += 1
 
             if num_tot == 0:
-                self.norm_data.append(0.0)
+                self.norm_data.append(1.0)
             else:
                 self.norm_data.append(float(num_true) / float(num_tot))
 

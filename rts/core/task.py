@@ -26,6 +26,7 @@ class Task(object):
         self.exec_time = float(kwargs.get('exec_time', 0))
         self.deadline = float(kwargs.get('deadline', 0))
         self.period = float(kwargs.get('period', 0))
+        self.slack = float(kwargs.get('slack', 0))
 
         type(self).cnt += 1
 
