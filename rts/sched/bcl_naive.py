@@ -11,25 +11,26 @@ class BCLNaive(Sched):
         i_sum = tsutil.workload_in_interval_edf(inter_task, base_task.deadline)
 
         # interference is limited to leftover of basetask
-        i_sum = max(0.0, min(i_sum, base_task.deadline - base_task.exec_time + 1.0))
+        i_sum = max(0.0, min(i_sum, base_task.deadline - base_task.exec_time))
 
         return i_sum
 
-    def sum_interference(self, ts, base_task, num_core):
+    def sum_interference(self, ts, base_task):
         # Add up all demands from interfering tasks
         sum_j = 0.0
         for inter_task in ts:
             if base_task != inter_task:
                 sum_j += self.calc_interference(base_task, inter_task)
 
-        return math.floor(sum_j / num_core)
+        # return math.floor(sum_j / num_core)
+        return sum_j / self.num_core
 
     def is_schedulable(self, ts):
         # check for all tasks
         for base_task in ts:
 
             # sum of interference from other tasks
-            interference = self.sum_interference(ts, base_task, self.num_core)
+            interference = self.sum_interference(ts, base_task)
             if interference > (base_task.deadline - base_task.exec_time) + 0.1:  # floating point comparison
                 return False
 

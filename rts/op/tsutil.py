@@ -46,10 +46,8 @@ def workload_in_interval_edf(t, l):
     w_body_job = t.exec_time * num_body_job
 
     # carry-in
-    # slack not defined
-    if not hasattr(t, 'slack'):
-        t.slack = 0.0
     w_carry_in = math.fmod(l, t.period) - t.slack
+    # print('s {} {}'.format(w_carry_in, t.slack))
     # carry-in has to be positive
     if w_carry_in < 0.0:
         w_carry_in = 0.0
@@ -85,9 +83,8 @@ def get_k_max_exec_time_task(ts, k=1):
 
 def workload_in_interval_fp(t, l):
     # body job
-    # slack not defined
-    if not hasattr(t, 'slack'):
-        t.slack = 0.0
+    if t.slack > 0.1:
+        print('sss!')
     num_body_job = math.floor((l + t.deadline - t.exec_time - t.slack) / t.period)
     w_body_job = t.exec_time * num_body_job
     print('w_body_job')
@@ -108,3 +105,9 @@ def workload_in_interval_fp(t, l):
     print(w_carry_out)
 
     return w_body_job + w_carry_out
+
+
+def reset_slack(ts):
+    for t in ts:
+        t.slack = 0.0
+    return

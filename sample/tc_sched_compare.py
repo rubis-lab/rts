@@ -12,9 +12,11 @@ if __name__ == '__main__':
         'min_exec_time': 30,
         'max_exec_time': 100,
         'min_period': 60,
-        'max_period': 200,
+        # 'max_period': 200,
+        'max_period': 500,
         'min_deadline': 40,
-        'max_deadline': 200,
+        # 'max_deadline': 200,
+        'max_deadline': 500,
         'tot_util': 4.0,
         'util_over': True,
         'implicit_deadline': False,
@@ -33,7 +35,7 @@ if __name__ == '__main__':
     stat_bcl = Stat(**stat_param)
     stat_rta = Stat(**stat_param)
 
-    notify_every = 5000
+    notify_every = 10000
     num_iter = 50000
 
     # schedulability check param
@@ -62,12 +64,12 @@ if __name__ == '__main__':
 
         # bcl naive schedulability
         bcl_naive = BCLNaive(**sched_param)
-        sched_bcl = bcl_naive.is_schedulable(pts)
+        sched_bcl = bcl_naive.is_schedulable(ts)
         stat_bcl.add(pts_util, sched_bcl)
 
         # rta schedulability
         rta = BCL(**sched_param)
-        sched_rta = rta.is_schedulable(pts)
+        sched_rta = rta.is_schedulable(ts)
         stat_rta.add(pts_util, sched_rta)
 
     print('bcl')
