@@ -9,6 +9,7 @@
 *.json
 *.info
 *.txt
+*.tex
 
 # idea project files
 /.idea/

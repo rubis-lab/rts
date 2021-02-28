@@ -6,6 +6,9 @@ from rts.sched.bcl import BCL
 from rts.sched.bar import BAR
 from rts.op.stat import Stat
 from rts.popt.cho import Cho
+import tikzplotlib
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
@@ -46,9 +49,7 @@ if __name__ == '__main__':
     rta = BCL(**sched_param)
     bar = BAR(**sched_param)
 
-    
-
-    num_iter = 10000
+    num_iter = 5000
     for i in tqdm(range(num_iter)):
         # generate tasks
         ts = u.next_task_set()
@@ -91,19 +92,59 @@ if __name__ == '__main__':
         stat_cho.add(pts_util, sched_cho)
 
     log_file = 'tc_log.txt'
+    r = ''
+    r += 'bcl\n'
+    r_bcl, r_str = stat_bcl.result_minimal()
+    r += r_str + '\n------------\n'
+
+    r += 'rta\n'
+    r_rta, r_str = stat_rta.result_minimal()
+    r += r_str + '\n------------\n'
+
+    r += 'bar\n'
+    r_bar, r_str = stat_bar.result_minimal()
+    r += r_str + '\n------------\n'
+
+    r += 'cho\n'
+    r_cho, r_str = stat_cho.result_minimal()
+    r += r_str + '\n------------\n'
+
+    # save to file
     with open(log_file, 'w') as f:
-        f.write('bcl\n')
-        f.write(stat_bcl.result_minimal())
-        f.write('------------\n')
+        f.write(r)
 
-        f.write('rta\n')
-        f.write(stat_rta.result_minimal())
-        f.write('------------\n')
+    # plot
+    x = np.arange(0, 4, 0.1)
+    plt.plot(x, r_bcl,
+        'ko-',
+        label='bcl',
+        markerfacecolor='none',
+        linewidth=0.5)
 
-        f.write('bar\n')
-        f.write(stat_bar.result_minimal())
-        f.write('------------\n')
+    plt.plot(x, r_rta,
+        'k^-',
+        label='rta',
+        markerfacecolor='none',
+        linewidth=0.5)
 
-        f.write('cho\n')
-        f.write(stat_cho.result_minimal())
-        f.write('------------\n')
+    plt.plot(x, r_bar,
+        'ks-',
+        label='bar',
+        markerfacecolor='none',
+        linewidth=0.5)
+
+    plt.plot(x, r_cho,
+        'kx-',
+        label='cho',
+        markerfacecolor='none',
+        linewidth=0.5)
+
+    plt.xlabel('Task Set Utilization')
+    plt.ylabel('Schedulability')
+    plt.legend(edgecolor='none')
+    plt.axis([0.0, 4.0, 0, 1.0])
+
+    out_tex = 'tc_sched_compare.tex'
+    tikzplotlib.save(out_tex)
+
+    plt.show()

@@ -60,7 +60,7 @@ class Stat:
         for i in range(self.size):
             result_str += str(self.norm_data[i]) + '\n'
 
-        return result_str
+        return self.norm_data, result_str
 
 
 if __name__ == '__main__':
