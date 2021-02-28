@@ -9,16 +9,29 @@ from rts.popt.cho import Cho
 import tikzplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+from rts.popt.exhaustive import Exhaustive
 
 
 # create generator
+# gen_param = {
+#     'min_exec_time': 30,
+#     'max_exec_time': 100,
+#     'min_period': 60,
+#     'max_period': 200,
+#     'min_deadline': 40,
+#     'max_deadline': 200,
+#     'tot_util': 4.0,
+#     'util_over': True,
+#     'implicit_deadline': False,
+#     'constrained_deadline': True,
+# }
 gen_param = {
-    'min_exec_time': 30,
-    'max_exec_time': 100,
-    'min_period': 60,
-    'max_period': 200,
-    'min_deadline': 40,
-    'max_deadline': 200,
+    'min_exec_time': 15,
+    'max_exec_time': 35,
+    'min_period': 20,
+    'max_period': 65,
+    'min_deadline': 15,
+    'max_deadline': 65,
     'tot_util': 4.0,
     'util_over': True,
     'implicit_deadline': False,
@@ -38,6 +51,8 @@ stat_bcl = Stat(**stat_param)
 stat_rta = Stat(**stat_param)
 stat_bar = Stat(**stat_param)
 stat_cho = Stat(**stat_param)
+stat_rta_exhaustive = Stat(**stat_param)
+stat_bar_exhaustive = Stat(**stat_param)
 
 # schedulability check param
 sched_param = {
@@ -47,8 +62,15 @@ sched_param = {
 bcl_naive = BCLNaive(**sched_param)
 rta = BCL(**sched_param)
 bar = BAR(**sched_param)
-
-num_iter = 5000
+rta_exhastive = Exhaustive(**{
+    'max_option': 4,
+    'sched': rta
+})
+bar_exhastive = Exhaustive(**{
+    'max_option': 4,
+    'sched': bar
+})
+num_iter = 500
 for i in tqdm(range(num_iter)):
     # generate tasks
     ts = u.next_task_set()
@@ -90,23 +112,47 @@ for i in tqdm(range(num_iter)):
     sched_cho, _ = cho.is_schedulable(pts)
     stat_cho.add(pts_util, sched_cho)
 
+    if sched_cho:
+        stat_rta_exhaustive.add(pts_util, True)
+        stat_bar_exhaustive.add(pts_util, True)
+    else:
+        pts.popt_strategy = 'single'
+        pts.serialize_pts()
+
+        # rta_exhaust schedulability
+        sched_rta_exhaustive = rta_exhastive.is_schedulable(pts)
+        stat_rta_exhaustive.add(pts_util, sched_rta)
+
+        # bar_exhaust schedulability
+        sched_bar_exhaustive = bar_exhastive.is_schedulable(pts)
+        stat_bar_exhaustive.add(pts_util, sched_bar)
+
+
 log_file = 'tc_log.txt'
 r = ''
 r += 'bcl\n'
 r_bcl, r_str = stat_bcl.result_minimal()
-r += r_str + '\n------------\n'
+r += r_str + '------------\n'
 
 r += 'rta\n'
 r_rta, r_str = stat_rta.result_minimal()
-r += r_str + '\n------------\n'
+r += r_str + '------------\n'
 
 r += 'bar\n'
 r_bar, r_str = stat_bar.result_minimal()
-r += r_str + '\n------------\n'
+r += r_str + '------------\n'
 
 r += 'cho\n'
 r_cho, r_str = stat_cho.result_minimal()
-r += r_str + '\n------------\n'
+r += r_str + '------------\n'
+
+r += 'rta_exhaustive\n'
+r_rta_exhaustive, r_str = stat_rta_exhaustive.result_minimal()
+r += r_str + '------------\n'
+
+r += 'bar_exhaustive\n'
+r_bar_exhaustive, r_str = stat_bar_exhaustive.result_minimal()
+r += r_str + '------------\n'
 
 # save to file
 with open(log_file, 'w') as f:
@@ -135,6 +181,18 @@ plt.plot(x, r_bar,
 plt.plot(x, r_cho,
     'kx-',
     label='cho',
+    markerfacecolor='none',
+    linewidth=0.5)
+
+plt.plot(x, r_rta_exhaustive,
+    'k+-',
+    label='rta_exhaustive',
+    markerfacecolor='none',
+    linewidth=0.5)
+
+plt.plot(x, r_bar_exhaustive,
+    'k*-',
+    label='bar_exhaustive',
     markerfacecolor='none',
     linewidth=0.5)
 
