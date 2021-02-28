@@ -4,6 +4,9 @@ from rts.popt.cho_mst import ChoMultiSegmentTask
 from rts.sched.bcl_mst import BCLMultiSegmentTask
 from rts.gen.mstgen import MSgen
 import time
+import tikzplotlib
+import numpy as np
+import matplotlib.pyplot as plt
 
 # create generator
 gen_param = {
@@ -48,7 +51,7 @@ sched_param = {
     'num_core': 4.0,
 }
 
-num_iter = 20000
+num_iter = 100000
 times = []
 lengths = []
 for i in tqdm(range(num_iter)):
@@ -89,7 +92,28 @@ l_avg = sum(lengths) / len(lengths)
 print('{} tasks'.format(l_avg))
 
 print('stat_time')
-_, r_time = stat_time.result_minimal()
-print(r_time)
+r_time, r_time_str = stat_time.result_minimal()
+print(r_time_str)
 print('------------')
 
+# plot
+x_max = 20
+y_max = 7
+x = [int(i + 1) for i in range(x_max)]
+plt.plot(x, r_time[:x_max],
+    'ko-',
+    # label='bcl',
+    markerfacecolor='none',
+    linewidth=0.5)
+
+plt.xlabel('Number of tasks')
+plt.ylabel('Average time spent (ms)')
+plt.legend(edgecolor='none')
+plt.axis([0, x_max, 0, y_max])
+plt.xticks(range(1, x_max + 1))
+plt.yticks(range(0, y_max + 1))
+
+out_tex = 'tc_timing.tex'
+tikzplotlib.save(out_tex)
+
+plt.show()
