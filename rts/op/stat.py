@@ -12,6 +12,7 @@ class Stat:
         self.size = int(math.floor((self.max - self.min) / self.inc))
         self.raw_data = [[] for i in range(self.size)]
         self.norm_data = []
+        self.mode = kwargs.get('mode', 'bool')
 
     def __str__(self):
         return "%d\t%.2f\t%.2f\t%.2f" % (
@@ -34,16 +35,19 @@ class Stat:
         self.norm_data = []
         for dat_idx in self.raw_data:
             num_tot = len(dat_idx)
-            num_true = 0
 
-            for dat in dat_idx:
-                if dat:
-                    num_true += 1
+            if self.mode == 'bool':
+                sum_dat = 0
+                for dat in dat_idx:
+                    if dat:
+                        sum_dat += 1
+            else:
+                sum_dat = sum(dat_idx)
 
             if num_tot == 0:
-                self.norm_data.append(1.0)
+                self.norm_data.append(0.0)
             else:
-                self.norm_data.append(float(num_true) / float(num_tot))
+                self.norm_data.append(float(sum_dat) / float(num_tot))
 
     def print_short(self):
         self.normalize()

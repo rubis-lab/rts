@@ -17,7 +17,7 @@ class MSgen(Gen):
         self.utilization_overflow = kwargs.get('util_over', True)
         self.deadline_scale = kwargs.get('deadline_scale', 1.0)
         self.max_mst_util = kwargs.get('max_mst_util', 1.0)
-        self.min_seg_size = kwargs.get('min_seg_size',  10)
+        self.min_seg_size = kwargs.get('min_seg_size', 10)
         self.max_seg_size = kwargs.get('max_seg_size', 20)
         self.max_option = kwargs.get('max_option', 1)
         self.overhead = kwargs.get('overhead', 0.0)
