@@ -68,6 +68,20 @@ class DAG(object):
     def graph_vol(self):
         return
 
+    def get_all_ance(self, node):
+        # get all ancestors
+        ance = []
+        for c in node.pred:
+            ance.append(c)
+            if len(c.pred) != 0:
+                ance += self.get_all_ance(c)
+        return ance
+
+    def get_all_ance_sorted(self, node):  # sorted by nid
+        ancestors = list(set(self.get_all_ance(node)))  # unsorted
+        ancestors.sort(key=operator.attrgetter('nid'))
+        return ancestors
+
     def assign_priority_inner(self, sub_g, prio):
         visited = []
         not_visited = sub_g
@@ -78,7 +92,7 @@ class DAG(object):
                 if self.in_degree[n] == 0:
                     dangling_nodes.append(n)
 
-            print('dangling_nodes: '.format(dangling_nodes))
+            print('dangling_nodes: {}'.format(list(map(lambda x: x.nid, dangling_nodes))))
             # find arg max lall node
             max_lall = max(list(map(lambda x: self.lall[x], dangling_nodes)))
 
@@ -87,6 +101,7 @@ class DAG(object):
                 if isclose(self.lall[d], max_lall):
                     max_node = d
 
+            print('max_node: {}'.format(max_node.nid))
             # assign priority
             max_node.priority = prio
             prio += 1
@@ -96,6 +111,25 @@ class DAG(object):
             not_visited.remove(max_node)
             for s in max_node.succ:
                 self.in_degree[s] -= 1
+
+            # create sub_g
+            max_node_ancestors = self.get_all_ance_sorted(max_node)
+            print('max_node_ancestors: {}'.format(list(map(lambda x: x.nid, max_node_ancestors))))
+            print('not_visited: {}'.format(list(map(lambda x: x.nid, not_visited))))
+            new_sub_g = []
+            if len(max_node_ancestors) != 0:
+                for n in not_visited:
+                    if n in max_node_ancestors:
+                        new_sub_g.append(n)
+
+            # recurse
+            if len(new_sub_g) != 0:
+                print('recurse with new_sub_g: {}'.format(list(map(lambda x: x.nid, new_sub_g))))
+                new_visited += self.assign_priority_inner(new_sub_g, prio)
+                visited += new_visited
+                for n in new_visited:
+                    not_visited.remove(n)
+
         return visited
 
     def assign_priority_he2019(self):
