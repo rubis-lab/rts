@@ -29,6 +29,7 @@ class Task(object):
         self.slack = float(kwargs.get('slack', 0))
         self.is_dag = kwargs.get('is_dag', False)
         if self.is_dag:
+            self.nid = kwargs.get('nid', -1)
             self.pred = kwargs.get('pred', [])
             self.succ = kwargs.get('succ', [])
             self.is_dummy = kwargs.get('is_dummy', False)
@@ -55,7 +56,10 @@ class Task(object):
         )
 
         if self.is_dag:
-            ret += '\npred:{}\nsucc:{}'.format(self.pred, self.succ)
+            ret += '\nnid: {}\npred: {}\nsucc: {}'\
+                .format(self.nid,
+                    list(map(lambda x: x.nid, self.pred)),
+                    list(map(lambda x: x.nid, self.succ)))
         return ret
 
     def utilization(self):

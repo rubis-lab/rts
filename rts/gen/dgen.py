@@ -44,14 +44,30 @@ class Dgen(Gen):
             return leaves
 
     def bfs(self, edges):
+        in_degree = [0 for _ in edges]
+        for n_start, n_ends in edges.items():
+            for n_end in n_ends:
+                in_degree[n_end] += 1
+        print('in_degree: {}'.format(in_degree))
+
         visited = [0]  # start from source vertex (always 0)
         q = [0]
         while q:
             s = q.pop(0)
-            for c in edges[s]:
-                if c not in visited:
-                    visited.append(c)
-                    q.append(c)
+            # print('doing {}'.format(s))
+            if in_degree[s] != 0:
+                print('not indegree 0: {}'.format(s))
+                print('need check')
+                q.append(s)
+                continue
+            else:
+                for c in edges[s]:
+                    in_degree[c] -= 1
+                    if in_degree[c] != 0:
+                        continue
+                    if c not in visited:
+                        visited.append(c)
+                        q.append(c)
         return visited
 
     def biased_normal(self, mu, sigma, cutoff=0.0):
@@ -87,8 +103,8 @@ class Dgen(Gen):
             .format(edge_cnt, possible_edges, edge_cnt / possible_edges))
 
         # detect starting & ending nodes
-        print(edges)
-        print(edges_backward)
+        print('edges: {}'.format(edges))
+        print('edges_backward: {}'.format(edges_backward))
         end_nodes_list = []
         start_nodes_list = []
         for e in range(1, n_nodes):
@@ -97,10 +113,10 @@ class Dgen(Gen):
             start_nodes_list += self.get_leaves(e, edges_backward)
 
         end_nodes = set(end_nodes_list)
-        print(end_nodes)
+        print('end_nodes: {}'.format(end_nodes))
 
         start_nodes = set(start_nodes_list)
-        print(start_nodes)
+        print('start_nodes: {}'.format(start_nodes))
 
         # make source and sink nodes
         # source: 0
@@ -116,11 +132,12 @@ class Dgen(Gen):
         for n in end_nodes:
             edges[n].append(n_nodes)
             edges_backward[n_nodes].append(n)
-        print(edges)
+        print('edges: {}'.format(edges))
+        print('edges_backward: {}'.format(edges_backward))
 
         # sort nodes
         nodes_sorted = self.bfs(edges)
-        print(nodes_sorted)
+        print('nodes_sorted: {}'.format(nodes_sorted))
 
         graph = {
             'nodes': nodes_sorted,
@@ -147,14 +164,17 @@ class Dgen(Gen):
             'deadline': deadline,
             'period': period,
             'is_dag': True,
+            'nid': 0,
             'is_dummy': True,
         })
         tasks.append(t_source)
 
         # general
         for n in g['nodes'][1:len(g['nodes']) - 1]:
+            # print(n)
             t = Task(**{
                 'is_dag': True,
+                'nid': n,
                 'exec_time': self.biased_normal(mu_exec_time, sig_exec_time),
                 'deadline': deadline,
                 'period': period,
@@ -167,6 +187,7 @@ class Dgen(Gen):
             'deadline': deadline,
             'period': period,
             'is_dag': True,
+            'nid': len(g['nodes']) - 1,
             'is_dummy': True,
         })
         tasks.append(t_sink)
@@ -177,14 +198,25 @@ class Dgen(Gen):
 
         return tasks
 
-    def connect_nodes(self, g, tasks):
+    def connect_tasks(self, g, tasks):
+        # forward connection (succ)
+        for t_from, node in zip(tasks, g['nodes']):
+            for t_to in g['edges'][node]:
+                t_from.succ.append(tasks[g['nodes'][t_to]])
+
+        # backward connection (pred)
+        for t_to, node in zip(tasks, g['nodes']):
+            for t_from in g['edges_backward'][node]:
+                t_to.pred.append(tasks[g['nodes'][t_from]])
+
         for t in tasks:
             print(t)
+            print('\n')
 
     def next_task(self):
         g = self.next_graph()
         tasks = self.generate_template_tasks(g)
-        self.connect_nodes(g, tasks)
+        self.connect_tasks(g, tasks)
 
 
 if __name__ == '__main__':
