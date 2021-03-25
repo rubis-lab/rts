@@ -112,20 +112,35 @@ class DAG(object):
             for s in max_node.succ:
                 self.in_degree[s] -= 1
 
+            # continue with other dangling vertex when there is no sucessor
+            if len(max_node.succ) == 0:
+                continue
+
+            # again, find maximum node among them
+            max_lall_s = max(list(map(lambda x: self.lall[x], max_node.succ)))
+            for s in max_node.succ:
+                if isclose(self.lall[s], max_lall_s):
+                    max_node_s = s
+
+            print('max_node_s: {}'.format(max_node_s.nid))
+
             # create sub_g
-            max_node_ancestors = self.get_all_ance_sorted(max_node)
-            print('max_node_ancestors: {}'.format(list(map(lambda x: x.nid, max_node_ancestors))))
-            print('not_visited: {}'.format(list(map(lambda x: x.nid, not_visited))))
+            max_node_s_ancestors = self.get_all_ance_sorted(max_node_s)
+            print('max_node_s_ancestors: {}'
+                .format(list(map(lambda x: x.nid, max_node_s_ancestors))))
+            print('not_visited: {}'
+                .format(list(map(lambda x: x.nid, not_visited))))
             new_sub_g = []
-            if len(max_node_ancestors) != 0:
+            if len(max_node_s_ancestors) != 0:
                 for n in not_visited:
-                    if n in max_node_ancestors:
+                    if n in max_node_s_ancestors:
                         new_sub_g.append(n)
 
             # recurse
             if len(new_sub_g) != 0:
-                print('recurse with new_sub_g: {}'.format(list(map(lambda x: x.nid, new_sub_g))))
-                new_visited += self.assign_priority_inner(new_sub_g, prio)
+                print('recurse with new_sub_g: {}'
+                    .format(list(map(lambda x: x.nid, new_sub_g))))
+                new_visited = self.assign_priority_inner(new_sub_g, prio)
                 visited += new_visited
                 for n in new_visited:
                     not_visited.remove(n)
