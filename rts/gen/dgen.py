@@ -15,10 +15,11 @@ class Dgen(Gen):
         self.min_nodes = kwargs.get('min_nodes', 1)
         self.max_nodes = kwargs.get('max_nodes', 20)
         self.edge_prob = kwargs.get('edge_prob', 0.3)
+        self.util_over = kwargs.get('util_over', True)
+        self.avg_node_util = kwargs.get('avg_node_util', 0.2)
 
         # might not be used
         # self.tot_util = kwargs.get('tot_util', 1.0)
-        # self.utilization_overflow = kwargs.get('util_over', True)
         # self.deadline_scale = kwargs.get('deadline_scale', 1.0)
         # self.max_mst_util = kwargs.get('max_mst_util', 1.0)
         # self.min_seg_size = kwargs.get('min_seg_size', 10)
@@ -26,6 +27,12 @@ class Dgen(Gen):
         # self.max_option = kwargs.get('max_option', 1)
         # self.overhead = kwargs.get('overhead', 0.0)
         # self.variance = kwargs.get('variance', 0.0)
+
+    def __str__(self):
+        info = 'Generator - dgen\n' + \
+            super(type(self), self).__str__()
+
+        return info
 
     def get_leaves(self, v, edges):
         leaves = []
@@ -46,6 +53,15 @@ class Dgen(Gen):
                     visited.append(c)
                     q.append(c)
         return visited
+
+    def biased_normal(self, mu, sigma, cutoff=0.0):
+        retries = 5
+        for _ in range(retries):
+            x = random.gauss(mu, sigma)
+            if x > cutoff:
+                return x
+        print('biased_normal failed. check mu/sigma')
+        return cutoff
 
     def next_graph(self):
         # number of nodes
@@ -116,60 +132,70 @@ class Dgen(Gen):
 
         return graph
 
-    def next_task(self):
-        g = self.next_graph()
-
+    def generate_template_tasks(self, g):
         # implicit deadline
         period = random.randint(self.min_period, self.min_period)
         deadline = period
+        mu_exec_time = period * self.avg_node_util
+        sig_exec_time = mu_exec_time / 2
 
-        # dummy node
+        # tasks
+        tasks = []
+        # source
         t_source = Task(**{
             'exec_time': 0.0,
             'deadline': deadline,
             'period': period,
             'is_dag': True,
-            'pred': [],
-            'succ': g['edges'][g['source']],
             'is_dummy': True,
         })
+        tasks.append(t_source)
 
+        # general
+        for n in g['nodes'][1:len(g['nodes']) - 1]:
+            t = Task(**{
+                'is_dag': True,
+                'exec_time': self.biased_normal(mu_exec_time, sig_exec_time),
+                'deadline': deadline,
+                'period': period,
+            })
+            tasks.append(t)
+
+        # sink
         t_sink = Task(**{
             'exec_time': 0.0,
             'deadline': deadline,
             'period': period,
             'is_dag': True,
-            'pred': g['edges_backward'][g['sink']],
-            'succ': [],
             'is_dummy': True,
         })
+        tasks.append(t_sink)
 
-        print(t_source)
-        print(t_sink)
+        # print("len: {}".format(len(tasks)))
+        # for t in tasks:
+        #     print(t)
 
-        # exec time
+        return tasks
 
+    def connect_nodes(self, g, tasks):
+        for t in tasks:
+            print(t)
 
-
-
-    def __str__(self):
-        info = 'Generator - dgen\n' + \
-            super(type(self), self).__str__()
-
-        return info
+    def next_task(self):
+        g = self.next_graph()
+        tasks = self.generate_template_tasks(g)
+        self.connect_nodes(g, tasks)
 
 
 if __name__ == '__main__':
     gen_param = {
-        'min_exec_time': 30,
-        'max_exec_time': 100,
         'min_period': 60,
         'max_period': 200,
-        'min_deadline': 40,
-        'max_deadline': 200,
         'min_nodes': 1,
         'max_nodes': 10,
         'edge_prob': 0.3,
+        'util_over': True,
+        'avg_node_util': 0.2,
     }
     dg = Dgen(**gen_param)
     dg.next_task()

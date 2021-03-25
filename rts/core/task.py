@@ -27,6 +27,11 @@ class Task(object):
         self.deadline = float(kwargs.get('deadline', 0))
         self.period = float(kwargs.get('period', 0))
         self.slack = float(kwargs.get('slack', 0))
+        self.is_dag = kwargs.get('is_dag', False)
+        if self.is_dag:
+            self.pred = kwargs.get('pred', [])
+            self.succ = kwargs.get('succ', [])
+            self.is_dummy = kwargs.get('is_dummy', False)
 
         type(self).cnt += 1
 
@@ -42,13 +47,16 @@ class Task(object):
         **Role**: Format for printing **Task** instance(s)\n
         id    exec_time    deadline    period
         """
-
-        return "%d\t%.2f\t%.2f\t%.2f" % (
+        ret = "%d\t%.2f\t%.2f\t%.2f" % (
             self.id,
             self.exec_time,
             self.deadline,
             self.period
         )
+
+        if self.is_dag:
+            ret += '\npred:{}\nsucc:{}'.format(self.pred, self.succ)
+        return ret
 
     def utilization(self):
         """
