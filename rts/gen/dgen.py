@@ -7,6 +7,7 @@ from rts.gen.gen import Gen
 import random
 import math
 
+
 # DAG generator
 class Dgen(Gen):
     def __init__(self, **kwargs):
@@ -14,34 +15,33 @@ class Dgen(Gen):
         self.min_nodes = kwargs.get('min_nodes', 1)
         self.max_nodes = kwargs.get('max_nodes', 10)
         self.edge_prob = kwargs.get('edge_prob', 0.3)
-        
 
         # might not be used
-        self.tot_util = kwargs.get('tot_util', 1.0)
-        self.utilization_overflow = kwargs.get('util_over', True)
-        self.deadline_scale = kwargs.get('deadline_scale', 1.0)
-        self.max_mst_util = kwargs.get('max_mst_util', 1.0)
-        self.min_seg_size = kwargs.get('min_seg_size', 10)
-        self.max_seg_size = kwargs.get('max_seg_size', 20)
-        self.max_option = kwargs.get('max_option', 1)
-        self.overhead = kwargs.get('overhead', 0.0)
-        self.variance = kwargs.get('variance', 0.0)
+        # self.tot_util = kwargs.get('tot_util', 1.0)
+        # self.utilization_overflow = kwargs.get('util_over', True)
+        # self.deadline_scale = kwargs.get('deadline_scale', 1.0)
+        # self.max_mst_util = kwargs.get('max_mst_util', 1.0)
+        # self.min_seg_size = kwargs.get('min_seg_size', 10)
+        # self.max_seg_size = kwargs.get('max_seg_size', 20)
+        # self.max_option = kwargs.get('max_option', 1)
+        # self.overhead = kwargs.get('overhead', 0.0)
+        # self.variance = kwargs.get('variance', 0.0)
 
-    def get_leaves(self, e, d):
+    def get_leaves(self, v, edges):
         leaves = []
-        if len(d[e]) == 0:
-            return [e]
+        if len(edges[v]) == 0:
+            return [v]
         else:
-            for c in d[e]:
-                leaves += self.get_leaves(c, d)
+            for c in edges[v]:
+                leaves += self.get_leaves(c, edges)
             return leaves
 
-    def bfs(self, d):
-        visited = [0]
+    def bfs(self, edges):
+        visited = [0]  # start from source vertex (always 0)
         q = [0]
         while q:
             s = q.pop(0)
-            for c in d[s]:
+            for c in edges[s]:
                 if c not in visited:
                     visited.append(c)
                     q.append(c)
@@ -55,7 +55,8 @@ class Dgen(Gen):
         # number of nodes
         n_nodes = random.randint(self.min_nodes, self.max_nodes)
 
-        print('generating {} nodes with p:{} / d:{} '.format(n_nodes, period, deadline))
+        print('generating {} nodes with p:{} / d:{} '
+            .format(n_nodes, period, deadline))
         print('edge_prob: {}'.format(self.edge_prob))
 
         # generate edges with probability
@@ -74,7 +75,8 @@ class Dgen(Gen):
                     edges_backward[n_to].append(n_from)
                     # print('{}->{}'.format(n_from, n_to))
         possible_edges = (n_nodes - 1) * (n_nodes - 2) / 2
-        print('edge_cnt: {}, possible_edges: {}, ratio: {}'.format(edge_cnt, possible_edges, edge_cnt / possible_edges))
+        print('edge_cnt: {}, possible_edges: {}, ratio: {}'
+            .format(edge_cnt, possible_edges, edge_cnt / possible_edges))
 
         # detect starting & ending nodes
         print(edges)
@@ -102,23 +104,14 @@ class Dgen(Gen):
         for n in end_nodes:
             edges[n].append(n_nodes)
         print(edges)
-        
+
         # connect all edges
         topological_sort = self.bfs(edges)
         print(topological_sort)
 
     def __str__(self):
-        info = 'Generator - mstgen\n' + \
-            super(type(self), self).__str__() + '\n' + \
-            'tot_util = ' + str(self.tot_util) + '\n' + \
-            'util_over = ' + str(self.utilization_overflow) + '\n' + \
-            'implicit_deadline = ' + str(self.implicit_deadline) + '\n' + \
-            'constrained_deadline = ' + str(self.constrained_deadline) + '\n' + \
-            'min_seg_size = ' + str(self.min_seg_size) + '\n' + \
-            'max_seg_size = ' + str(self.max_seg_size) + '\n' + \
-            'max_option = ' + str(self.max_option) + '\n' + \
-            'overhead = ' + str(self.overhead) + '\n' + \
-            'variance = ' + str(self.variance)
+        info = 'Generator - dgen\n' + \
+            super(type(self), self).__str__()
 
         return info
 
@@ -131,13 +124,6 @@ if __name__ == '__main__':
         'max_period': 200,
         'min_deadline': 40,
         'max_deadline': 200,
-        'tot_util': 4.0,
-        'util_over': True,
-        'implicit_deadline': False,
-        'constrained_deadline': True,
-        'min_seg_size': 10,
-        'max_seg_size': 30,
-        'max_option': 4
     }
     dg = Dgen(**gen_param)
     dg.next_dag()
