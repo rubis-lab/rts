@@ -13,7 +13,7 @@ class Dgen(Gen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.min_nodes = kwargs.get('min_nodes', 1)
-        self.max_nodes = kwargs.get('max_nodes', 10)
+        self.max_nodes = kwargs.get('max_nodes', 20)
         self.edge_prob = kwargs.get('edge_prob', 0.3)
 
         # might not be used
@@ -47,17 +47,9 @@ class Dgen(Gen):
                     q.append(c)
         return visited
 
-    def next_dag(self):
-        # uniform (implicit deadline)
-        period = random.randint(self.min_period, self.min_period)
-        deadline = period
-
+    def next_graph(self):
         # number of nodes
         n_nodes = random.randint(self.min_nodes, self.max_nodes)
-
-        print('generating {} nodes with p:{} / d:{} '
-            .format(n_nodes, period, deadline))
-        print('edge_prob: {}'.format(self.edge_prob))
 
         # generate edges with probability
         edge_cnt = 0
@@ -97,17 +89,68 @@ class Dgen(Gen):
         # make source and sink nodes
         # source: 0
         edges[0] = []
+        edges_backward[0] = []
         for n in start_nodes:
             edges[0].append(n)
+            edges_backward[n].append(0)
+
         # sink: n
         edges[n_nodes] = []
+        edges_backward[n_nodes] = []
         for n in end_nodes:
             edges[n].append(n_nodes)
+            edges_backward[n_nodes].append(n)
         print(edges)
 
-        # connect all edges
-        topological_sort = self.bfs(edges)
-        print(topological_sort)
+        # sort nodes
+        nodes_sorted = self.bfs(edges)
+        print(nodes_sorted)
+
+        graph = {
+            'nodes': nodes_sorted,
+            'edges': edges,
+            'edges_backward': edges_backward,
+            'source': 0,
+            'sink': n_nodes
+        }  # G(V, E)
+
+        return graph
+
+    def next_task(self):
+        g = self.next_graph()
+
+        # implicit deadline
+        period = random.randint(self.min_period, self.min_period)
+        deadline = period
+
+        # dummy node
+        t_source = Task(**{
+            'exec_time': 0.0,
+            'deadline': deadline,
+            'period': period,
+            'is_dag': True,
+            'pred': [],
+            'succ': g['edges'][g['source']],
+            'is_dummy': True,
+        })
+
+        t_sink = Task(**{
+            'exec_time': 0.0,
+            'deadline': deadline,
+            'period': period,
+            'is_dag': True,
+            'pred': g['edges_backward'][g['sink']],
+            'succ': [],
+            'is_dummy': True,
+        })
+
+        print(t_source)
+        print(t_sink)
+
+        # exec time
+
+
+
 
     def __str__(self):
         info = 'Generator - dgen\n' + \
@@ -124,6 +167,9 @@ if __name__ == '__main__':
         'max_period': 200,
         'min_deadline': 40,
         'max_deadline': 200,
+        'min_nodes': 1,
+        'max_nodes': 10,
+        'edge_prob': 0.3,
     }
     dg = Dgen(**gen_param)
-    dg.next_dag()
+    dg.next_task()
