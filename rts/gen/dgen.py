@@ -1,8 +1,7 @@
 from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.gen.gen import Gen
-
-# from rts.core.dag import DAG
+from rts.core.dag import DAG
 
 import random
 import math
@@ -165,6 +164,7 @@ class Dgen(Gen):
             'period': period,
             'is_dag': True,
             'nid': 0,
+            'priority': 0,
             'is_dummy': True,
         })
         tasks.append(t_source)
@@ -175,6 +175,7 @@ class Dgen(Gen):
             t = Task(**{
                 'is_dag': True,
                 'nid': n,
+                'priority': n,
                 'exec_time': self.biased_normal(mu_exec_time, sig_exec_time),
                 'deadline': deadline,
                 'period': period,
@@ -188,6 +189,7 @@ class Dgen(Gen):
             'period': period,
             'is_dag': True,
             'nid': len(g['nodes']) - 1,
+            'priority': len(g['nodes']) - 1,
             'is_dummy': True,
         })
         tasks.append(t_sink)
@@ -209,14 +211,21 @@ class Dgen(Gen):
             for t_from in g['edges_backward'][node]:
                 t_to.pred.append(tasks[g['nodes'][t_from]])
 
-        for t in tasks:
-            print(t)
-            print('\n')
+        return tasks
+
+    def create_dag(self, tasks):
+        dag = DAG(**{
+            'tasks': tasks
+        })
+        return dag
 
     def next_task(self):
         g = self.next_graph()
         tasks = self.generate_template_tasks(g)
-        self.connect_tasks(g, tasks)
+        tasks = self.connect_tasks(g, tasks)
+        dag = self.create_dag(tasks)
+        return dag 
+
 
 
 if __name__ == '__main__':

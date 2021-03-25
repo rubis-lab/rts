@@ -4,6 +4,8 @@ from rts.core.pt import ParaTask
 from rts.op import para
 from rts.op import tsutil
 import random
+import operator
+from math import isclose
 
 
 class DAG(object):
@@ -16,36 +18,88 @@ class DAG(object):
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
 
-        # parallelizer info
-        self.max_opt = kwargs.get('max_option', 1)
-        self.overhead = kwargs.get('overhead', 0.0)
-        self.variance = kwargs.get('variance', 0.0)
+        self.tasks = kwargs.get('tasks')  # topological
+        self.sort_tasks()
+        self.assign_priority_he2019()
 
-        # base para task set info
-        # tmp_ts: default task set with a single dummy task.
-        tmp_ts = TaskSet()
-        tmp_ts.append(Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
-        self.base_ts = kwargs.get('base_ts', tmp_ts)
-        self.pt_list = []
+    def sort_tasks(self):
+        self.tasks.sort(key=operator.attrgetter('priority'))
+        return
 
-        if kwargs.get('custom', 'False') == 'True':
-            self.pt_list = kwargs.get('pt_list', [[]])
-        else:
-            self.populate_pt_list()
+    def calc_len_he2019(self):
+        # lf
+        lf = {}
+        t_source = self.tasks[0]
+        lf[t_source] = t_source.exec_time
+        for t in self.tasks:
+            # print(t)
+            lf[t] = t.exec_time
+            if len(t.pred) != 0:
+                lf[t] += max(list(map(lambda x: lf[x], t.pred)))
 
-        # task like property
-        self.exec_time = -1  # sum of all exec_times
-        self.crit_exec_time = -1  # sum of largest exec_times
-        self.deadline = self.base_ts[0].deadline
-        self.period = self.base_ts[0].period
+        # lb
+        lb = {}
+        t_sink = self.tasks[-1]
+        lb[t_sink] = t_sink.exec_time
 
-        # create a list of task sets according to selected option.
-        # defaults to single thread for each pt
-        self.popt_strategy = kwargs.get('popt_strategy', 'single')
-        self.popt_list = kwargs.get('popt_list', [1 for _ in range(len(self.pt_list))])
+        for t in self.tasks[::-1]:
+            # print(t)
+            lb[t] = t.exec_time
+            if len(t.succ) != 0:
+                lb[t] += max(list(map(lambda x: lb[x], t.succ)))
 
-        self.ts_list = []  # list of ts resulting from pt[option]
-        self.update_ts_list()
+        # l
+        lall = {}
+        for t in self.tasks:
+            lall[t] = lf[t] + lb[t] - t.exec_time
+
+        # for t in self.tasks:
+        #     print('t.nid: {}, t.exec_time: {}, lf: {}, lb: {}, lall: {}'
+        #         .format(t.nid, t.exec_time, lf[t], lb[t], lall[t]))
+
+        return lall
+
+    def graph_len(self):
+        return
+
+    def graph_vol(self):
+        return
+
+    def assign_priority_he2019(self):
+        lall = self.calc_len_he2019()
+        print(lall)
+        return
+
+        # # parallelizer info
+        # self.max_opt = kwargs.get('max_option', 1)
+        # self.overhead = kwargs.get('overhead', 0.0)
+        # self.variance = kwargs.get('variance', 0.0)
+
+        # # base para task set info
+        # # tmp_ts: default task set with a single dummy task.
+        # tmp_ts = TaskSet()
+        # tmp_ts.append(Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
+        # self.base_ts = kwargs.get('base_ts', tmp_ts)
+        # self.pt_list = []
+
+        # if kwargs.get('custom', 'False') == 'True':
+        #     self.pt_list = kwargs.get('pt_list', [[]])
+        # else:
+        #     self.populate_pt_list()
+
+        # # task like property
+        # self.exec_time = -1  # sum of all exec_times
+        # self.crit_exec_time = -1  # sum of largest exec_times
+        # self.deadline = self.base_ts[0].deadline
+        # self.period = self.base_ts[0].period
+
+        # # create a list of task sets according to selected option.
+        # # defaults to single thread for each pt
+        # self.popt_strategy = kwargs.get('popt_strategy', 'single')
+        # self.popt_list = kwargs.get('popt_list', [1 for _ in range(len(self.pt_list))])
+
+        # self.ts_list = []  # list of ts resulting from pt[option]
+        # self.update_ts_list()
         return
 
     def __del__(self):

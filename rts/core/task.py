@@ -27,6 +27,7 @@ class Task(object):
         self.deadline = float(kwargs.get('deadline', 0))
         self.period = float(kwargs.get('period', 0))
         self.slack = float(kwargs.get('slack', 0))
+        self.priority = kwargs.get('priority', -1)
         self.is_dag = kwargs.get('is_dag', False)
         if self.is_dag:
             self.nid = kwargs.get('nid', -1)
@@ -56,8 +57,9 @@ class Task(object):
         )
 
         if self.is_dag:
-            ret += '\nnid: {}\npred: {}\nsucc: {}'\
+            ret += '\nnid: {}\nprio: {}\npred: {}\nsucc: {}'\
                 .format(self.nid,
+                    self.priority,
                     list(map(lambda x: x.nid, self.pred)),
                     list(map(lambda x: x.nid, self.succ)))
         return ret
