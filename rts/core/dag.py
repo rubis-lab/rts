@@ -18,6 +18,9 @@ class DAG(object):
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
 
+        # he2019
+        self.lall = {}
+        self.in_degree = {}
         self.tasks = kwargs.get('tasks')  # topological
         self.sort_tasks()
         self.assign_priority_he2019()
@@ -65,9 +68,62 @@ class DAG(object):
     def graph_vol(self):
         return
 
+    def assign_priority_inner(self, sub_g, prio):
+        visited = []
+        not_visited = sub_g
+        while not_visited:
+            # check dangling nodes
+            dangling_nodes = []
+            for n in not_visited:
+                if self.in_degree[n] == 0:
+                    dangling_nodes.append(n)
+
+            print('dangling_nodes: '.format(dangling_nodes))
+            # find arg max lall node
+            max_lall = max(list(map(lambda x: self.lall[x], dangling_nodes)))
+
+            # perform argmax (ties broken by topological order)
+            for d in dangling_nodes:
+                if isclose(self.lall[d], max_lall):
+                    max_node = d
+
+            # assign priority
+            max_node.priority = prio
+            prio += 1
+
+            # update tracking info
+            visited.append(max_node)
+            not_visited.remove(max_node)
+            for s in max_node.succ:
+                self.in_degree[s] -= 1
+        return visited
+
     def assign_priority_he2019(self):
-        lall = self.calc_len_he2019()
-        print(lall)
+        self.lall = self.calc_len_he2019()
+        print('lall: {}'.format(self.lall))
+        self.in_degree = {}
+        for t in self.tasks:
+            self.in_degree[t] = len(t.pred)
+
+        # track visited / not_visited nodes
+        not_visited = []
+        for t in self.tasks:
+            not_visited.append(t)
+
+        # start with source node
+        t_source = self.tasks[0]
+        visited = [t_source]
+        not_visited.remove(t_source)
+        for s in t_source.succ:
+            self.in_degree[s] -= 1
+        print('not_visited: {}'.format(not_visited))
+        prio = 1
+
+        visited += self.assign_priority_inner(not_visited, prio)
+
+        for idx, t in enumerate(visited):
+            print('prio: {} / nid: {} / lall: {}'
+                .format(t.priority, t.nid, self.lall[t]))
         return
 
         # # parallelizer info
