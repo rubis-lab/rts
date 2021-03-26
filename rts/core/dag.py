@@ -62,7 +62,25 @@ class DAG(object):
 
         return lall
 
+    def detect_longest_chain(self):
+        # identify all max nodes
+        max_lall = max(self.lall)
+        max_nodes = []
+        for t in self.tasks:
+            if isclose(self.lall[t], max_lall):
+                max_nodes.append(t)
+
+        # find longest chain among them
+        t_source = max_nodes[0]
+        
+        chains = []
+        for m in max_nodes:
+
+
+        return
+
     def graph_len(self):
+
         return
 
     def graph_vol(self):
@@ -92,7 +110,8 @@ class DAG(object):
                 if self.in_degree[n] == 0:
                     dangling_nodes.append(n)
 
-            print('dangling_nodes: {}'.format(list(map(lambda x: x.nid, dangling_nodes))))
+            print('dangling_nodes: {}'
+                .format(list(map(lambda x: x.nid, dangling_nodes))))
             # find arg max lall node
             max_lall = max(list(map(lambda x: self.lall[x], dangling_nodes)))
 
@@ -173,38 +192,6 @@ class DAG(object):
         for idx, t in enumerate(visited):
             print('prio: {} / nid: {} / lall: {}'
                 .format(t.priority, t.nid, self.lall[t]))
-        return
-
-        # # parallelizer info
-        # self.max_opt = kwargs.get('max_option', 1)
-        # self.overhead = kwargs.get('overhead', 0.0)
-        # self.variance = kwargs.get('variance', 0.0)
-
-        # # base para task set info
-        # # tmp_ts: default task set with a single dummy task.
-        # tmp_ts = TaskSet()
-        # tmp_ts.append(Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
-        # self.base_ts = kwargs.get('base_ts', tmp_ts)
-        # self.pt_list = []
-
-        # if kwargs.get('custom', 'False') == 'True':
-        #     self.pt_list = kwargs.get('pt_list', [[]])
-        # else:
-        #     self.populate_pt_list()
-
-        # # task like property
-        # self.exec_time = -1  # sum of all exec_times
-        # self.crit_exec_time = -1  # sum of largest exec_times
-        # self.deadline = self.base_ts[0].deadline
-        # self.period = self.base_ts[0].period
-
-        # # create a list of task sets according to selected option.
-        # # defaults to single thread for each pt
-        # self.popt_strategy = kwargs.get('popt_strategy', 'single')
-        # self.popt_list = kwargs.get('popt_list', [1 for _ in range(len(self.pt_list))])
-
-        # self.ts_list = []  # list of ts resulting from pt[option]
-        # self.update_ts_list()
         return
 
     def __del__(self):
