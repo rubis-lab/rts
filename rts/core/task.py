@@ -34,6 +34,8 @@ class Task(object):
             self.pred = kwargs.get('pred', [])
             self.succ = kwargs.get('succ', [])
             self.is_dummy = kwargs.get('is_dummy', False)
+            self.start_time = 0.0
+            self.finish_time = 0.0
 
         type(self).cnt += 1
 
@@ -67,6 +69,7 @@ class Task(object):
     def utilization(self):
         """
         **Role**: Returns Utilization\n
-        .. note:: **utilization**  **=** **exec_time** / **period**\t ( from  **"op.tsutil.calc_utilization"**  )
+        .. note:: **utilization**  **=** **exec_time** / **period**\t
+        ( from  **"op.tsutil.calc_utilization"**  )
         """
         return tsutil.calc_utilization(self)

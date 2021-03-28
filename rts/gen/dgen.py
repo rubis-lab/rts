@@ -215,7 +215,9 @@ class Dgen(Gen):
 
     def create_dag(self, tasks):
         dag = DAG(**{
-            'tasks': tasks
+            'tasks': tasks,
+            'deadline': tasks[0].deadline,
+            'period': tasks[0].period,
         })
         return dag
 
@@ -224,8 +226,7 @@ class Dgen(Gen):
         tasks = self.generate_template_tasks(g)
         tasks = self.connect_tasks(g, tasks)
         dag = self.create_dag(tasks)
-        return dag 
-
+        return dag
 
 
 if __name__ == '__main__':

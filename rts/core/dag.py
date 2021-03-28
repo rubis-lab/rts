@@ -33,7 +33,9 @@ class DAG(object):
         self.period = kwargs.get('period')
         self.carry_in_calculated = False
 
-        self.carry_in_gedf()
+        w_carry_in_20 = self.carry_in_gedf(20)
+
+        print('w_carry_in_20: {}'.format(w_carry_in_20))
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -252,16 +254,31 @@ class DAG(object):
                 .format(t.priority, t.nid,
                     t.start_time, t.exec_time, t.finish_time))
 
-    def carry_in_gedf(self, d=0):
+    def carry_in_gedf(self, _l=0):
         # assumes maximal parallelization AND maximal possible cores
         # determine which tasks to be included
         # start from lowest priority(backmost)
         if not self.carry_in_calculated:
             self.prepare_carry_in_calculation()
 
-        for t in self.tasks[::-1]:
-            pass
-        return
+        w_carry_in = 0.0
+        cutoff = self.deadline - _l
+        for t in self.tasks:
+            #           cutoff (D - l)
+            # case 1)      |
+            #              |    <--- t --->
+            if t.start_time > cutoff:
+                w_carry_in += t.exec_time
+            # case 2)      |
+            #  <--- t ---> |
+            elif t.finish_time < cutoff:
+                w_carry_in += 0.0
+            # case 3)      |
+            #          <--- t --->
+            else:
+                w_carry_in += t.finish_time - cutoff
+
+        return w_carry_in
 
     def workload_gedf(self, d):
         return
