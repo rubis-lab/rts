@@ -258,6 +258,24 @@ def unifast_divide_alpha(pcs, tot, limit):
     return divided_best_effort
 
 
+def parallelize_task_ideal(t, pcs):
+    thr_param = {
+        'id': t.id,
+        # 'exec_time': e_list[i],
+        'deadline': t.deadline,
+        'period': t.period,
+    }
+    thrs = []
+    new_exec_time = t.exec_time / pcs
+    for tid in range(pcs):
+        thr = Thread(**thr_param)
+        thr.tid = tid
+        thr.exec_time = new_exec_time
+        thrs.append(thr)
+
+    return thrs
+
+
 def normalize_list(_l):
     l_sum = sum(_l)
     l_mean = l_sum / len(_l)
