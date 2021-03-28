@@ -5,7 +5,7 @@ from rts.op import para
 from rts.op import tsutil
 import random
 import operator
-from math import isclose
+from math import isclose, floor
 
 
 class DAG(object):
@@ -33,9 +33,17 @@ class DAG(object):
         self.period = kwargs.get('period')
         self.carry_in_calculated = False
 
-        w_carry_in_20 = self.carry_in_gedf(20)
+        w_100 = self.workload_gedf(100)
+        print('w_100: {}'.format(w_100))
 
-        print('w_carry_in_20: {}'.format(w_carry_in_20))
+        w_200 = self.workload_gedf(200)
+        print('w_200: {}'.format(w_200))
+
+        w_300 = self.workload_gedf(300)
+        print('w_300: {}'.format(w_300))
+
+        w_400 = self.workload_gedf(400)
+        print('w_400: {}'.format(w_400))
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -260,6 +268,7 @@ class DAG(object):
         # start from lowest priority(backmost)
         if not self.carry_in_calculated:
             self.prepare_carry_in_calculation()
+            self.carry_in_calculated = True
 
         w_carry_in = 0.0
         cutoff = self.deadline - _l
@@ -280,8 +289,14 @@ class DAG(object):
 
         return w_carry_in
 
-    def workload_gedf(self, d):
-        return
+    def workload_gedf(self, _l):
+        n_whole_inclusion = floor(_l / self.period)
+        w_body = n_whole_inclusion * self.graph_vol()
+
+        remaining_l = _l - n_whole_inclusion * self.period
+        w_carry_in = self.carry_in_gedf(remaining_l)
+
+        return w_body + w_carry_in
 
     def __del__(self):
         type(self).cnt -= 1
