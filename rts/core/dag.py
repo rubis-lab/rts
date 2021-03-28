@@ -24,6 +24,9 @@ class DAG(object):
         self.tasks = kwargs.get('tasks')  # topological
         self.sort_tasks()
         self.assign_priority_he2019()
+        self.longest_chain = self.detect_longest_chain()
+        self.graph_len()
+        self.graph_vol()
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -63,28 +66,49 @@ class DAG(object):
         return lall
 
     def detect_longest_chain(self):
-        # identify all max nodes
-        max_lall = max(self.lall)
-        max_nodes = []
-        for t in self.tasks:
-            if isclose(self.lall[t], max_lall):
-                max_nodes.append(t)
+        # # identify all max nodes
+        # max_lall = max(self.lall)
+        # max_nodes = []
+        # for t in self.tasks:
+        #     if isclose(self.lall[t], max_lall):
+        #         max_nodes.append(t)
 
-        # find longest chain among them
-        t_source = max_nodes[0]
-        
-        chains = []
-        for m in max_nodes:
+        # find longest chain
+        longest_chain = []
+        t_source = self.tasks[0]
+        longest_chain.append(t_source)
 
+        # recursively
+        t = t_source
+        while len(t.succ) != 0:
+            max_lall = max(list(map(lambda x: self.lall[x], t.succ)))
+            for c in t.succ:
+                if isclose(self.lall[c], max_lall):
+                    longest_chain.append(c)
+                    t = c
+                    break
+        # print('longest_chain: {}'.format(longest_chain))
+        # for t in longest_chain:
+        #     print(t.nid)
+        return longest_chain
 
-        return
-
-    def graph_len(self):
-
-        return
+    def graph_len(self, recalculate=True):
+        if recalculate:
+            longest_chain = self.detect_longest_chain()
+        else:
+            longest_chain = self.longest_chain
+        graph_len = 0
+        for t in longest_chain:
+            graph_len += t.exec_time
+        print('graph_len: {}'.format(graph_len))
+        return graph_len
 
     def graph_vol(self):
-        return
+        graph_vol = 0
+        for t in self.tasks:
+            graph_vol += t.exec_time
+        print('graph_vol: {}'.format(graph_vol))
+        return graph_vol
 
     def get_all_ance(self, node):
         # get all ancestors
