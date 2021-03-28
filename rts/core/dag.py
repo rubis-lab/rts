@@ -23,8 +23,7 @@ class DAG(object):
         self.in_degree = {}
         self.tasks = kwargs.get('tasks')  # topological
         self.sort_tasks()
-        visited = self.assign_priority_he2019()
-        print('#####visited: {}'.format(visited))
+        self.assign_priority_he2019()
         self.longest_chain = self.detect_longest_chain()
         self.graph_len()
         self.graph_vol()
@@ -233,9 +232,25 @@ class DAG(object):
         self.sort_tasks()
         for t in self.tasks:
             t.start_time = self.deadline
-            t.end_time = self.deadline
+            t.finish_time = self.deadline
+        # for t in self.tasks:
+        #     if len(t.pred) == 0:
+        #         continue
+        #     for p in t.pred:
+        #         if p.start_time < t.finish_time:
+        #             t.finish_time = p.start_time
+        #     t.start_time = t.finish_time - t.exec_time
+        for t in self.tasks[::-1]:
+            if len(t.succ) == 0:
+                continue
+            for p in t.succ:
+                if p.start_time < t.finish_time:
+                    t.finish_time = p.start_time
+            t.start_time = t.finish_time - t.exec_time
         for t in self.tasks:
-            print(t.priority)
+            print('{}({}): s[{}] e[{}] f[{}]'
+                .format(t.priority, t.nid,
+                    t.start_time, t.exec_time, t.finish_time))
 
     def carry_in_gedf(self, d=0):
         # assumes maximal parallelization AND maximal possible cores
