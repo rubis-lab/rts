@@ -23,10 +23,18 @@ class DAG(object):
         self.in_degree = {}
         self.tasks = kwargs.get('tasks')  # topological
         self.sort_tasks()
-        self.assign_priority_he2019()
+        visited = self.assign_priority_he2019()
+        print('#####visited: {}'.format(visited))
         self.longest_chain = self.detect_longest_chain()
         self.graph_len()
         self.graph_vol()
+
+        # gedf
+        self.deadline = kwargs.get('deadline')
+        self.period = kwargs.get('period')
+        self.carry_in_calculated = False
+
+        self.carry_in_gedf()
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -143,6 +151,7 @@ class DAG(object):
             for d in dangling_nodes:
                 if isclose(self.lall[d], max_lall):
                     max_node = d
+                    break
 
             print('max_node: {}'.format(max_node.nid))
             # assign priority
@@ -164,6 +173,7 @@ class DAG(object):
             for s in max_node.succ:
                 if isclose(self.lall[s], max_lall_s):
                     max_node_s = s
+                    break
 
             print('max_node_s: {}'.format(max_node_s.nid))
 
@@ -183,12 +193,12 @@ class DAG(object):
             if len(new_sub_g) != 0:
                 print('recurse with new_sub_g: {}'
                     .format(list(map(lambda x: x.nid, new_sub_g))))
-                new_visited = self.assign_priority_inner(new_sub_g, prio)
+                new_visited, prio = self.assign_priority_inner(new_sub_g, prio)
                 visited += new_visited
                 for n in new_visited:
                     not_visited.remove(n)
 
-        return visited
+        return visited, prio
 
     def assign_priority_he2019(self):
         self.lall = self.calc_len_he2019()
@@ -211,11 +221,34 @@ class DAG(object):
         print('not_visited: {}'.format(not_visited))
         prio = 1
 
-        visited += self.assign_priority_inner(not_visited, prio)
+        v, prio = self.assign_priority_inner(not_visited, prio)
+        visited += v
 
         for idx, t in enumerate(visited):
             print('prio: {} / nid: {} / lall: {}'
                 .format(t.priority, t.nid, self.lall[t]))
+        return visited
+
+    def prepare_carry_in_calculation(self):
+        self.sort_tasks()
+        for t in self.tasks:
+            t.start_time = self.deadline
+            t.end_time = self.deadline
+        for t in self.tasks:
+            print(t.priority)
+
+    def carry_in_gedf(self, d=0):
+        # assumes maximal parallelization AND maximal possible cores
+        # determine which tasks to be included
+        # start from lowest priority(backmost)
+        if not self.carry_in_calculated:
+            self.prepare_carry_in_calculation()
+
+        for t in self.tasks[::-1]:
+            pass
+        return
+
+    def workload_gedf(self, d):
         return
 
     def __del__(self):
@@ -234,155 +267,14 @@ class DAG(object):
         return info
 
     def __len__(self):
-        return len(self.ts_list)  # number of segments
+        return len(self.tasks)  # number of segments
 
     def __getitem__(self, idx):
-        return self.ts_list[idx]  # get segment
+        return self.tasks[idx]  # get segment
 
-    def __setitem__(self, idx, ts):
-        self.ts_list[idx] = ts  # set segment
+    def __setitem__(self, idx, t):
+        self.tasks[idx] = t  # set segment
         return
 
     def __iter__(self):
-        return iter(self.ts_list)
-
-    def clear(self):
-        del self.ts_list[:]
-        del self.pt_list[:]
-        return
-
-    def populate_pt_list(self):
-        for t in self.base_ts:
-            para_task_param = {
-                'base_task': t,
-                'max_option': self.max_opt,
-                'overhead': self.overhead,
-                'variance': self.variance,
-            }
-            pt = ParaTask(**para_task_param)
-            self.pt_list.append(pt)
-        return
-
-    def increment_naive(self):
-        new_popt_list = []
-        for opt in self.popt_list:
-            if opt < self.max_opt:
-                new_popt_list.append(opt + 1)
-            else:  # won't increment over max_opt
-                new_popt_list.append(opt)
-        self.popt_list = new_popt_list
-        self.popt_strategy = 'custom'
-        self.update_ts_list()
-        return
-
-    def increment_fdsf(self):
-        # farther from deadline segment first
-        # or... first segment first
-        new_popt_list = []
-        incremented = False
-        for opt in self.popt_list:
-            if not incremented:
-                if opt < self.max_opt:
-                    new_popt_list.append(opt + 1)
-                    incremented = True  # increment only a single option
-                else:  # won't increment over max_opt
-                    new_popt_list.append(opt)
-            else:
-                new_popt_list.append(opt)
-        self.popt_list = new_popt_list
-        self.popt_strategy = 'custom'
-        self.update_ts_list()
-        return
-
-    def increment_cdsf(self):
-        # closer to deadline segment first
-        # or... last segment first
-        new_popt_list = []
-        incremented = False
-        for opt in self.popt_list[::-1]:
-            if not incremented:
-                if opt < self.max_opt:
-                    new_popt_list.append(opt + 1)
-                    incremented = True  # increment only a single option
-                else:  # won't increment over max_opt
-                    new_popt_list.append(opt)
-            else:
-                new_popt_list.append(opt)
-        self.popt_list = new_popt_list[::-1]  # reverse it back
-        self.popt_strategy = 'custom'
-        self.update_ts_list()
-        return
-
-    def update_ts_list(self):
-        if self.popt_strategy == 'single':
-            self.popt_list = [1 for _ in range(len(self))]
-            self.ts_list = para.parallelize_multiseg_single(self.pt_list)
-        elif self.popt_strategy == 'max':
-            self.popt_list = [self.max_opt for _ in range(len(self))]
-            self.ts_list = para.parallelize_multiseg_max(self.pt_list, **{'max_option': self.max_opt})
-        elif self.popt_strategy == 'random':  # deprecated
-            del self.popt_list[:]
-            for i in range(len(self.base_ts)):
-                self.popt_list.append(random.randint(1, self.max_opt))
-            self.ts_list = para.parallelize_multiseg_custom(self.pt_list, self.popt_list)
-        elif self.popt_strategy == 'custom':
-            self.ts_list = para.parallelize_multiseg_custom(self.pt_list, self.popt_list)
-        else:
-            raise Exception('Parallelization strategy not defined')
-
-        # update longest exec_time
-        self.update_exec_time()
-        return
-
-    def update_exec_time(self):
-        c_e = 0.0
-        e = 0.0
-        # print('used_option')
-        # print(self.popt_list)
-        for ts in self.ts_list:
-            c_e += ts[0].exec_time  # sum of largest exec_time (longest path)
-            # print('ts[0].exec_time')
-            # print(ts[0].exec_time)
-            for t in ts:
-                e += t.exec_time  # sum of all exec_time
-                # print('t.exec_time')
-                # print(t.exec_time)
-
-        self.crit_exec_time = c_e
-        self.exec_time = e
-        # print('exec_time_updated')
-        # print('c_e')
-        # print(c_e)
-        # print('e')
-        # print(e)
-        return
-
-    def tot_util(self):
-        return self.exec_time / self.period
-#
-#
-# if __name__ == '__main__':
-#     t1 = Task(**{
-#         'exec_time': 20,
-#         'deadline': 30,
-#         'period': 40
-#     })
-#     t2 = Task(**{
-#         'exec_time': 40,
-#         'deadline': 60,
-#         'period': 80
-#     })
-#     ts = TaskSet()
-#     ts.append(t1)
-#     ts.append(t2)
-#
-#     ms = MultiSegmentTask(**{
-#         'base_ts': ts,
-#         'max_option': 4,
-#         'popt_strategy': 'max'
-#     })
-#
-#     print(ms)
-#     print(ms.crit_exec_time)
-#     print(ms.exec_time)
-#     print(ms.tot_util())
+        return iter(self.tasks)
