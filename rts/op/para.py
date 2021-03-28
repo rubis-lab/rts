@@ -39,8 +39,8 @@ def parallelize_alpha(pt):
 
         e_max_limit = e_ideal + (e_max(prev) - e_ideal) * variance
 
-        unifast split into pcs, 
-        while only accepting when largest generated e < e_max_limit 
+        unifast split into pcs,
+        while only accepting when largest generated e < e_max_limit
         """
 
         # execution times
@@ -188,11 +188,11 @@ def parallelize_pt_non_dec(pt):
         normalize variance
         variance = 0 --> e_max = e_ideal
         variance = 1 --> e_max = e_max (prev)
-        
+
         e_max_limit = e_ideal + (e_max(prev) - e_ideal) * variance
-        
-        unifast split into pcs, 
-        while only accepting when largest generated e < e_max_limit 
+
+        unifast split into pcs,
+        while only accepting when largest generated e < e_max_limit
         """
 
         # execution times
@@ -258,11 +258,11 @@ def unifast_divide_alpha(pcs, tot, limit):
     return divided_best_effort
 
 
-def normalize_list(l):
-    l_sum = sum(l)
-    l_mean = l_sum / len(l)
+def normalize_list(_l):
+    l_sum = sum(_l)
+    l_mean = l_sum / len(_l)
 
-    return [(ll - l_mean) / l_sum for ll in l]
+    return [(ll - l_mean) / l_sum for ll in _l]
 
 
 def parallelize_pt_non_dec_alpha(pt):
@@ -298,7 +298,8 @@ def parallelize_pt_non_dec_alpha(pt):
                 break
 
             s_tot = 1000
-            s_list = unifast_divide(opt, s_tot, (s_tot / opt) * (1.0 + pt.variance))
+            s_list = unifast_divide(opt, s_tot, (s_tot / opt) *
+                (1.0 + pt.variance))
             s_list_norm = normalize_list(s_list)
             # print(s_list_norm)
 
@@ -308,7 +309,7 @@ def parallelize_pt_non_dec_alpha(pt):
             e_max = max(e_list)
             # print('e_max: ' + str(e_max))
 
-            if e_max >= e_max_prev: 
+            if e_max >= e_max_prev:
                 effort += 1
                 continue
             break
@@ -382,7 +383,8 @@ def parallelize_pts_random(pt_list, **kwargs):
 
 def parallelize_pts_custom(pt_list, popt_list):
     if len(pt_list) != len(popt_list):
-        raise Exception('pt_list or popt_list malformed. Length does not match.')
+        raise Exception(
+            'pt_list or popt_list malformed. Length does not match.')
 
     ts = TaskSet()
     for i in range(len(pt_list)):
@@ -415,7 +417,8 @@ def parallelize_multiseg_random(pt_list, **kwargs):
 
 def parallelize_multiseg_custom(pt_list, popt_list):
     if len(pt_list) != len(popt_list):
-        raise Exception('pt_list or popt_list malformed. Length does not match.')
+        raise Exception(
+            'pt_list or popt_list malformed. Length does not match.')
     ts_list = []
     for i, pt in enumerate(pt_list):
         ts_list.append(pt[popt_list[i]])
