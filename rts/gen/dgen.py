@@ -1,4 +1,5 @@
 from rts.core.task import Task
+from rts.core.pt import ParaTask
 from rts.core.ts import TaskSet
 from rts.gen.gen import Gen
 from rts.core.dag import DAG
@@ -20,12 +21,9 @@ class Dgen(Gen):
         # might not be used
         # self.tot_util = kwargs.get('tot_util', 1.0)
         # self.deadline_scale = kwargs.get('deadline_scale', 1.0)
-        # self.max_mst_util = kwargs.get('max_mst_util', 1.0)
-        # self.min_seg_size = kwargs.get('min_seg_size', 10)
-        # self.max_seg_size = kwargs.get('max_seg_size', 20)
-        # self.max_option = kwargs.get('max_option', 1)
-        # self.overhead = kwargs.get('overhead', 0.0)
-        # self.variance = kwargs.get('variance', 0.0)
+        self.max_option = kwargs.get('max_option', 4)
+        self.overhead = kwargs.get('overhead', 0.0)
+        self.variance = kwargs.get('variance', 0.0)
 
     def __str__(self):
         info = 'Generator - dgen\n' + \
@@ -148,7 +146,7 @@ class Dgen(Gen):
 
         return graph
 
-    def generate_template_tasks(self, g):
+    def generate_template_ptasks(self, g):
         # implicit deadline
         period = random.randint(self.min_period, self.min_period)
         deadline = period
@@ -156,76 +154,94 @@ class Dgen(Gen):
         sig_exec_time = mu_exec_time / 2
 
         # tasks
-        tasks = []
+        ptasks = []
         # source
         t_source = Task(**{
             'exec_time': 0.0,
             'deadline': deadline,
             'period': period,
+        })
+        pt_source = ParaTask(**{
+            'base_task': t_source,
+            'max_option': self.max_option,
+            'overhead': self.overhead,
+            'variance': self.variance,
             'is_dag': True,
             'nid': 0,
             'priority': 0,
             'is_dummy': True,
         })
-        tasks.append(t_source)
+        ptasks.append(pt_source)
 
         # general
         for n in g['nodes'][1:len(g['nodes']) - 1]:
             # print(n)
             t = Task(**{
-                'is_dag': True,
-                'nid': n,
-                'priority': n,
                 'exec_time': self.biased_normal(mu_exec_time, sig_exec_time),
                 'deadline': deadline,
                 'period': period,
             })
-            tasks.append(t)
+            pt = ParaTask(**{
+                'base_task': t,
+                'max_option': self.max_option,
+                'overhead': self.overhead,
+                'variance': self.variance,
+                'is_dag': True,
+                'nid': n,
+                'priority': n,
+            })
+            ptasks.append(pt)
 
         # sink
         t_sink = Task(**{
             'exec_time': 0.0,
             'deadline': deadline,
             'period': period,
+        })
+        pt_sink = ParaTask(**{
+            'base_task': t_sink,
+            'max_option': self.max_option,
+            'overhead': self.overhead,
+            'variance': self.variance,
             'is_dag': True,
             'nid': len(g['nodes']) - 1,
             'priority': len(g['nodes']) - 1,
             'is_dummy': True,
         })
-        tasks.append(t_sink)
+        ptasks.append(pt_sink)
 
-        # print("len: {}".format(len(tasks)))
-        # for t in tasks:
+        # print("len: {}".format(len(ptasks)))
+        # for t in ptasks:
         #     print(t)
 
-        return tasks
+        return ptasks
 
-    def connect_tasks(self, g, tasks):
+    def connect_ptasks(self, g, ptasks):
         # forward connection (succ)
-        for t_from, node in zip(tasks, g['nodes']):
+        for t_from, node in zip(ptasks, g['nodes']):
             for t_to in g['edges'][node]:
-                t_from.succ.append(tasks[g['nodes'][t_to]])
+                t_from.succ.append(ptasks[g['nodes'][t_to]])
 
         # backward connection (pred)
-        for t_to, node in zip(tasks, g['nodes']):
+        for t_to, node in zip(ptasks, g['nodes']):
             for t_from in g['edges_backward'][node]:
-                t_to.pred.append(tasks[g['nodes'][t_from]])
+                t_to.pred.append(ptasks[g['nodes'][t_from]])
 
-        return tasks
+        return ptasks
 
-    def create_dag(self, tasks):
+    def create_dag(self, ptasks):
         dag = DAG(**{
-            'tasks': tasks,
-            'deadline': tasks[0].deadline,
-            'period': tasks[0].period,
+            'tasks': ptasks,
+            'deadline': ptasks[0].base_task.deadline,
+            'period': ptasks[0].base_task.period,
         })
         return dag
 
     def next_task(self):
         g = self.next_graph()
-        tasks = self.generate_template_tasks(g)
-        tasks = self.connect_tasks(g, tasks)
-        dag = self.create_dag(tasks)
+        ptasks = self.generate_template_ptasks(g)
+        ptasks = self.connect_ptasks(g, ptasks)
+        dag = self.create_dag(ptasks)
         return dag
 
 

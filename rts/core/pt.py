@@ -51,11 +51,33 @@ class ParaTask(object):
         ts.append(self.base_task)
         self.ts_table = {'1': ts}
 
+        # convenience
+        self.exec_time = self.base_task.exec_time
+        self.deadline = self.base_task.deadline
+        self.period = self.base_task.period
+
         if kwargs.get('custom', 'False') == 'True':
             self.exec_times = kwargs.get('exec_times', [[]])
             self.populate_ts_table_custom()
+        elif kwargs.get('ideal', True):
+            self.populate_ts_table_ideal()
         else:
             self.populate_ts_table()
+
+        # dag specific
+        # self.exec_time = float(kwargs.get('exec_time', 0))
+        # self.deadline = float(kwargs.get('deadline', 0))
+        # self.period = float(kwargs.get('period', 0))
+        self.slack = float(kwargs.get('slack', 0))
+        self.priority = kwargs.get('priority', -1)
+        self.is_dag = kwargs.get('is_dag', False)
+        if self.is_dag:
+            self.nid = kwargs.get('nid', -1)
+            self.pred = kwargs.get('pred', [])
+            self.succ = kwargs.get('succ', [])
+            self.is_dummy = kwargs.get('is_dummy', False)
+            self.start_time = 0.0
+            self.finish_time = 0.0
 
     def populate_ts_table_custom(self):
         """
@@ -156,6 +178,14 @@ class ParaTask(object):
             raise Exception('Parallelization option out of bound.\n' +
                 'max_parallel option: ' + str(self.max_opt) + '\n' +
                 'requested option: ' + str(opt))
+
+    def populate_ts_table_ideal(self):
+        if self.max_opt >= 2:
+            # para.parallelize_pt_non_dec(self)
+            thrs = para.parallelize_task_ideal(self.base_task, self.max_opt)
+            for thr_idx, thr in enumerate(thrs):
+                opt = 
+        return
 
     def populate_ts_table(self):
         """

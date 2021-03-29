@@ -27,16 +27,6 @@ class Task(object):
         self.deadline = float(kwargs.get('deadline', 0))
         self.period = float(kwargs.get('period', 0))
         self.slack = float(kwargs.get('slack', 0))
-        self.priority = kwargs.get('priority', -1)
-        self.is_dag = kwargs.get('is_dag', False)
-        if self.is_dag:
-            self.nid = kwargs.get('nid', -1)
-            self.pred = kwargs.get('pred', [])
-            self.succ = kwargs.get('succ', [])
-            self.is_dummy = kwargs.get('is_dummy', False)
-            self.start_time = 0.0
-            self.finish_time = 0.0
-
         type(self).cnt += 1
 
     def __del__(self):
