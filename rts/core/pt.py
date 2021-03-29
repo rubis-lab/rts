@@ -180,11 +180,15 @@ class ParaTask(object):
                 'requested option: ' + str(opt))
 
     def populate_ts_table_ideal(self):
-        if self.max_opt >= 2:
-            # para.parallelize_pt_non_dec(self)
+        if self.max_opt < 2:
+            return
+
+        for opt in range(2, self.max_opt + 1):
+            ts = TaskSet()
             thrs = para.parallelize_task_ideal(self.base_task, self.max_opt)
-            for thr_idx, thr in enumerate(thrs):
-                opt = 
+            for thr in thrs:
+                ts.append(thr)
+            self.ts_table[str(opt)] = ts
         return
 
     def populate_ts_table(self):
