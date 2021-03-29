@@ -26,9 +26,12 @@ class ParaTask(object):
         **Role**: Initialize Parallelizable Task\n
         .. note::
          * **max_option** : The maximum parallelize option that \n
-         * **overhead** : The increasing rate of **execution_time** on every **parallelization** \n
-         * **variance** : The **execution_time** difference between **threads** on parallelization\n
-         * **base_task** : **parallelize task** needs **base_task** ( Default: exec_time=1, deadline=2, period=3 )\n
+         * **overhead** : The increasing rate of **execution_time**
+         on every **parallelization** \n
+         * **variance** : The **execution_time**
+         difference between **threads** on parallelization\n
+         * **base_task** : **parallelize task** needs **base_task**
+         ( Default: exec_time=1, deadline=2, period=3 )\n
          * **ts_table** : Save taskset from **1** to **max_option**\n
          * **populate_ts_table** : See the **"populate_ts_table"**\n
         """
@@ -42,7 +45,8 @@ class ParaTask(object):
         self.variance = kwargs.get('variance', 1.0)
 
         # base task info
-        self.base_task = kwargs.get('base_task', Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
+        self.base_task = kwargs.get('base_task',
+            Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
         ts = TaskSet()
         ts.append(self.base_task)
         self.ts_table = {'1': ts}
@@ -117,7 +121,8 @@ class ParaTask(object):
         .. note::
          * :py:const:`if opt <= len(self.ts_table)` \n
             returns **ts_table** for given option
-         * :py:const:`if opt == 0` && :py:const:`if opt < len(self.ts_table)` \n
+         * :py:const:`if opt == 0`
+            && :py:const:`if opt < len(self.ts_table)` \n
             Exception Handler
         """
 
@@ -127,8 +132,8 @@ class ParaTask(object):
             return self.ts_table[str(opt)]
         else:
             raise Exception('Parallelization option out of bound.\n' +
-                            'max_parallel option: ' + str(self.max_opt) + '\n' +
-                            'requested option: ' + str(opt))
+                'max_parallel option: ' + str(self.max_opt) + '\n' +
+                'requested option: ' + str(opt))
 
     def __setitem__(self, opt, ts):
         """
@@ -138,7 +143,8 @@ class ParaTask(object):
         .. note::
          * :py:const:`if opt <= len(self.ts_table)` \n
             returns ts_table for given option
-         * :py:const:`if opt == 0` && :py:const:`if opt < len(self.ts_table)` \n
+         * :py:const:`if opt == 0`
+            && :py:const:`if opt < len(self.ts_table)` \n
             Exception Handler
         """
         if opt == 0:
@@ -148,8 +154,8 @@ class ParaTask(object):
             return
         else:
             raise Exception('Parallelization option out of bound.\n' +
-                            'max_parallel option: ' + str(self.max_opt) + '\n' +
-                            'requested option: ' + str(opt))
+                'max_parallel option: ' + str(self.max_opt) + '\n' +
+                'requested option: ' + str(opt))
 
     def populate_ts_table(self):
         """

@@ -20,7 +20,8 @@ class Thread(Task):
         **Role**: Initialize Thread \n
 
         .. important:: **thread** inherits from **Task**\n
-        Thread = Task + tid. You may treat a thread the same as you would a task.
+        Thread = Task + tid.
+        You may treat a thread the same as you would a task.
         """
 
         super().__init__(**kwargs)
@@ -39,7 +40,8 @@ class Thread(Task):
     def __str__(self):
         """
         **Role**: Format for printing taskset \n
-        .. note:: **Thread** => **id** **tid** **exec_time** **deadline** **period**
+        .. note:: **Thread** =>
+        **id** **tid** **exec_time** **deadline** **period**
         """
         return "%d\t%d\t%.2f\t%.2f\t%.2f" % (
             self.id,
