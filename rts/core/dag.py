@@ -6,6 +6,7 @@ from rts.op import tsutil
 import random
 import operator
 from math import isclose, floor
+from rts.op.log import new_logger
 
 
 class DAG(object):
@@ -17,6 +18,7 @@ class DAG(object):
     def __init__(self, **kwargs):
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
+        self.log = new_logger(__name__)
 
         # he2019
         self.lall = {}
@@ -34,16 +36,16 @@ class DAG(object):
         self.carry_in_calculated = False
 
         w_100 = self.workload_gedf(100)
-        print('w_100: {}'.format(w_100))
+        self.log.info('w_100: {}'.format(w_100))
 
         w_200 = self.workload_gedf(200)
-        print('w_200: {}'.format(w_200))
+        self.log.info('w_200: {}'.format(w_200))
 
         w_300 = self.workload_gedf(300)
-        print('w_300: {}'.format(w_300))
+        self.log.info('w_300: {}'.format(w_300))
 
         w_400 = self.workload_gedf(400)
-        print('w_400: {}'.format(w_400))
+        self.log.info('w_400: {}'.format(w_400))
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -55,7 +57,6 @@ class DAG(object):
         t_source = self.tasks[0]
         lf[t_source] = t_source.exec_time
         for t in self.tasks:
-            # print(t)
             lf[t] = t.exec_time
             if len(t.pred) != 0:
                 lf[t] += max(list(map(lambda x: lf[x], t.pred)))
@@ -66,7 +67,6 @@ class DAG(object):
         lb[t_sink] = t_sink.exec_time
 
         for t in self.tasks[::-1]:
-            # print(t)
             lb[t] = t.exec_time
             if len(t.succ) != 0:
                 lb[t] += max(list(map(lambda x: lb[x], t.succ)))
@@ -76,9 +76,10 @@ class DAG(object):
         for t in self.tasks:
             lall[t] = lf[t] + lb[t] - t.exec_time
 
-        # for t in self.tasks:
-        #     print('t.nid: {}, t.exec_time: {}, lf: {}, lb: {}, lall: {}'
-        #         .format(t.nid, t.exec_time, lf[t], lb[t], lall[t]))
+        for t in self.tasks:
+            self.log.debug(
+                't.nid: {}, t.exec_time: {}, lf: {}, lb: {}, lall: {}'
+                .format(t.nid, t.exec_time, lf[t], lb[t], lall[t]))
 
         return lall
 
@@ -104,9 +105,9 @@ class DAG(object):
                     longest_chain.append(c)
                     t = c
                     break
-        # print('longest_chain: {}'.format(longest_chain))
-        # for t in longest_chain:
-        #     print(t.nid)
+        self.log.debug('longest_chain: {}'.format(longest_chain))
+        for t in longest_chain:
+            self.log.debug(t.nid)
         return longest_chain
 
     def graph_len(self, recalculate=True):
@@ -117,14 +118,14 @@ class DAG(object):
         graph_len = 0
         for t in longest_chain:
             graph_len += t.exec_time
-        print('graph_len: {}'.format(graph_len))
+        self.log.debug('graph_len: {}'.format(graph_len))
         return graph_len
 
     def graph_vol(self):
         graph_vol = 0
         for t in self.tasks:
             graph_vol += t.exec_time
-        print('graph_vol: {}'.format(graph_vol))
+        self.log.debug('graph_vol: {}'.format(graph_vol))
         return graph_vol
 
     def get_all_ance(self, node):
@@ -151,7 +152,7 @@ class DAG(object):
                 if self.in_degree[n] == 0:
                     dangling_nodes.append(n)
 
-            print('dangling_nodes: {}'
+            self.log.debug('dangling_nodes: {}'
                 .format(list(map(lambda x: x.nid, dangling_nodes))))
             # find arg max lall node
             max_lall = max(list(map(lambda x: self.lall[x], dangling_nodes)))
@@ -162,7 +163,7 @@ class DAG(object):
                     max_node = d
                     break
 
-            print('max_node: {}'.format(max_node.nid))
+            self.log.debug('max_node: {}'.format(max_node.nid))
             # assign priority
             max_node.priority = prio
             prio += 1
@@ -184,13 +185,13 @@ class DAG(object):
                     max_node_s = s
                     break
 
-            print('max_node_s: {}'.format(max_node_s.nid))
+            self.log.debug('max_node_s: {}'.format(max_node_s.nid))
 
             # create sub_g
             max_node_s_ancestors = self.get_all_ance_sorted(max_node_s)
-            print('max_node_s_ancestors: {}'
+            self.log.debug('max_node_s_ancestors: {}'
                 .format(list(map(lambda x: x.nid, max_node_s_ancestors))))
-            print('not_visited: {}'
+            self.log.debug('not_visited: {}'
                 .format(list(map(lambda x: x.nid, not_visited))))
             new_sub_g = []
             if len(max_node_s_ancestors) != 0:
@@ -200,7 +201,7 @@ class DAG(object):
 
             # recurse
             if len(new_sub_g) != 0:
-                print('recurse with new_sub_g: {}'
+                self.log.debug('recurse with new_sub_g: {}'
                     .format(list(map(lambda x: x.nid, new_sub_g))))
                 new_visited, prio = self.assign_priority_inner(new_sub_g, prio)
                 visited += new_visited
@@ -211,7 +212,7 @@ class DAG(object):
 
     def assign_priority_he2019(self):
         self.lall = self.calc_len_he2019()
-        print('lall: {}'.format(self.lall))
+        self.log.debug('lall: {}'.format(self.lall))
         self.in_degree = {}
         for t in self.tasks:
             self.in_degree[t] = len(t.pred)
@@ -227,14 +228,14 @@ class DAG(object):
         not_visited.remove(t_source)
         for s in t_source.succ:
             self.in_degree[s] -= 1
-        print('not_visited: {}'.format(not_visited))
+        self.log.debug('not_visited: {}'.format(not_visited))
         prio = 1
 
         v, prio = self.assign_priority_inner(not_visited, prio)
         visited += v
 
         for idx, t in enumerate(visited):
-            print('prio: {} / nid: {} / lall: {}'
+            self.log.debug('prio: {} / nid: {} / lall: {}'
                 .format(t.priority, t.nid, self.lall[t]))
         return visited
 
@@ -258,7 +259,7 @@ class DAG(object):
                     t.finish_time = p.start_time
             t.start_time = t.finish_time - t.exec_time
         for t in self.tasks:
-            print('{}({}): s[{}] e[{}] f[{}]'
+            self.log.debug('{}({}): s[{}] e[{}] f[{}]'
                 .format(t.priority, t.nid,
                     t.start_time, t.exec_time, t.finish_time))
 

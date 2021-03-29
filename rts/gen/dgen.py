@@ -3,6 +3,7 @@ from rts.core.pt import ParaTask
 from rts.core.ts import TaskSet
 from rts.gen.gen import Gen
 from rts.core.dag import DAG
+from rts.op.log import new_logger
 
 import random
 import math
@@ -24,6 +25,7 @@ class Dgen(Gen):
         self.max_option = kwargs.get('max_option', 4)
         self.overhead = kwargs.get('overhead', 0.0)
         self.variance = kwargs.get('variance', 0.0)
+        self.log = new_logger(__name__)
 
     def __str__(self):
         info = 'Generator - dgen\n' + \
@@ -45,16 +47,16 @@ class Dgen(Gen):
         for n_start, n_ends in edges.items():
             for n_end in n_ends:
                 in_degree[n_end] += 1
-        print('in_degree: {}'.format(in_degree))
+        self.log.debug('in_degree: {}'.format(in_degree))
 
         visited = [0]  # start from source vertex (always 0)
         q = [0]
         while q:
             s = q.pop(0)
-            # print('doing {}'.format(s))
+            # self.log.debug('doing {}'.format(s))
             if in_degree[s] != 0:
-                print('not indegree 0: {}'.format(s))
-                print('need check')
+                self.log.warning('not indegree 0: {}'.format(s))
+                self.log.warning('need check')
                 q.append(s)
                 continue
             else:
@@ -73,7 +75,7 @@ class Dgen(Gen):
             x = random.gauss(mu, sigma)
             if x > cutoff:
                 return x
-        print('biased_normal failed. check mu/sigma')
+        self.log.warning('biased_normal failed. check mu/sigma')
         return cutoff
 
     def next_graph(self):
@@ -94,14 +96,14 @@ class Dgen(Gen):
                     edge_cnt += 1
                     edges[n_from].append(n_to)
                     edges_backward[n_to].append(n_from)
-                    # print('{}->{}'.format(n_from, n_to))
+                    self.log.debug('{}->{}'.format(n_from, n_to))
         possible_edges = (n_nodes - 1) * (n_nodes - 2) / 2
-        print('edge_cnt: {}, possible_edges: {}, ratio: {}'
+        self.log.debug('edge_cnt: {}, possible_edges: {}, ratio: {}'
             .format(edge_cnt, possible_edges, edge_cnt / possible_edges))
 
         # detect starting & ending nodes
-        print('edges: {}'.format(edges))
-        print('edges_backward: {}'.format(edges_backward))
+        self.log.debug('edges: {}'.format(edges))
+        self.log.debug('edges_backward: {}'.format(edges_backward))
         end_nodes_list = []
         start_nodes_list = []
         for e in range(1, n_nodes):
@@ -110,10 +112,10 @@ class Dgen(Gen):
             start_nodes_list += self.get_leaves(e, edges_backward)
 
         end_nodes = set(end_nodes_list)
-        print('end_nodes: {}'.format(end_nodes))
+        self.log.debug('end_nodes: {}'.format(end_nodes))
 
         start_nodes = set(start_nodes_list)
-        print('start_nodes: {}'.format(start_nodes))
+        self.log.debug('start_nodes: {}'.format(start_nodes))
 
         # make source and sink nodes
         # source: 0
@@ -129,12 +131,12 @@ class Dgen(Gen):
         for n in end_nodes:
             edges[n].append(n_nodes)
             edges_backward[n_nodes].append(n)
-        print('edges: {}'.format(edges))
-        print('edges_backward: {}'.format(edges_backward))
+        self.log.debug('edges: {}'.format(edges))
+        self.log.debug('edges_backward: {}'.format(edges_backward))
 
         # sort nodes
         nodes_sorted = self.bfs(edges)
-        print('nodes_sorted: {}'.format(nodes_sorted))
+        self.log.debug('nodes_sorted: {}'.format(nodes_sorted))
 
         graph = {
             'nodes': nodes_sorted,
@@ -175,7 +177,6 @@ class Dgen(Gen):
 
         # general
         for n in g['nodes'][1:len(g['nodes']) - 1]:
-            # print(n)
             t = Task(**{
                 'exec_time': self.biased_normal(mu_exec_time, sig_exec_time),
                 'deadline': deadline,
@@ -209,10 +210,6 @@ class Dgen(Gen):
             'is_dummy': True,
         })
         ptasks.append(pt_sink)
-
-        # print("len: {}".format(len(ptasks)))
-        # for t in ptasks:
-        #     print(t)
 
         return ptasks
 
