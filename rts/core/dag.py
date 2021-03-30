@@ -35,19 +35,22 @@ class DAG(object):
         self.period = kwargs.get('period')
         self.carry_in_calculated = False
 
-        w_100 = self.workload_gedf(100)
-        self.log.info('w_100: {}'.format(w_100))
-
-        w_200 = self.workload_gedf(200)
-        self.log.info('w_200: {}'.format(w_200))
-
-        w_300 = self.workload_gedf(300)
-        self.log.info('w_300: {}'.format(w_300))
-
-        w_400 = self.workload_gedf(400)
-        self.log.info('w_400: {}'.format(w_400))
-
         # parallelize
+        # options = [2 for _ in self.tasks]
+        # self.parallelize_custom(options)
+
+        # w_100 = self.workload_gedf(100)
+        # self.log.info('w_100: {}'.format(w_100))
+
+        # w_200 = self.workload_gedf(200)
+        # self.log.info('w_200: {}'.format(w_200))
+
+        # w_300 = self.workload_gedf(300)
+        # self.log.info('w_300: {}'.format(w_300))
+
+        # w_400 = self.workload_gedf(400)
+        # self.log.info('w_400: {}'.format(w_400))
+
 
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
@@ -301,9 +304,10 @@ class DAG(object):
 
         return w_body + w_carry_in
 
-    def configure_custom(self, options):
+    def parallelize_custom(self, options):
         for t, opt in zip(self.tasks, options):
             t.configure_pt(opt)
+        self.carry_in_calculated = False
         return
 
     def __del__(self):
