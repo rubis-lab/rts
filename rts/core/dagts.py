@@ -11,7 +11,6 @@ class DAGTaskSet(object):
     def __init__(self, **kwargs):
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
-        self.log = new_logger(__name__)
         self.dags = []
 
     def __str__(self):

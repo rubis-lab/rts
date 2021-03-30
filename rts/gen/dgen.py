@@ -3,6 +3,7 @@ from rts.core.pt import ParaTask
 from rts.core.ts import TaskSet
 from rts.gen.gen import Gen
 from rts.core.dag import DAG
+from rts.core.dagts import DAGTaskSet
 from rts.op.log import new_logger
 
 import random
@@ -226,20 +227,28 @@ class Dgen(Gen):
 
         return ptasks
 
-    def create_dag(self, ptasks):
+    def create_dag(self, ptasks, tid):
         dag = DAG(**{
+            'id': tid,
             'tasks': ptasks,
             'deadline': ptasks[0].base_task.deadline,
             'period': ptasks[0].base_task.period,
         })
         return dag
 
-    def next_task(self):
+    def next_task(self, tid):
         g = self.next_graph()
         ptasks = self.generate_template_ptasks(g)
         ptasks = self.connect_ptasks(g, ptasks)
-        dag = self.create_dag(ptasks)
+        dag = self.create_dag(ptasks, tid)
         return dag
+
+    def next_task_set(self):
+        gts = DAGTaskSet()
+        for tid in range(self.num_task):
+            gt = self.next_task(tid)
+            gts.append(gt)
+        return gts
 
 
 if __name__ == '__main__':
@@ -251,6 +260,8 @@ if __name__ == '__main__':
         'edge_prob': 0.3,
         'util_over': True,
         'avg_node_util': 0.2,
+        'num_task': 3
     }
     dg = Dgen(**gen_param)
-    dg.next_task()
+    # dg.next_task()
+    dg.next_task_set()
