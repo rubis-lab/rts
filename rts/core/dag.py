@@ -47,6 +47,8 @@ class DAG(object):
         w_400 = self.workload_gedf(400)
         self.log.info('w_400: {}'.format(w_400))
 
+        # parallelize
+
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
         return
@@ -298,6 +300,11 @@ class DAG(object):
         w_carry_in = self.carry_in_gedf(remaining_l)
 
         return w_body + w_carry_in
+
+    def configure_custom(self, options):
+        for t, opt in zip(self.tasks, options):
+            t.configure_pt(opt)
+        return
 
     def __del__(self):
         type(self).cnt -= 1

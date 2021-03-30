@@ -51,11 +51,7 @@ class ParaTask(object):
         ts.append(self.base_task)
         self.ts_table = {'1': ts}
 
-        # convenience
-        self.exec_time = self.base_task.exec_time
-        self.deadline = self.base_task.deadline
-        self.period = self.base_task.period
-
+        # ts_table
         if kwargs.get('custom', 'False') == 'True':
             self.exec_times = kwargs.get('exec_times', [[]])
             self.populate_ts_table_custom()
@@ -63,6 +59,17 @@ class ParaTask(object):
             self.populate_ts_table_ideal()
         else:
             self.populate_ts_table()
+
+        # macro
+        self.selected_option = 1
+        self.selected_tasks = \
+            self.ts_table[str(self.selected_option)]
+        self.exec_time = self.base_task.exec_time
+        self.longest_exec_time = self.base_task.exec_time
+        self.total_exec_time = self.base_task.exec_time
+        self.deadline = self.base_task.deadline
+        self.period = self.base_task.period
+        self.configure_pt(self.selected_option)
 
         # dag specific
         # self.exec_time = float(kwargs.get('exec_time', 0))
@@ -200,4 +207,18 @@ class ParaTask(object):
         if self.max_opt >= 2:
             # para.parallelize_pt_non_dec(self)
             para.parallelize_pt_non_dec_alpha(self)
+        return
+
+    def configure_pt(self, option):
+        self.selected_option = option
+        self.selected_tasks = self.ts_table[str(option)]
+
+        self.longest_exec_time = \
+            max(list(map(lambda x: x.exec_time, self.selected_tasks)))
+        self.total_exec_time = \
+            sum(list(map(lambda x: x.exec_time, self.selected_tasks)))
+        self.exec_time = self.total_exec_time
+
+        self.deadline = self.base_task.deadline
+        self.period = self.base_task.period
         return
