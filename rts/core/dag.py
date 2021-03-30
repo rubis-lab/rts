@@ -57,31 +57,31 @@ class DAG(object):
         # lf
         lf = {}
         t_source = self.tasks[0]
-        lf[t_source] = t_source.exec_time
+        lf[t_source] = t_source.longest_exec_time
         for t in self.tasks:
-            lf[t] = t.exec_time
+            lf[t] = t.longest_exec_time
             if len(t.pred) != 0:
                 lf[t] += max(list(map(lambda x: lf[x], t.pred)))
 
         # lb
         lb = {}
         t_sink = self.tasks[-1]
-        lb[t_sink] = t_sink.exec_time
+        lb[t_sink] = t_sink.longest_exec_time
 
         for t in self.tasks[::-1]:
-            lb[t] = t.exec_time
+            lb[t] = t.longest_exec_time
             if len(t.succ) != 0:
                 lb[t] += max(list(map(lambda x: lb[x], t.succ)))
 
         # l
         lall = {}
         for t in self.tasks:
-            lall[t] = lf[t] + lb[t] - t.exec_time
+            lall[t] = lf[t] + lb[t] - t.longest_exec_time
 
         for t in self.tasks:
             self.log.debug(
-                't.nid: {}, t.exec_time: {}, lf: {}, lb: {}, lall: {}'
-                .format(t.nid, t.exec_time, lf[t], lb[t], lall[t]))
+                't.nid: {}, t.longest_exec_time: {}, lf: {}, lb: {}, lall: {}'
+                .format(t.nid, t.longest_exec_time, lf[t], lb[t], lall[t]))
 
         return lall
 
@@ -119,14 +119,14 @@ class DAG(object):
             longest_chain = self.longest_chain
         graph_len = 0
         for t in longest_chain:
-            graph_len += t.exec_time
+            graph_len += t.longest_exec_time
         self.log.debug('graph_len: {}'.format(graph_len))
         return graph_len
 
     def graph_vol(self):
         graph_vol = 0
         for t in self.tasks:
-            graph_vol += t.exec_time
+            graph_vol += t.total_exec_time
         self.log.debug('graph_vol: {}'.format(graph_vol))
         return graph_vol
 
@@ -259,11 +259,11 @@ class DAG(object):
             for p in t.succ:
                 if p.start_time < t.finish_time:
                     t.finish_time = p.start_time
-            t.start_time = t.finish_time - t.exec_time
+            t.start_time = t.finish_time - t.longest_exec_time
         for t in self.tasks:
             self.log.debug('{}({}): s[{}] e[{}] f[{}]'
                 .format(t.priority, t.nid,
-                    t.start_time, t.exec_time, t.finish_time))
+                    t.start_time, t.longest_exec_time, t.finish_time))
 
     def carry_in_gedf(self, _l=0):
         # assumes maximal parallelization AND maximal possible cores
@@ -280,7 +280,7 @@ class DAG(object):
             # case 1)      |
             #              |    <--- t --->
             if t.start_time > cutoff:
-                w_carry_in += t.exec_time
+                w_carry_in += t.total_exec_time
             # case 2)      |
             #  <--- t ---> |
             elif t.finish_time < cutoff:
@@ -288,7 +288,7 @@ class DAG(object):
             # case 3)      |
             #          <--- t --->
             else:
-                w_carry_in += t.finish_time - cutoff
+                w_carry_in += (t.finish_time - cutoff) * t.selected_option
 
         return w_carry_in
 

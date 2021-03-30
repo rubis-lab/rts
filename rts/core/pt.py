@@ -217,7 +217,7 @@ class ParaTask(object):
             max(list(map(lambda x: x.exec_time, self.selected_tasks)))
         self.total_exec_time = \
             sum(list(map(lambda x: x.exec_time, self.selected_tasks)))
-        self.exec_time = self.total_exec_time
+        self.exec_time = self.longest_exec_time
 
         self.deadline = self.base_task.deadline
         self.period = self.base_task.period
