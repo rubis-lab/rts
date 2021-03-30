@@ -2,6 +2,8 @@ import math
 
 
 def calc_utilization(t):
+    if hasattr(t, 'total_exec_time'):
+        return t.total_exec_time / t.period
     return t.exec_time / t.period
 
 
@@ -13,6 +15,8 @@ def sum_utilization(ts):
 
 
 def calc_density(t):
+    if hasattr(t, 'total_exec_time'):
+        return t.total_exec_time / t.deadline
     return t.exec_time / t.deadline
 
 
@@ -39,14 +43,14 @@ def max_density(ts):
     return max(list)
 
 
-def workload_in_interval_edf(t, l):
+def workload_in_interval_edf(t, _l):
     # body job
     # tasks aligned to deadlines
-    num_body_job = math.floor(l / t.period)
+    num_body_job = math.floor(_l / t.period)
     w_body_job = t.exec_time * num_body_job
 
     # carry-in
-    w_carry_in = math.fmod(l, t.period) - t.slack
+    w_carry_in = math.fmod(_l, t.period) - t.slack
     # print('s {} {}'.format(w_carry_in, t.slack))
     # carry-in has to be positive
     if w_carry_in < 0.0:
@@ -57,17 +61,17 @@ def workload_in_interval_edf(t, l):
     return w_body_job + w_carry_in
 
 
-def workload_in_interval_edf_whole(t, l):
+def workload_in_interval_edf_whole(t, _l):
     # body job
     # tasks aligned to deadlines
-    num_body_job = math.floor(l / t.period)
+    num_body_job = math.floor(_l / t.period)
     w_body_job = t.exec_time * num_body_job
 
     return w_body_job
 
 
-def workload_in_interval_dbf(t, l):
-    num_body_job = math.floor((l - t.deadline) / t.period)
+def workload_in_interval_dbf(t, _l):
+    num_body_job = math.floor((_l - t.deadline) / t.period)
 
     w_body_job = t.exec_time * (num_body_job + 1.0)
 
@@ -81,17 +85,19 @@ def get_k_max_exec_time_task(ts, k=1):
     return tasks[:k]
 
 
-def workload_in_interval_fp(t, l):
+def workload_in_interval_fp(t, _l):
     # body job
     if t.slack > 0.1:
         print('sss!')
-    num_body_job = math.floor((l + t.deadline - t.exec_time - t.slack) / t.period)
+    num_body_job = \
+        math.floor((_l + t.deadline - t.exec_time - t.slack) / t.period)
     w_body_job = t.exec_time * num_body_job
     print('w_body_job')
     print(w_body_job)
 
     # carry-out
-    w_carry_out = l + t.deadline - t.exec_time - t.period * num_body_job - t.slack
+    w_carry_out = \
+        _l + t.deadline - t.exec_time - t.period * num_body_job - t.slack
     print('w_carry_out_orig')
     print(w_carry_out)
 
@@ -99,7 +105,7 @@ def workload_in_interval_fp(t, l):
     w_carry_out = min(t.exec_time, w_carry_out)
 
     # carry-out cannot exceed the length of the interval
-    w_carry_out = min(l, w_carry_out)
+    w_carry_out = min(_l, w_carry_out)
 
     print('w_carry_out')
     print(w_carry_out)

@@ -51,7 +51,6 @@ class DAG(object):
         # w_400 = self.workload_gedf(400)
         # self.log.info('w_400: {}'.format(w_400))
 
-
     def sort_tasks(self):
         self.tasks.sort(key=operator.attrgetter('priority'))
         return
