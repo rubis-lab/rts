@@ -2,9 +2,9 @@ from rts.core.dag import DAG
 from rts.op.tsutil import sum_utilization
 
 
-class DAG(object):
+class DAGTaskSet(object):
     """
-    'DAG Task'
+    'DAG Task Set'
     """
     cnt = 0
 
