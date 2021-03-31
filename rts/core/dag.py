@@ -112,9 +112,8 @@ class DAG(object):
                     longest_chain.append(c)
                     t = c
                     break
-        self.log.debug('longest_chain: {}'.format(longest_chain))
-        for t in longest_chain:
-            self.log.debug(t.nid)
+        self.log.debug('longest_chain: {}'
+            .format(list(map(lambda x: x.nid, longest_chain))))
         return longest_chain
 
     def graph_len(self, recalculate=True):
@@ -219,7 +218,6 @@ class DAG(object):
 
     def assign_priority_he2019(self):
         self.lall = self.calc_len_he2019()
-        self.log.debug('lall: {}'.format(self.lall))
         self.in_degree = {}
         for t in self.tasks:
             self.in_degree[t] = len(t.pred)
@@ -235,7 +233,8 @@ class DAG(object):
         not_visited.remove(t_source)
         for s in t_source.succ:
             self.in_degree[s] -= 1
-        self.log.debug('not_visited: {}'.format(not_visited))
+        self.log.debug('not_visited: {}'
+            .format(list(map(lambda x: x.nid, not_visited))))
         prio = 1
 
         v, prio = self.assign_priority_inner(not_visited, prio)
