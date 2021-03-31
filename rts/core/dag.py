@@ -27,8 +27,8 @@ class DAG(object):
         self.sort_tasks()
         self.assign_priority_he2019()
         self.longest_chain = self.detect_longest_chain()
-        self.graph_len()
-        self.graph_vol()
+        self.total_exec_time = self.graph_vol()
+        self.longest_exec_time = self.graph_len()
 
         # gedf
         self.deadline = kwargs.get('deadline')

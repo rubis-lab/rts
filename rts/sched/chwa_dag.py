@@ -39,7 +39,7 @@ if __name__ == '__main__':
         'max_nodes': 10,
         'edge_prob': 0.3,
         'util_over': True,
-        'avg_node_util': 0.2,
+        'avg_node_util': 0.15,
         'num_task': 3
     })
     dagts = dg.next_task_set()
