@@ -47,13 +47,6 @@ class Task(object):
             self.deadline,
             self.period
         )
-
-        if self.is_dag:
-            ret += '\nnid: {}\nprio: {}\npred: {}\nsucc: {}'\
-                .format(self.nid,
-                    self.priority,
-                    list(map(lambda x: x.nid, self.pred)),
-                    list(map(lambda x: x.nid, self.succ)))
         return ret
 
     def utilization(self):

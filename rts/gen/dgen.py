@@ -216,14 +216,20 @@ class Dgen(Gen):
 
     def connect_ptasks(self, g, ptasks):
         # forward connection (succ)
-        for t_from, node in zip(ptasks, g['nodes']):
-            for t_to in g['edges'][node]:
-                t_from.succ.append(ptasks[g['nodes'][t_to]])
+        for t_from in ptasks:
+            for t_to in g['edges'][t_from.nid]:
+                self.log.debug('connecting {}->{}'
+                    .format(t_from.nid, t_to))
+                task_t_to = next(x for x in ptasks if x.nid == t_to)
+                t_from.succ.append(task_t_to)
 
         # backward connection (pred)
-        for t_to, node in zip(ptasks, g['nodes']):
-            for t_from in g['edges_backward'][node]:
-                t_to.pred.append(ptasks[g['nodes'][t_from]])
+        for t_from in ptasks:
+            for t_to in g['edges_backward'][t_from.nid]:
+                self.log.debug('connecting(backwards) {}->{}'
+                    .format(t_from.nid, t_to))
+                task_t_to = next(x for x in ptasks if x.nid == t_to)
+                t_from.pred.append(task_t_to)
 
         return ptasks
 
@@ -260,7 +266,7 @@ if __name__ == '__main__':
         'edge_prob': 0.3,
         'util_over': True,
         'avg_node_util': 0.2,
-        'num_task': 3
+        'num_task': 2
     }
     dg = Dgen(**gen_param)
     # dg.next_task()

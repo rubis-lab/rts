@@ -72,8 +72,11 @@ class DAG(object):
 
         for t in self.tasks[::-1]:
             lb[t] = t.longest_exec_time
+            self.log.debug('calculating lb[{}]'.format(t.nid))
             if len(t.succ) != 0:
                 lb[t] += max(list(map(lambda x: lb[x], t.succ)))
+                for tt in t.succ:
+                    self.log.debug('lb[{}]: {}'.format(tt.nid, lb[tt]))
 
         # l
         lall = {}
