@@ -35,6 +35,9 @@ class DAG(object):
         self.period = kwargs.get('period')
         self.carry_in_calculated = False
 
+        # parallelization
+        self.max_opt = kwargs.get('max_option', 1)
+
         # parallelize
         # options = [2 for _ in self.tasks]
         # self.parallelize_custom(options)
@@ -310,6 +313,21 @@ class DAG(object):
             t.configure_pt(opt)
         self.carry_in_calculated = False
         return
+
+    def increment_fdf(self):
+        for t in self.longest_chain:
+            self.log.debug('pt {}: option {}'.format(t.nid, t.selected_option))
+            # try increment option
+            if t.increment_option():
+                self.log.debug('pt {}: option incremented to: {}'
+                    .format(t.nid, t.selected_option))
+
+                # recalculate longest chain
+                self.assign_priority_he2019()
+                self.longest_chain = self.detect_longest_chain()
+                return True
+        self.log.debug('cannot increment more.')
+        return False
 
     def __del__(self):
         type(self).cnt -= 1

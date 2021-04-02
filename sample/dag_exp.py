@@ -15,9 +15,16 @@ if __name__ == '__main__':
         'edge_prob': 0.3,
         'util_over': True,
         'avg_node_util': 0.15,
-        'num_task': 3
+        'num_task': 3,
+        'max_option': 4
     })
     print(dg)
+    d1 = dg.next_task(0)
+    cnt = 0
+    while d1.increment_fdf():
+        cnt += 1
+    print('ntask: {}, cnt: {}'.format(len(d1), cnt))
+    exit()
 
     stat_param = {
         'id': 0,

@@ -166,7 +166,7 @@ class Dgen(Gen):
         })
         pt_source = ParaTask(**{
             'base_task': t_source,
-            'max_option': self.max_option,
+            'max_option': 1,
             'overhead': self.overhead,
             'variance': self.variance,
             'is_dag': True,
@@ -202,7 +202,7 @@ class Dgen(Gen):
         })
         pt_sink = ParaTask(**{
             'base_task': t_sink,
-            'max_option': self.max_option,
+            'max_option': 1,
             'overhead': self.overhead,
             'variance': self.variance,
             'is_dag': True,
@@ -239,6 +239,7 @@ class Dgen(Gen):
             'tasks': ptasks,
             'deadline': ptasks[0].base_task.deadline,
             'period': ptasks[0].base_task.period,
+            'max_option': self.max_option,
         })
         return dag
 

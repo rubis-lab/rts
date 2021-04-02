@@ -222,3 +222,10 @@ class ParaTask(object):
         self.deadline = self.base_task.deadline
         self.period = self.base_task.period
         return
+
+    def increment_option(self):
+        if self.selected_option < self.max_opt:
+            self.selected_option += 1
+            self.configure_pt(self.selected_option)
+            return True
+        return False
