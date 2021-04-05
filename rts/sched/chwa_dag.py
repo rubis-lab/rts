@@ -20,11 +20,13 @@ class ChwaDAG(Sched):
 
         return w_other + w_self
 
+    def sum_tolerance(self, base_dag):
+        return self.num_core * (base_dag.deadline - base_dag.graph_len())
+
     def is_schedulable(self, dagts):
         for base_dag in dagts:
             interference = self.sum_interference(dagts, base_dag)
-            tolerance = self.num_core * \
-                (base_dag.deadline - base_dag.graph_len())
+            tolerance = self.sum_tolerance(base_dag)
             if interference > tolerance:
                 return False
         return True
