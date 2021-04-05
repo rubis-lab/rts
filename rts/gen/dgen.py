@@ -24,13 +24,23 @@ class Dgen(Gen):
         # self.tot_util = kwargs.get('tot_util', 1.0)
         # self.deadline_scale = kwargs.get('deadline_scale', 1.0)
         self.max_option = kwargs.get('max_option', 4)
+        self.overhead_strategy = kwargs.get('overhead_strategy', 'ideal')
         self.overhead = kwargs.get('overhead', 0.0)
         self.variance = kwargs.get('variance', 0.0)
         self.log = new_logger(__name__)
 
     def __str__(self):
         info = 'Generator - dgen\n' + \
-            super(type(self), self).__str__()
+            super(type(self), self).__str__() + '\n' + \
+            'min_nodes = {}\n'.format(self.min_nodes) + \
+            'max_nodes = {}\n'.format(self.max_nodes) + \
+            'edge_prob = {}\n'.format(self.edge_prob) + \
+            'util_over = {}\n'.format(self.util_over) + \
+            'avg_node_util = {}\n'.format(self.avg_node_util) + \
+            'max_option = {}\n'.format(self.max_option) + \
+            'overhead_strategy = {}\n'.format(self.overhead_strategy) + \
+            'overhead = {}\n'.format(self.overhead) + \
+            'variance = {}\n'.format(self.variance)
 
         return info
 
@@ -167,6 +177,7 @@ class Dgen(Gen):
         pt_source = ParaTask(**{
             'base_task': t_source,
             'max_option': 1,
+            'overhead_strategy': self.overhead_strategy,
             'overhead': self.overhead,
             'variance': self.variance,
             'is_dag': True,
@@ -186,6 +197,7 @@ class Dgen(Gen):
             pt = ParaTask(**{
                 'base_task': t,
                 'max_option': self.max_option,
+                'overhead_strategy': self.overhead_strategy,
                 'overhead': self.overhead,
                 'variance': self.variance,
                 'is_dag': True,
@@ -203,6 +215,7 @@ class Dgen(Gen):
         pt_sink = ParaTask(**{
             'base_task': t_sink,
             'max_option': 1,
+            'overhead_strategy': self.overhead_strategy,
             'overhead': self.overhead,
             'variance': self.variance,
             'is_dag': True,

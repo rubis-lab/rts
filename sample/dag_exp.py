@@ -17,7 +17,9 @@ if __name__ == '__main__':
         'util_over': True,
         'avg_node_util': 0.15,
         'num_task': 3,
-        'max_option': 4
+        'max_option': 4,
+        'overhead_strategy': 'identical',
+        'overhead': 0.0,
     })
     print(dg)
 
@@ -33,7 +35,7 @@ if __name__ == '__main__':
     chwa = ChwaDAG(**{'num_core': 4.0})
     cho_dag = ChoDAGTask(**{'num_core': 4.0})
 
-    num_iter = 50000
+    num_iter = 4000
     for _ in tqdm(range(num_iter)):
         dagts = dg.next_task_set()
         dag_util = dagts.tot_util()

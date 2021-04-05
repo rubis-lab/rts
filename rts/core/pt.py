@@ -52,11 +52,14 @@ class ParaTask(object):
         self.ts_table = {'1': ts}
 
         # ts_table
+        self.overhead_strategy = kwargs.get('overhead_strategy', 'identical')
         if kwargs.get('custom', 'False') == 'True':
             self.exec_times = kwargs.get('exec_times', [[]])
             self.populate_ts_table_custom()
-        elif kwargs.get('ideal', True):
-            self.populate_ts_table_ideal()
+        elif self.overhead_strategy == 'identical':
+            self.populate_ts_table_identical()
+        elif self.overhead_strategy == 'linear':
+            self.populate_ts_table_linear()
         else:
             self.populate_ts_table()
 
@@ -186,13 +189,25 @@ class ParaTask(object):
                 'max_parallel option: ' + str(self.max_opt) + '\n' +
                 'requested option: ' + str(opt))
 
-    def populate_ts_table_ideal(self):
+    def populate_ts_table_identical(self):
         if self.max_opt < 2:
             return
 
         for opt in range(2, self.max_opt + 1):
             ts = TaskSet()
-            thrs = para.parallelize_task_ideal(self.base_task, self.max_opt)
+            thrs = para.parallelize_task_ideal(self.base_task, opt, self.overhead)
+            for thr in thrs:
+                ts.append(thr)
+            self.ts_table[str(opt)] = ts
+        return
+
+    def populate_ts_table_linear(self):
+        if self.max_opt < 2:
+            return
+
+        for opt in range(2, self.max_opt + 1):
+            ts = TaskSet()
+            thrs = para.parallelize_task_linear(self.base_task, self.max_opt)
             for thr in thrs:
                 ts.append(thr)
             self.ts_table[str(opt)] = ts

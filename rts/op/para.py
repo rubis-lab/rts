@@ -258,21 +258,31 @@ def unifast_divide_alpha(pcs, tot, limit):
     return divided_best_effort
 
 
-def parallelize_task_ideal(t, pcs):
+def parallelize_task_ideal(t, pcs, overhead=0.0):
     thr_param = {
         'id': t.id,
-        # 'exec_time': e_list[i],
         'deadline': t.deadline,
         'period': t.period,
     }
     thrs = []
-    new_exec_time = t.exec_time / pcs
+    new_exec_time = (1.0 + overhead) * t.exec_time / pcs  # todo: this is wrong
     for tid in range(pcs):
         thr = Thread(**thr_param)
         thr.tid = tid
         thr.exec_time = new_exec_time
         thrs.append(thr)
 
+    return thrs
+
+
+def parallelize_task_linear(t, pcs):
+    thr_param = {
+        'id': t.id,
+        'deadline': t.deadline,
+        'period': t.period,
+    }
+    thrs = []
+    # todo
     return thrs
 
 
