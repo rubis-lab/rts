@@ -2,6 +2,7 @@ from rts.core.task import Task
 from rts.core.ts import TaskSet
 from rts.op import para
 from rts.core.thr import Thread
+import random
 
 
 class ParaTask(object):
@@ -186,6 +187,18 @@ class ParaTask(object):
             para.parallelize_pt_linear(self)
         elif self.para_strategy == 'custom':  # may not work for now
             self.populate_ts_table_custom()
+
+        return
+
+    def parallelize_preset(self, preset, option=1):
+        if preset == 'single':
+            self.configure_pt(1)
+        elif preset == 'random':
+            self.configure_pt(random.randint(1, self.max_opt))
+        elif preset == 'max':
+            self.configure_pt(self.max_opt)
+        elif preset == 'custom':
+            self.configure_pt(option)
         return
 
     def configure_pt(self, option):

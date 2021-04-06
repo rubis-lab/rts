@@ -3,7 +3,6 @@ from rts.core.ts import TaskSet
 from rts.core.pt import ParaTask
 from rts.op import para
 from rts.op import tsutil
-import random
 import operator
 from math import isclose, floor
 from rts.op.log import new_logger
@@ -40,7 +39,7 @@ class DAG(object):
 
         # parallelize
         # options = [2 for _ in self.tasks]
-        # self.parallelize_custom(options)
+        # self.parallelize_preset('custom', options)
 
         # w_100 = self.workload_gedf(100)
         # self.log.info('w_100: {}'.format(w_100))
@@ -308,9 +307,12 @@ class DAG(object):
 
         return w_body + w_carry_in
 
-    def parallelize_custom(self, options):
-        for t, opt in zip(self.tasks, options):
-            t.configure_pt(opt)
+    def parallelize_preset(self, preset, options=None):
+        for pt in self.tasks:
+            if preset == 'custom':
+                pt.parallelize_preset(preset, options[self.tasks.index(pt)])
+            else:
+                pt.parallelize_preset(preset)
         self.carry_in_calculated = False
         return
 
@@ -335,23 +337,17 @@ class DAG(object):
     def __str__(self):
         info = 'id: ' + str(self.id) + '\n' + \
             'max_option: ' + str(self.max_opt) + '\n' + \
-            'popt_strategy: ' + self.popt_strategy + '\n' + \
-            'num_segments: ' + str(len(self)) + '\n' + \
-            'tot_util: ' + str(self.tot_util()) + '\n\n' + \
-            'generated: \n'
-        for i, ts in enumerate(self.ts_list):
-            info += 'segment ' + str(i + 1) + '\n' + \
-                str(ts) + '\n'
+            'popt_strategy: ' + self.popt_strategy + '\n'
         return info
 
     def __len__(self):
-        return len(self.tasks)  # number of segments
+        return len(self.tasks)
 
     def __getitem__(self, idx):
-        return self.tasks[idx]  # get segment
+        return self.tasks[idx]
 
     def __setitem__(self, idx, t):
-        self.tasks[idx] = t  # set segment
+        self.tasks[idx] = t
         return
 
     def __iter__(self):

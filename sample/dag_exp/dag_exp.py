@@ -16,6 +16,7 @@ if __name__ == '__main__':
         cfg = yaml.load(f, Loader=yaml.FullLoader)
     dg = Dgen(**cfg['dgen'])
     stat_base = Stat(**cfg['stat'])
+    stat_max = Stat(**cfg['stat'])
     stat_cho = Stat(**cfg['stat'])
 
     chwa = ChwaDAG(**cfg['chwa_dag'])
@@ -25,15 +26,25 @@ if __name__ == '__main__':
         dagts = dg.next_task_set()
         dag_util = dagts.tot_util()
 
-        # base (chwa)
+        # base (chwa) (single)
         stat_base.add(dag_util, chwa.is_schedulable(dagts))
 
+        # max
+        dagts.parallelize_preset('max')
+        stat_max.add(dag_util, chwa.is_schedulable(dagts))
+
         # cho
+        dagts.parallelize_preset('single')
         stat_cho.add(dag_util, cho_dag.is_schedulable(dagts))
 
     print('base')
     base_res, base_res_str = stat_base.result_minimal()
     print(base_res_str)
+    print('------------')
+
+    print('max')
+    max_res, max_res_str = stat_max.result_minimal()
+    print(max_res_str)
     print('------------')
 
     print('cho')
@@ -52,6 +63,12 @@ if __name__ == '__main__':
         markerfacecolor='none',
         linewidth=0.5)
 
+    plt.plot(x, max_res,
+        'ks-',
+        label='max',
+        markerfacecolor='none',
+        linewidth=0.5)
+
     plt.plot(x, cho_res,
         'kx-',
         label='cho',
@@ -60,7 +77,7 @@ if __name__ == '__main__':
 
     plt.xlabel('Task Set Utilization')
     plt.ylabel('Schedulability')
-    # plt.legend(edgecolor='none')
+    plt.legend(edgecolor='none')
     # plt.axis([0, x_max, 0, y_max])
 
     plt.show()

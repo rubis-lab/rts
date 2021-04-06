@@ -11,6 +11,7 @@ class DAGTaskSet(object):
     def __init__(self, **kwargs):
         type(self).cnt += 1
         self.id = kwargs.get('id', type(self).cnt)
+        self.popt_strategy = kwargs.get('popt_strategy', 'single')
         self.dags = []
 
     def __str__(self):
@@ -42,3 +43,8 @@ class DAGTaskSet(object):
 
     def tot_util(self):
         return sum_utilization(self)
+
+    def parallelize_preset(self, preset):
+        for dag in self.dags:
+            dag.parallelize_preset(preset)
+        return
