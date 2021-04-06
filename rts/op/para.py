@@ -258,21 +258,37 @@ def unifast_divide_alpha(pcs, tot, limit):
     return divided_best_effort
 
 
-def parallelize_task_ideal(t, pcs, overhead=0.0):
+def parallelize_pt_identical(pt):
+    # creates identical sibling threads
+    # each increment of option scales sum of exec_times
+    # by a factor of (1 + overhead)
+    # compared to the sum of previous option
     thr_param = {
         'id': t.id,
         'deadline': t.deadline,
         'period': t.period,
     }
-    thrs = []
-    new_exec_time = (1.0 + overhead) * t.exec_time / pcs  # todo: this is wrong
-    for tid in range(pcs):
-        thr = Thread(**thr_param)
-        thr.tid = tid
-        thr.exec_time = new_exec_time
-        thrs.append(thr)
 
-    return thrs
+    # calculate sum of thread exec_times
+    sum_thread_exec_times = {1: pt.base_task.exec_time}
+    for opt in range(2, pt.max_opt + 1):
+        sum_thr_exec_time = \
+            sum_thread_exec_times[opt - 1] * (1.0 + pt.overhead)
+        sum_thread_exec_times[opt] = sum_thr_exec_time
+
+        # equally distributed exec_times
+        ts = TaskSet()
+        thr_exec_time = sum_thr_exec_time / opt
+        for tid in range(opt):
+            thr = Thread(**thr_param)
+            thr.tid = tid
+            thr.exec_time = thr_exec_time
+            ts.append(thr)
+
+        # finally, set ts_table of para task
+        pt.ts_table[opt] = ts
+
+    return
 
 
 def parallelize_task_linear(t, pcs):

@@ -49,19 +49,11 @@ class ParaTask(object):
             Task(**{'exec_time': 1, 'deadline': 2, 'period': 3}))
         ts = TaskSet()
         ts.append(self.base_task)
-        self.ts_table = {'1': ts}
+        self.ts_table = {1: ts}
 
         # ts_table
-        self.overhead_strategy = kwargs.get('overhead_strategy', 'identical')
-        if kwargs.get('custom', 'False') == 'True':
-            self.exec_times = kwargs.get('exec_times', [[]])
-            self.populate_ts_table_custom()
-        elif self.overhead_strategy == 'identical':
-            self.populate_ts_table_identical()
-        elif self.overhead_strategy == 'linear':
-            self.populate_ts_table_linear()
-        else:
-            self.populate_ts_table()
+        self.para_strategy = kwargs.get('para_strategy', 'identical')
+        self.populate_ts_table(self.para_strategy)
 
         # macro
         self.selected_option = 1
@@ -89,28 +81,28 @@ class ParaTask(object):
             self.start_time = 0.0
             self.finish_time = 0.0
 
-    def populate_ts_table_custom(self):
-        """
-        **Role**: Populate ts_table using predefined execution times.\n
-        """
-        if self.max_opt >= 2:
-            # para.parallelize_pt_non_dec_alpha(self)
-            for opt in range(1, self.max_opt + 1):
+    # def populate_ts_table_custom(self):
+    #     """
+    #     **Role**: Populate ts_table using predefined execution times.\n
+    #     """
+    #     if self.max_opt >= 2:
+    #         # para.parallelize_pt_non_dec_alpha(self)
+    #         for opt in range(1, self.max_opt + 1):
 
-                ts = TaskSet()
-                for i in range(0, opt):
+    #             ts = TaskSet()
+    #             for i in range(0, opt):
 
-                    thr_param = {
-                        'id': self.base_task.id,
-                        'exec_time': self.exec_times[opt - 1][i],
-                        'deadline': self.base_task.deadline,
-                        'period': self.base_task.period,
-                    }
-                    thr = Thread(**thr_param)
+    #                 thr_param = {
+    #                     'id': self.base_task.id,
+    #                     'exec_time': self.exec_times[opt - 1][i],
+    #                     'deadline': self.base_task.deadline,
+    #                     'period': self.base_task.period,
+    #                 }
+    #                 thr = Thread(**thr_param)
 
-                    ts.append(thr)
-                self.ts_table[str(opt)] = ts
-        return
+    #                 ts.append(thr)
+    #             self.ts_table[str(opt)] = ts
+    #     return
 
     def __del__(self):
         """
@@ -161,7 +153,7 @@ class ParaTask(object):
         if opt == 0:
             raise Exception('Parallelization option cannot be 0.')
         elif opt <= len(self.ts_table):
-            return self.ts_table[str(opt)]
+            return self.ts_table[opt]
         else:
             raise Exception('Parallelization option out of bound.\n' +
                 'max_parallel option: ' + str(self.max_opt) + '\n' +
@@ -182,42 +174,32 @@ class ParaTask(object):
         if opt == 0:
             raise Exception('Parallelization option cannot be 0.')
         elif opt <= len(self.ts_table):
-            self.ts_table[str(opt)] = ts
+            self.ts_table[opt] = ts
             return
         else:
             raise Exception('Parallelization option out of bound.\n' +
                 'max_parallel option: ' + str(self.max_opt) + '\n' +
                 'requested option: ' + str(opt))
 
-    def populate_ts_table_identical(self):
+
+    def populate_ts_table(self, para_strategy='identical'):
         if self.max_opt < 2:
             return
 
-        for opt in range(2, self.max_opt + 1):
-            ts = TaskSet()
-            thrs = para.parallelize_task_ideal(self.base_task, opt, self.overhead)
-            for thr in thrs:
-                ts.append(thr)
-            self.ts_table[str(opt)] = ts
-        return
+        if para_strategy == 'identical':
 
-    def populate_ts_table_linear(self):
-        if self.max_opt < 2:
-            return
 
-        for opt in range(2, self.max_opt + 1):
-            ts = TaskSet()
-            thrs = para.parallelize_task_linear(self.base_task, self.max_opt)
-            for thr in thrs:
-                ts.append(thr)
-            self.ts_table[str(opt)] = ts
-        return
 
-    def populate_ts_table(self):
-        """
-        **Role**: Generate **populate_ts_table**
-        For more details **See "op.para.parallelize_pt_non_dec_alpha"**
-        """
+        if kwargs.get('custom', 'False') == 'True':
+            self.exec_times = kwargs.get('exec_times', [[]])
+            self.populate_ts_table_custom()
+        elif self.overhead_strategy == 'identical':
+            self.populate_ts_table_identical()
+        elif self.overhead_strategy == 'linear':
+            self.populate_ts_table_linear()
+        else:
+            self.populate_ts_table()
+
 
         if self.max_opt >= 2:
             # para.parallelize_pt_non_dec(self)
@@ -226,7 +208,7 @@ class ParaTask(object):
 
     def configure_pt(self, option):
         self.selected_option = option
-        self.selected_tasks = self.ts_table[str(option)]
+        self.selected_tasks = self.ts_table[option]
 
         self.longest_exec_time = \
             max(list(map(lambda x: x.exec_time, self.selected_tasks)))
