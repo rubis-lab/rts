@@ -58,7 +58,7 @@ class ParaTask(object):
         # macro
         self.selected_option = 1
         self.selected_tasks = \
-            self.ts_table[str(self.selected_option)]
+            self.ts_table[self.selected_option]
         self.exec_time = self.base_task.exec_time
         self.longest_exec_time = self.base_task.exec_time
         self.total_exec_time = self.base_task.exec_time
@@ -67,9 +67,6 @@ class ParaTask(object):
         self.configure_pt(self.selected_option)
 
         # dag specific
-        # self.exec_time = float(kwargs.get('exec_time', 0))
-        # self.deadline = float(kwargs.get('deadline', 0))
-        # self.period = float(kwargs.get('period', 0))
         self.slack = float(kwargs.get('slack', 0))
         self.priority = kwargs.get('priority', -1)
         self.is_dag = kwargs.get('is_dag', False)
@@ -185,9 +182,9 @@ class ParaTask(object):
         if self.max_opt < 2:
             return
 
-        if para_strategy == 'linear':
+        if self.para_strategy == 'linear':
             para.parallelize_pt_linear(self)
-        elif para_strategy == 'custom':  # may not work for now
+        elif self.para_strategy == 'custom':  # may not work for now
             self.populate_ts_table_custom()
         return
 
