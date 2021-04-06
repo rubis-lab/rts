@@ -3,6 +3,8 @@ num_iter: 2000
 
 # generator
 dgen:
+  min_num_task: 1
+  max_num_task: 5
   min_period: 60
   max_period: 200
   min_nodes: 3
@@ -13,7 +15,7 @@ dgen:
   num_task: 3
   max_option: 4
   para_strategy: linear
-  overhead: 0.3
+  overhead: 0.2
   variance: 0.1
 
 # stat

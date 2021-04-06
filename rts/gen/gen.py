@@ -11,6 +11,8 @@ class Gen(object):
         self.seed = kwargs.get('seed', 0)
         random.seed(self.seed)
         self.num_task = kwargs.get('num_task', 0)
+        self.min_num_task = kwargs.get('min_num_task', 0)
+        self.max_num_task = kwargs.get('max_num_task', 0)
         self.min_exec_time = kwargs.get('min_exec_time', 0)
         self.max_exec_time = kwargs.get('max_exec_time', 0)
         self.min_deadline = kwargs.get('min_deadline', 0)
@@ -25,7 +27,10 @@ class Gen(object):
         return
 
     def __str__(self):
-        info = 'min_exec_time = ' + str(self.min_exec_time) + '\n' + \
+        info = 'num_task = ' + str(self.num_task) + '\n' + \
+            'min_num_task = ' + str(self.min_num_task) + '\n' + \
+            'max_num_task = ' + str(self.max_num_task) + '\n' + \
+            'min_exec_time = ' + str(self.min_exec_time) + '\n' + \
             'max_exec_time = ' + str(self.max_exec_time) + '\n' + \
             'min_deadline = ' + str(self.min_deadline) + '\n' + \
             'max_deadline = ' + str(self.max_deadline) + '\n' + \

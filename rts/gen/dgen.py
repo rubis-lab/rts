@@ -265,7 +265,7 @@ class Dgen(Gen):
 
     def next_task_set(self):
         gts = DAGTaskSet()
-        for tid in range(self.num_task):
+        for tid in range(random.randint(self.min_num_task, self.max_num_task)):
             gt = self.next_task(tid)
             gts.append(gt)
         return gts
