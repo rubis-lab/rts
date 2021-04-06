@@ -258,15 +258,21 @@ def unifast_divide_alpha(pcs, tot, limit):
     return divided_best_effort
 
 
-def parallelize_pt_identical(pt):
-    # creates identical sibling threads
+def parallelize_pt_linear(pt):
     # each increment of option scales sum of exec_times
     # by a factor of (1 + overhead)
     # compared to the sum of previous option
+    # exec_time of sibling threads distributed linearly
+    # distribution controlled by the variance factor (var)
+    # the largest exec_time among the exec_times of sibling thread
+    # is scaled by (1 + var) compared to the mean exec_time
+    # other threads' exec_time is interpolated linearly
+    # note that var = 0 (no variance) creates identical threads
+
     thr_param = {
-        'id': t.id,
-        'deadline': t.deadline,
-        'period': t.period,
+        'id': pt.base_task.id,
+        'deadline': pt.base_task.deadline,
+        'period': pt.base_task.period,
     }
 
     # calculate sum of thread exec_times
@@ -276,18 +282,26 @@ def parallelize_pt_identical(pt):
             sum_thread_exec_times[opt - 1] * (1.0 + pt.overhead)
         sum_thread_exec_times[opt] = sum_thr_exec_time
 
-        # equally distributed exec_times
+        # ---- a ---- mu ---- b ----
+        # a = (1 - var) * mu
+        # b = (1 + var) * mu
+        # del = (b - a) / opt = 2 * var * mu / opt
+
+        mean_thr_exec_time = sum_thr_exec_time / opt
+        largest_thr_exec_time = mean_thr_exec_time * (1.0 + pt.variance)
+        thr_exec_time_interval = \
+            2 * pt.variance * mean_thr_exec_time / opt
+
         ts = TaskSet()
-        thr_exec_time = sum_thr_exec_time / opt
         for tid in range(opt):
             thr = Thread(**thr_param)
             thr.tid = tid
-            thr.exec_time = thr_exec_time
+            thr.exec_time = \
+                largest_thr_exec_time - opt * thr_exec_time_interval
             ts.append(thr)
 
         # finally, set ts_table of para task
         pt.ts_table[opt] = ts
-
     return
 
 
