@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # print('base_res({}): {}'.format(len(base_res), base_res))
     plt.plot(x, base_res,
         'ko-',
-        label='base',
+        label='single',
         markerfacecolor='none',
         linewidth=0.5)
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     plt.plot(x, cho_res,
         'kx-',
-        label='cho',
+        label='ours',
         markerfacecolor='none',
         linewidth=0.5)
 

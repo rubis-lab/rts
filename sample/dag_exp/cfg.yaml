@@ -12,7 +12,6 @@ dgen:
   edge_prob: 0.3
   util_over: True
   avg_node_util: 0.15
-  num_task: 3
   max_option: 4
   para_strategy: linear
   overhead: 0.2
