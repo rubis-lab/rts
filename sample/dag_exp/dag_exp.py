@@ -1,43 +1,27 @@
+import os
+import yaml
 from tqdm import tqdm
+import numpy as np
+import matplotlib.pyplot as plt
 from rts.op.stat import Stat
 from rts.gen.dgen import Dgen
 from rts.sched.chwa_dag import ChwaDAG
-import numpy as np
-import matplotlib.pyplot as plt
 from rts.popt.cho_dag import ChoDAGTask
 
 
 if __name__ == '__main__':
-    dg = Dgen(**{
-        'min_period': 60,
-        'max_period': 200,
-        'min_nodes': 3,
-        'max_nodes': 10,
-        'edge_prob': 0.3,
-        'util_over': True,
-        'avg_node_util': 0.15,
-        'num_task': 3,
-        'max_option': 4,
-        'para_strategy': 'linear',
-        'overhead': 0.3,
-        'variance': 0.1,
-    })
-    print(dg)
+    cfg_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'cfg.yaml')
+    with open(cfg_file, 'r') as f:
+        cfg = yaml.load(f, Loader=yaml.FullLoader)
+    dg = Dgen(**cfg['dgen'])
+    stat_base = Stat(**cfg['stat'])
+    stat_cho = Stat(**cfg['stat'])
 
-    stat_param = {
-        'id': 0,
-        'min': 0.0,
-        'max': 4.0,
-        'inc': 0.1,
-    }
-    stat_base = Stat(**stat_param)
-    stat_cho = Stat(**stat_param)
+    chwa = ChwaDAG(**cfg['chwa_dag'])
+    cho_dag = ChoDAGTask(**cfg['cho_dag'])
 
-    chwa = ChwaDAG(**{'num_core': 4.0})
-    cho_dag = ChoDAGTask(**{'num_core': 4.0})
-
-    num_iter = 2000
-    for _ in tqdm(range(num_iter)):
+    for _ in tqdm(range(cfg['num_iter'])):
         dagts = dg.next_task_set()
         dag_util = dagts.tot_util()
 
