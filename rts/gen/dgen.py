@@ -161,7 +161,7 @@ class Dgen(Gen):
 
     def generate_template_ptasks(self, g):
         # implicit deadline
-        period = random.randint(self.min_period, self.min_period)
+        period = random.randint(self.min_period, self.max_period)
         deadline = period
         mu_exec_time = period * self.avg_node_util
         sig_exec_time = mu_exec_time / 2
