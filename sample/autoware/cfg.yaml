@@ -1,31 +1,121 @@
-# experiment
-num_iter: 50000
+# custom
+custom:
+  num_task: 9
+  num_graph: 7
+  graph_isolation: [
+    [0],
+    [1],
+    [2],
+    [3],
+    [4, 5],
+    [6],
+    [7, 8]
+  ] 
+  graphs:
+    node: [
+      {
+        node_name: 'point_cloud_filter_transform_0',
+        node_id: 0,
+        exec_time: 8.0,
+        deadline: 12.0,
+        period: 30.0        
+      },
+      {
+        node_name: 'point_cloud_filter_transform_1',
+        node_id: 1,
+        exec_time: 8.0,
+        deadline: 12.0,
+        period: 30.0
+      },
+      {
+        node_name: 'point_cloud_filter_transform_2',
+        node_id: 2,
+        exec_time: 8.0,
+        deadline: 12.0,
+        period: 30.0
+      },
+      {
+        node_name: 'point_cloud_filter_transform_3',
+        node_id: 3,
+        exec_time: 8.0,
+        deadline: 12.0,
+        period: 30.0 
+      },
+      {
+        node_name: 'point_cloud_fusion',
+        node_id: 4,
+        exec_time: 4.5,
+        deadline: 15.0,
+        period: 15.0
+      },
+      {
+        node_name: 'ray_ground_classifier',
+        node_id: 5,
+        exec_time: 5.0,
+        deadline: 12,
+        period: 40.0
+      },
+      {
+        node_name: 'euclidean_cluster',
+        node_id: 6,
+        exec_time: 0.25,
+        deadline: 1.0,
+        period: 1.5 
+      },
+      {
+        node_name: 'rubis_detect',
+        node_id: 7,
+        exec_time: 3.0,
+        deadline: 7.0,
+        period: 15.0
+      },
+      {
+        node_name: 'rubis_drive',
+        node_id: 8,
+        exec_time: 3.5,
+        deadline: 9.0,
+        period: 15.0 
+      }
+    ]
+    edge: [
+      {
+        from: 4,
+        to: 5
+      }
+      {
+        from: 7,
+        to: 8
+      }
+    ]
+    
+# # experiment
+# num_iter: 50000
 
-# generator
-dgen:
-  min_num_task: 1
-  max_num_task: 5
-  min_period: 60
-  max_period: 200
-  min_nodes: 3
-  max_nodes: 10
-  edge_prob: 0.3
-  util_over: True
-  avg_node_util: 0.15
-  max_option: 4
-  para_strategy: linear
-  overhead: 0.2
-  variance: 0.1
+# # generator
+# dgen:
+#   min_num_task: 1
+#   max_num_task: 5
+#   min_period: 60
+#   max_period: 200
+#   min_nodes: 3
+#   max_nodes: 10
+#   edge_prob: 0.3
+#   util_over: True
+#   avg_node_util: 0.15
+#   max_option: 4
+#   para_strategy: linear
+#   overhead: 0.2
+#   variance: 0.1
 
-# stat
-stat:
-  id: 0
-  min: 0.0
-  max: 4.0
-  inc: 0.1
+# # stat
+# stat:
+#   id: 0
+#   min: 0.0
+#   max: 4.0
+#   inc: 0.1
 
-# sched
-chwa_dag:
-  num_core: 4.0
-cho_dag:
-  num_core: 4.0
+# # sched
+# chwa_dag:
+#   num_core: 4.0
+# cho_dag:
+#   num_core: 4.0
