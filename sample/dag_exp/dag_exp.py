@@ -7,6 +7,7 @@ from rts.op.stat import Stat
 from rts.gen.dgen import Dgen
 from rts.sched.chwa_dag import ChwaDAG
 from rts.popt.cho_dag import ChoDAGTask
+import tikzplotlib
 
 
 if __name__ == '__main__':
@@ -79,5 +80,9 @@ if __name__ == '__main__':
     plt.ylabel('Schedulability')
     plt.legend(edgecolor='none')
     # plt.axis([0, x_max, 0, y_max])
+
+    tex_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), __file__ + '.tex')
+    tikzplotlib.save(tex_file)
 
     plt.show()

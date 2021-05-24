@@ -1,5 +1,5 @@
 # experiment
-num_iter: 50000
+num_iter: 500
 
 # generator
 dgen:
