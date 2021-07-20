@@ -7,6 +7,7 @@ from rts.op.stat import Stat
 from rts.gen.dgen import Dgen
 from rts.sched.chwa_dag import ChwaDAG
 from rts.popt.cho_dag import ChoDAGTask
+from rts.popt.exhaustive_dag import ExhaustiveDAGTask
 import tikzplotlib
 
 
@@ -19,9 +20,11 @@ if __name__ == '__main__':
     stat_base = Stat(**cfg['stat'])
     stat_max = Stat(**cfg['stat'])
     stat_cho = Stat(**cfg['stat'])
+    stat_exh = Stat(**cfg['stat'])
 
     chwa = ChwaDAG(**cfg['chwa_dag'])
     cho_dag = ChoDAGTask(**cfg['cho_dag'])
+    exhaustive_dag = ExhaustiveDAGTask(**cfg['exhaustive_dag'])
 
     for _ in tqdm(range(cfg['num_iter'])):
         dagts = dg.next_task_set()
@@ -37,6 +40,10 @@ if __name__ == '__main__':
         # cho
         dagts.parallelize_preset('single')
         stat_cho.add(dag_util, cho_dag.is_schedulable(dagts))
+        
+        # exh
+        dagts.parallelize_preset('single')
+        stat_exh.add(dag_util, exhaustive_dag.is_schedulable(dagts))
 
     print('base')
     base_res, base_res_str = stat_base.result_minimal()
@@ -51,6 +58,11 @@ if __name__ == '__main__':
     print('cho')
     cho_res, cho_res_str = stat_cho.result_minimal()
     print(cho_res_str)
+    print('------------')
+
+    print('exh')
+    exh_res, exh_res_str = stat_exh.result_minimal()
+    print(exh_res_str)
     print('------------')
 
     x_max = 4.0
@@ -73,6 +85,12 @@ if __name__ == '__main__':
     plt.plot(x, cho_res,
         'kx-',
         label='ours',
+        markerfacecolor='none',
+        linewidth=0.5)
+
+    plt.plot(x, exh_res,
+        'k^-',
+        label='exhaustive',
         markerfacecolor='none',
         linewidth=0.5)
 

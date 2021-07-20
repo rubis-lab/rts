@@ -1,5 +1,5 @@
 # experiment
-num_iter: 500
+num_iter: 10000
 
 # generator
 dgen:
@@ -28,4 +28,6 @@ stat:
 chwa_dag:
   num_core: 4.0
 cho_dag:
+  num_core: 4.0
+exhaustive_dag:
   num_core: 4.0
