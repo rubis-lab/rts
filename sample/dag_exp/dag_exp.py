@@ -27,7 +27,7 @@ if __name__ == '__main__':
     exhaustive_dag = ExhaustiveDAGTask(**cfg['exhaustive_dag'])
 
     for _ in tqdm(range(cfg['num_iter'])):
-        dagts = dg.next_task_set()
+        dagts = dg.next_task_set_small()
         dag_util = dagts.tot_util()
 
         # base (chwa) (single)

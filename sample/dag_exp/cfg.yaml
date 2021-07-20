@@ -1,5 +1,5 @@
 # experiment
-num_iter: 10
+num_iter: 500000
 
 # generator
 dgen:
@@ -31,3 +31,4 @@ cho_dag:
   num_core: 4.0
 exhaustive_dag:
   num_core: 4.0
+  max_option: 4

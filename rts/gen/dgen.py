@@ -271,6 +271,16 @@ class Dgen(Gen):
         return gts
 
 
+    def next_task_set_small(self):
+        num_node = 20
+        while num_node > 10:
+            gts = self.next_task_set()
+            num_node = 0
+            for dag in gts:
+                num_node += len(dag.tasks) -2
+
+        return gts
+
 if __name__ == '__main__':
     gen_param = {
         'min_period': 60,
