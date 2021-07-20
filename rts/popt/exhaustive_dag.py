@@ -33,6 +33,7 @@ class ExhaustiveDAGTask(Popt):
     def is_schedulable(self, dagts):
         # number of possible cases: max_opt ^ n_task
         n_task = 0
+        res = False
         for dag in dagts:
             n_task += len(dag.tasks)
         
@@ -45,16 +46,20 @@ class ExhaustiveDAGTask(Popt):
                 for task in dag:
                     task.configure_pt(idx[it]+1)
                     it += 1
-            
+                    
+            tempres = True
             for base_dag in dagts:
                 interference = self.chwa.sum_interference(dagts, base_dag)
                 tolerance = self.chwa.sum_tolerance(base_dag)
                 if interference > tolerance:
-                    continue
-                else:
-                    return True
+                    tempres = False
+                    break
+            
+            if tempres is True:
+                res = tempres
+                break
         
-        return False
+        return res
                 
     # def is_schedulable(self, dagts):
 
